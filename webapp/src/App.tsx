@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useIsAuthenticated, useMsal } from '@azure/msal-react';
-import { FluentProvider, Subtitle1, makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import { FluentProvider, makeStyles, shorthands, tokens } from '@fluentui/react-components';
 
 import * as React from 'react';
 import { useEffect } from 'react';
@@ -15,6 +15,8 @@ import { RootState } from './redux/app/store';
 import { FeatureKeys } from './redux/features/app/AppState';
 import { addAlert, setActiveUserInfo, setServiceInfo, setSpecialization } from './redux/features/app/appSlice';
 import { semanticKernelDarkTheme, semanticKernelLightTheme } from './styles';
+import Header from './components/shared/Header';
+
 /** 
  * Changes to support specialization 
 */
@@ -149,9 +151,7 @@ const App = () => {
                 <>
                     <UnauthenticatedTemplate>
                         <div className={classes.container}>
-                            <div className={classes.header}>
-                                <Subtitle1 as="h1">Chat Copilot</Subtitle1>
-                            </div>
+                            <Header appState={appState} setAppState={setAppState} showPluginsAndSettings={false} />
                             {appState === AppState.SigningOut && <Loading text="Signing you out..." />}
                             {appState !== AppState.SigningOut && <Login />}
                         </div>

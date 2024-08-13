@@ -103,9 +103,9 @@ export const UserSettingsMenu: FC<IUserSettingsProps> = ({ setLoadingState }) =>
             ) : (
                 <Button
                     data-testid="settingsButtonWithoutAuth"
-                    style={{ color: 'white' }}
+                    style={{ color: 'black' }}
                     appearance="transparent"
-                    icon={<Settings24Regular color="white" />}
+                    icon={<Settings24Regular color="black" />}
                     onClick={() => {
                         setOpenSettingsDialog(true);
                     }}
