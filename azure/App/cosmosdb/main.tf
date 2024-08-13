@@ -37,32 +37,52 @@ resource "azurerm_cosmosdb_sql_database" "main" {
   throughput          = var.throughput
 }
 
-resource "azurerm_cosmosdb_sql_container" "example" {
-  name                  = "${random_pet.prefix.id}-sql-container"
+resource "azurerm_cosmosdb_sql_container" "chat_sessions" {
+  name                  = "chatsessions"
   resource_group_name   = azurerm_resource_group.example.name
   account_name          = azurerm_cosmosdb_account.example.name
   database_name         = azurerm_cosmosdb_sql_database.main.name
-  partition_key_path    = "/definition/id"
-  partition_key_version = 1
+  partition_key_path    = "/id"
+  partition_key_version = 2
   throughput            = var.throughput
+}
 
-  indexing_policy {
-    indexing_mode = "consistent"
+resource "azurerm_cosmosdb_sql_container" "chat_messages" {
+  name                  = "chatmessages"
+  resource_group_name   = azurerm_resource_group.example.name
+  account_name          = azurerm_cosmosdb_account.example.name
+  database_name         = azurerm_cosmosdb_sql_database.main.name
+  partition_key_path    = "/chatId"
+  partition_key_version = 2
+  throughput            = var.throughput
+}
 
-    included_path {
-      path = "/*"
-    }
+resource "azurerm_cosmosdb_sql_container" "chat_memory_sources" {
+  name                  = "chatmemorysources"
+  resource_group_name   = azurerm_resource_group.example.name
+  account_name          = azurerm_cosmosdb_account.example.name
+  database_name         = azurerm_cosmosdb_sql_database.main.name
+  partition_key_path    = "/chatId"
+  partition_key_version = 2
+  throughput            = var.throughput
+}
 
-    included_path {
-      path = "/included/?"
-    }
+resource "azurerm_cosmosdb_sql_container" "chat_participants" {
+  name                  = "chatparticipants"
+  resource_group_name   = azurerm_resource_group.example.name
+  account_name          = azurerm_cosmosdb_account.example.name
+  database_name         = azurerm_cosmosdb_sql_database.main.name
+  partition_key_path    = "/userId"
+  partition_key_version = 2
+  throughput            = var.throughput
+}
 
-    excluded_path {
-      path = "/excluded/?"
-    }
-  }
-
-  unique_key {
-    paths = ["/definition/idlong", "/definition/idshort"]
-  }
+resource "azurerm_cosmosdb_sql_container" "chat_specialization_sessions" {
+  name                  = "chatspecializationsessions"
+  resource_group_name   = azurerm_resource_group.example.name
+  account_name          = azurerm_cosmosdb_account.example.name
+  database_name         = azurerm_cosmosdb_sql_database.main.name
+  partition_key_path    = "/chatId"
+  partition_key_version = 2
+  throughput            = var.throughput
 }
