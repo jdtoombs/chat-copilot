@@ -32,6 +32,11 @@ export const useClasses = makeStyles({
         ...shorthands.padding(tokens.spacingVerticalM, tokens.spacingVerticalMNudge),
         overflowWrap: 'break-word',
     },
+    hoverEffect: {
+        '&:hover': {
+            backgroundColor: tokens.colorNeutralBackground1Hover, // Hover effect
+        },
+    },
 });
 
 interface IUserSettingsProps {

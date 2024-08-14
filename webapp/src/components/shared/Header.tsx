@@ -16,6 +16,7 @@ const useStyles = makeStyles({
         width: '100%',
         padding: '0 16px',
         position: 'relative',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     },
     title: {
         flex: 1,
@@ -34,6 +35,7 @@ const useStyles = makeStyles({
         gap: tokens.spacingHorizontalS,
         color: 'black',
         textAlign: 'right',
+        paddingRight: '16px',
     },
 });
 
