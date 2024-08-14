@@ -41,9 +41,10 @@ export const useClasses = makeStyles({
 
 interface IUserSettingsProps {
     setLoadingState: () => void;
+    isDarkMode: boolean;
 }
 
-export const UserSettingsMenu: FC<IUserSettingsProps> = ({ setLoadingState }) => {
+export const UserSettingsMenu: FC<IUserSettingsProps> = ({ setLoadingState, isDarkMode }) => {
     const classes = useClasses();
     const { instance } = useMsal();
 
@@ -108,9 +109,9 @@ export const UserSettingsMenu: FC<IUserSettingsProps> = ({ setLoadingState }) =>
             ) : (
                 <Button
                     data-testid="settingsButtonWithoutAuth"
-                    style={{ color: 'black' }}
+                    style={{ color: isDarkMode ? 'white' : 'black' }}
                     appearance="transparent"
-                    icon={<Settings24Regular color="black" />}
+                    icon={<Settings24Regular color={isDarkMode ? 'white' : 'black'} />}
                     onClick={() => {
                         setOpenSettingsDialog(true);
                     }}
