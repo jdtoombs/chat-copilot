@@ -220,6 +220,7 @@ public class SpecializationController : ControllerBase
         defaultProps.Add("roleInformation", this._promptOptions.SystemDescription);
         defaultProps.Add("imageFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationImage);
         defaultProps.Add("iconFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationIcon);
+        defaultProps.Add("deployment", "gpt-4o");
         return defaultProps;
     }
 }
