@@ -43,7 +43,7 @@ public class QSearchService : IQSearchService
         {
             return null;
         }
-        var (apiKey, endpoint) = this._qAzureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(specializationId);
+        var (apiKey, endpoint) = this._qAzureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(indexName);
         if (apiKey == null || endpoint == null)
         {
             return null;

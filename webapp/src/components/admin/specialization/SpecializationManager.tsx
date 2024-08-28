@@ -49,13 +49,14 @@ export const SpecializationManager: React.FC = () => {
     const [description, setDescription] = useState('');
     const [roleInformation, setRoleInformation] = useState('');
     const [indexName, setIndexName] = useState('');
+    const [deployment, setDeployment] = useState('');
     const [imageFilePath, setImageFilePath] = useState('');
     const [iconFilePath, setIconFilePath] = useState('');
     const [membershipId, setMembershipId] = useState<string[]>([]);
 
     const dropdownId = useId();
 
-    const { specializations, specializationIndexes, selectedId } = useAppSelector((state: RootState) => state.admin);
+    const { specializations, specializationIndexes, chatCompletionDeployments ,selectedId } = useAppSelector((state: RootState) => state.admin);
 
     const onSaveSpecialization = () => {
         if (editMode) {
@@ -65,6 +66,7 @@ export const SpecializationManager: React.FC = () => {
                 description,
                 roleInformation,
                 indexName,
+                deployment,
                 imageFilePath,
                 iconFilePath,
                 groupMemberships: membershipId,
@@ -77,6 +79,7 @@ export const SpecializationManager: React.FC = () => {
                 description,
                 roleInformation,
                 indexName,
+                deployment,
                 imageFilePath,
                 iconFilePath,
                 groupMemberships: membershipId,
@@ -95,6 +98,7 @@ export const SpecializationManager: React.FC = () => {
         setImageFilePath('');
         setIconFilePath('');
         setIndexName('');
+        setDeployment('');
     };
 
     useEffect(() => {
@@ -111,6 +115,7 @@ export const SpecializationManager: React.FC = () => {
                 setImageFilePath(specializationObj.imageFilePath);
                 setIconFilePath(specializationObj.iconFilePath);
                 setIndexName(specializationObj.indexName ?? '');
+                setDeployment(specializationObj.deployment ?? '');
             }
         } else {
             setEditMode(false);
@@ -168,6 +173,20 @@ export const SpecializationManager: React.FC = () => {
                 >
                     {specializationIndexes.map((specializationIndex) => (
                         <Option key={specializationIndex}>{specializationIndex}</Option>
+                    ))}
+                </Dropdown>
+                <label htmlFor="deployment">Deployment</label>
+                <Dropdown
+                    clearable
+                    id="deployment"
+                    aria-labelledby={dropdownId}
+                    onOptionSelect={(_control, data) => {
+                        setDeployment(data.optionValue ?? '');
+                    }}
+                    value={deployment}
+                >
+                    {chatCompletionDeployments.map((deployment) => (
+                        <Option key={deployment}>{deployment}</Option>
                     ))}
                 </Dropdown>
                 <label htmlFor="description">

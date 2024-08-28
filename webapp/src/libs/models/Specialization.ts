@@ -5,6 +5,7 @@ export interface ISpecialization {
     description: string;
     roleInformation: string;
     indexName: string | undefined;
+    deployment: string | undefined;
     imageFilePath: string;
     iconFilePath: string;
     isActive: boolean;
@@ -19,6 +20,7 @@ export interface ISpecializationRequest {
     description: string;
     roleInformation: string;
     indexName: string;
+    deployment: string;
     imageFilePath: string;
     iconFilePath: string;
     groupMemberships: string[];

@@ -56,6 +56,7 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationParameters.Description,
                 qSpecializationParameters.RoleInformation,
                 qSpecializationParameters.IndexName,
+                qSpecializationParameters.Deployment,
                 qSpecializationParameters.ImageFilePath!,
                 qSpecializationParameters.IconFilePath,
                 qSpecializationParameters.GroupMemberships
@@ -101,6 +102,10 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationParameters.IndexName != null
                     ? qSpecializationParameters.IndexName
                     : specializationToUpdate!.IndexName;
+            specializationToUpdate!.Deployment =
+                qSpecializationParameters.Deployment != null
+                    ? qSpecializationParameters.Deployment
+                    : specializationToUpdate!.Deployment;
             specializationToUpdate!.ImageFilePath =
                 qSpecializationParameters.ImageFilePath != null
                     ? qSpecializationParameters.ImageFilePath

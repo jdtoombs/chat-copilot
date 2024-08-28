@@ -90,6 +90,18 @@ public class SpecializationController : ControllerBase
     }
 
     /// <summary>
+    /// Get all chat completion deployments.
+    /// </summary>
+    /// <returns>A list of chat completion deployments.</returns>
+    [HttpGet("specialization/deployments")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public List<string> GetAllChatCompletionDeployments()
+    {
+        return this._qAzureOpenAIChatExtension.GetAllChatCompletionDeployments();
+    }
+
+    /// <summary>
     /// Creates a new specialization.
     /// </summary>
     /// <param name="authInfo">Auth info for the current request.</param>

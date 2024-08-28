@@ -108,7 +108,7 @@ public class QAzureOpenAIChatExtension
     public List<string> GetAllSpecializationIndexNames()
     {
         var indexNames = new List<string>();
-    foreach (QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes)
+        foreach (QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes)
         {
             indexNames.Add(_qSpecializationIndex.IndexName);
         }
@@ -129,20 +129,32 @@ public class QAzureOpenAIChatExtension
         }
         return null;
     }
-    public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string name)
+    public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
     {
         return this._qAzureOpenAIChatOptions.AISearchDeploymentConnections
-            .FirstOrDefault(connection => connection.Name == name);
+            .FirstOrDefault(connection => connection.Name == connectionName);
     }
-    public (string? ApiKey, string? Endpoint) GetAISearchDeploymentConnectionDetails(string specializationId)
+    public (string? ApiKey, string? Endpoint) GetAISearchDeploymentConnectionDetails(string indexName)
     {
-        var specializationIndex = this.GetSpecializationIndexByName(specializationId);
+        var specializationIndex = this.GetSpecializationIndexByName(indexName);
         if (specializationIndex == null)
         {
             return (null, null);
         }
-
         var aiSearchDeploymentConnection = this.GetAISearchDeploymentConnection(specializationIndex.AISearchDeploymentConnection);
         return (aiSearchDeploymentConnection?.APIKey, aiSearchDeploymentConnection?.Endpoint.ToString());
+    }
+
+    /// <summary>
+    /// Retrieve all chat completion deployments from the available OpenAI deployment connections.
+    /// </summary>
+    public List<string> GetAllChatCompletionDeployments()
+    {
+        var chatCompletionDeployments = new List<string>();
+        foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections)
+        {
+            chatCompletionDeployments.AddRange(connection.ChatCompletionDeployments);
+        }
+        return chatCompletionDeployments;
     }
 }

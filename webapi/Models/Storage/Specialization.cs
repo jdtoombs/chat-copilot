@@ -48,6 +48,11 @@ public class Specialization : IStorageEntity
     public string? IndexName { get; set; }
 
     /// <summary>
+    /// Deployment
+    /// </summary>
+    public string? Deployment { get; set; }
+
+    /// <summary>
     /// Image URL for pictorial description of specialization.
     /// </summary>
     public string ImageFilePath { get; set; }
@@ -98,7 +103,7 @@ public class Specialization : IStorageEntity
     /// </summary>>
     public int DocumentCount { get; set; } = 20;
 
-    public Specialization(string Label, string Name, string Description, string RoleInformation, string? IndexName, string ImageFilePath, string IconFilePath, IList<string> GroupMemberships)
+    public Specialization(string Label, string Name, string Description, string RoleInformation, string? IndexName, string? Deployment, string ImageFilePath, string IconFilePath, IList<string> GroupMemberships)
     {
         this.Id = Guid.NewGuid().ToString();
         this.Label = Label;
@@ -106,6 +111,7 @@ public class Specialization : IStorageEntity
         this.Description = Description;
         this.RoleInformation = RoleInformation;
         this.IndexName = IndexName;
+        this.Deployment = Deployment;
         this.ImageFilePath = ImageFilePath;
         this.IconFilePath = IconFilePath;
         this.GroupMemberships = GroupMemberships;
