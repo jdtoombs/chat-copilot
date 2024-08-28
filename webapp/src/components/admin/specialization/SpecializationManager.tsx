@@ -186,7 +186,7 @@ export const SpecializationManager: React.FC = () => {
                     value={deployment}
                 >
                     {chatCompletionDeployments.map((deployment) => (
-                        <Option key={deployment}>{deployment}</Option>
+                        <Option key={deployment} value={deployment}>{deployment}</Option>
                     ))}
                 </Dropdown>
                 <label htmlFor="description">
