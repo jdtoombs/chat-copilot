@@ -23,6 +23,7 @@ export class SpecializationService extends BaseService {
         );
         return result;
     };
+
     public getAllChatCompletionDeploymentsAsync = async (accessToken: string): Promise<string[]> => {
         const result = await this.getResponseAsync<string[]>(
             {

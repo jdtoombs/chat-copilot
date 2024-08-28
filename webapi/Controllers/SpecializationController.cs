@@ -93,7 +93,8 @@ public class SpecializationController : ControllerBase
     /// Get all chat completion deployments.
     /// </summary>
     /// <returns>A list of chat completion deployments.</returns>
-    [HttpGet("specialization/deployments")]
+    [HttpGet]
+    [Route("specialization/deployments")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public List<string> GetAllChatCompletionDeployments()
