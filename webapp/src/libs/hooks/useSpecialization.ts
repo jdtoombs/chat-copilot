@@ -50,11 +50,9 @@ export const useSpecialization = () => {
     const loadChatCompletionDeployments = async () => {
         try {
             const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
-            await specializationService
-                .getAllChatCompletionDeploymentsAsync(accessToken)
-                .then((result: string[]) => {
-                    dispatch(setChatCompletionDeployments(result));
-                });
+            await specializationService.getAllChatCompletionDeploymentsAsync(accessToken).then((result: string[]) => {
+                dispatch(setChatCompletionDeployments(result));
+            });
         } catch (e: any) {
             const errorMessage = `Unable to load chat completion deployments. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));

@@ -114,8 +114,8 @@ export const SpecializationManager: React.FC = () => {
                 setMembershipId(specializationObj.groupMemberships);
                 setImageFilePath(specializationObj.imageFilePath);
                 setIconFilePath(specializationObj.iconFilePath);
-                setIndexName(specializationObj.indexName ?? '');
-                setDeployment(specializationObj.deployment ?? '');
+                setIndexName(specializationObj.indexName);
+                setDeployment(specializationObj.deployment);
             }
         } else {
             setEditMode(false);

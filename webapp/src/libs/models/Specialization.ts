@@ -4,8 +4,8 @@ export interface ISpecialization {
     name: string;
     description: string;
     roleInformation: string;
-    indexName: string | undefined;
-    deployment: string | undefined;
+    indexName: string;
+    deployment: string;
     imageFilePath: string;
     iconFilePath: string;
     isActive: boolean;
