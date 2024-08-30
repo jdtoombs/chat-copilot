@@ -153,7 +153,10 @@ public class QAzureOpenAIChatExtension
         var chatCompletionDeployments = new List<string>();
         foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections)
         {
-            chatCompletionDeployments.AddRange(connection.ChatCompletionDeployments);
+            foreach (var deployment in connection.ChatCompletionDeployments)
+            {
+                chatCompletionDeployments.Add($"{deployment} ({connection.Name})");
+            }
         }
         return chatCompletionDeployments;
     }
