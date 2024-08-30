@@ -89,7 +89,7 @@ public class QSpecializationResponse
         this.ImageFilePath = specializationSource.ImageFilePath;
         this.IconFilePath = specializationSource.IconFilePath;
         this.isActive = specializationSource.IsActive;
-
+        this.GroupMemberships = specializationSource.GroupMemberships;
         if (specializationSource.IndexName != null)
         {
             this.IndexName = specializationSource.IndexName;
