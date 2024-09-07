@@ -93,7 +93,7 @@ public class QAzureOpenAIChatExtension
                         DocumentCount = specialization.DocumentCount,
                         Authentication = new OnYourDataApiKeyAuthenticationOptions (aiSearchDeploymentConnection.APIKey),
                         VectorizationSource = new OnYourDataEndpointVectorizationSource (
-                           openAIDeploymentConnection.Endpoint,
+                           openAIDeploymentConnection.EmbeddingEndpoint,
                            new OnYourDataApiKeyAuthenticationOptions (openAIDeploymentConnection.APIKey))
                     }
                 }
