@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -17,9 +19,9 @@ public sealed class SemanticKernelProvider
 {
     private readonly Kernel _kernel;
 
-    public SemanticKernelProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+    public SemanticKernelProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHttpClientFactory httpClientFactory, QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
     {
-        this._kernel = InitializeCompletionKernel(serviceProvider, configuration, httpClientFactory);
+        this._kernel = InitializeCompletionKernels(serviceProvider, configuration, httpClientFactory, qAzureOpenAIChatOptions);
     }
 
     /// <summary>
@@ -27,10 +29,11 @@ public sealed class SemanticKernelProvider
     /// </summary>
     public Kernel GetCompletionKernel() => this._kernel.Clone();
 
-    private static Kernel InitializeCompletionKernel(
+    private static Kernel InitializeCompletionKernels(
         IServiceProvider serviceProvider,
         IConfiguration configuration,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
     {
         var builder = Kernel.CreateBuilder();
 
@@ -42,13 +45,18 @@ public sealed class SemanticKernelProvider
         {
             case string x when x.Equals("AzureOpenAI", StringComparison.OrdinalIgnoreCase):
             case string y when y.Equals("AzureOpenAIText", StringComparison.OrdinalIgnoreCase):
-                var azureAIOptions = memoryOptions.GetServiceConfig<AzureOpenAIConfig>(configuration, "AzureOpenAIText");
+                var defaultModel = qAzureOpenAIChatOptions.DefaultModel;
+                foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections){
+                    foreach (var deployment in connection.ChatCompletionDeployments){
 #pragma warning disable CA2000 // No need to dispose of HttpClient instances from IHttpClientFactory
-                builder.AddAzureOpenAIChatCompletion(
-                    azureAIOptions.Deployment,
-                    azureAIOptions.Endpoint,
-                    azureAIOptions.APIKey,
-                    httpClient: httpClientFactory.CreateClient());
+                        builder.AddAzureOpenAIChatCompletion(
+                            deployment,
+                            connection.Endpoint?.ToString(),
+                            connection.APIKey,
+                            httpClient: httpClientFactory.CreateClient(),
+                            serviceId: deployment == defaultModel ? "default" : deployment);
+                    }
+                }
                 break;
 
             case string x when x.Equals("OpenAI", StringComparison.OrdinalIgnoreCase):

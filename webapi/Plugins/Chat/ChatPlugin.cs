@@ -27,6 +27,7 @@ using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CopilotChat.WebApi.Plugins.Chat;
 
@@ -68,6 +69,8 @@ public class ChatPlugin
     /// </summary>
     private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
 
+    private readonly QSpecializationService _qSpecializationService;
+
     /// <summary>
     /// Settings containing prompt texts.
     /// </summary>
@@ -99,6 +102,7 @@ public class ChatPlugin
         IKernelMemory memoryClient,
         ChatMessageRepository chatMessageRepository,
         ChatSessionRepository chatSessionRepository,
+        QSpecializationService qSpecializationService,
         SpecializationRepository specializationSourceRepository,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
@@ -116,7 +120,7 @@ public class ChatPlugin
         this._messageRelayHubContext = messageRelayHubContext;
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
-
+        this._qSpecializationService = new QSpecializationService(specializationSourceRepository);
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(promptOptions, chatSessionRepository, memoryClient, logger);
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(qAzureOpenAIChatOptions.Value, specializationSourceRepository);
         this._contentSafety = contentSafety;
@@ -692,8 +696,15 @@ public class ChatPlugin
         string combinedPrompt = $"{prompt.MetaPromptTemplate}\n\nContext: {serializedContext}";
         var chatHistory = new ChatHistory();
         chatHistory.AddUserMessage(combinedPrompt);
-
-        var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
+        var provider = this._kernel.GetRequiredService<IServiceProvider>();
+        var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
+        var specialization = specializationkey == "general"
+            ? null
+            : await this._qSpecializationService.GetSpecializationAsync(specializationkey);
+        var serviceId = (specialization == null || specialization.Deployment == defaultModel)
+            ? "default"
+            : specialization.Deployment;
+        var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
         var stream =
             chatCompletion.GetStreamingChatMessageContentsAsync(
                 chatHistory,

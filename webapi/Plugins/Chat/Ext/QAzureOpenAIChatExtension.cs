@@ -155,9 +155,17 @@ public class QAzureOpenAIChatExtension
         {
             foreach (var deployment in connection.ChatCompletionDeployments)
             {
-                chatCompletionDeployments.Add($"{deployment} ({connection.Name})");
+                chatCompletionDeployments.Add($"{deployment}");
             }
         }
         return chatCompletionDeployments;
+    }
+
+    /// <summary>
+    /// Get the default chat completion deployment.
+    /// </summary>
+    public string GetDefaultChatCompletionDeployment()
+    {
+        return this._qAzureOpenAIChatOptions.DefaultModel;
     }
 }
