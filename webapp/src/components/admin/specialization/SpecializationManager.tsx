@@ -56,7 +56,9 @@ export const SpecializationManager: React.FC = () => {
 
     const dropdownId = useId();
 
-    const { specializations, specializationIndexes, chatCompletionDeployments ,selectedId } = useAppSelector((state: RootState) => state.admin);
+    const { specializations, specializationIndexes, chatCompletionDeployments, selectedId } = useAppSelector(
+        (state: RootState) => state.admin,
+    );
 
     const onSaveSpecialization = () => {
         if (editMode) {
@@ -186,7 +188,9 @@ export const SpecializationManager: React.FC = () => {
                     value={deployment}
                 >
                     {chatCompletionDeployments.map((deployment) => (
-                        <Option key={deployment} value={deployment}>{deployment}</Option>
+                        <Option key={deployment} value={deployment}>
+                            {deployment}
+                        </Option>
                     ))}
                 </Dropdown>
                 <label htmlFor="description">

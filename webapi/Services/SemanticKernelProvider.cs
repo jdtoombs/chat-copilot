@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -46,8 +45,10 @@ public sealed class SemanticKernelProvider
             case string x when x.Equals("AzureOpenAI", StringComparison.OrdinalIgnoreCase):
             case string y when y.Equals("AzureOpenAIText", StringComparison.OrdinalIgnoreCase):
                 var defaultModel = qAzureOpenAIChatOptions.DefaultModel;
-                foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections){
-                    foreach (var deployment in connection.ChatCompletionDeployments){
+                foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections)
+                {
+                    foreach (var deployment in connection.ChatCompletionDeployments)
+                    {
 #pragma warning disable CA2000 // No need to dispose of HttpClient instances from IHttpClientFactory
                         builder.AddAzureOpenAIChatCompletion(
                             deployment,
