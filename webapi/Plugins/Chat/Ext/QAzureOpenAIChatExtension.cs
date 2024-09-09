@@ -163,6 +163,7 @@ public class QAzureOpenAIChatExtension
     /// <summary>
     /// Get the default chat completion deployment.
     /// </summary>
+#pragma warning disable CA1024
     public string GetDefaultChatCompletionDeployment()
     {
         return this._qAzureOpenAIChatOptions.DefaultModel;

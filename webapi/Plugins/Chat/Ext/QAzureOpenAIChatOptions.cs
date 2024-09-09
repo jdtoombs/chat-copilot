@@ -59,6 +59,7 @@ public class QAzureOpenAIChatOptions
 
     public class FieldMappingOption
     {
+#pragma warning disable CA1056
         public string UrlFieldName { get; set; } = "url";
         public string TitleFieldName { get; set; } = "title";
         public string FilepathFieldName { get; set; } = "filepath";
