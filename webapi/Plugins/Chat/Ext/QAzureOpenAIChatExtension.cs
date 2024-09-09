@@ -65,7 +65,7 @@ public class QAzureOpenAIChatExtension
             var aiSearchDeploymentConnection = this._qAzureOpenAIChatOptions.AISearchDeploymentConnections
                 .FirstOrDefault(c => c.Name == qSpecializationIndex.AISearchDeploymentConnection);
             var openAIDeploymentConnection = this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections
-                .FirstOrDefault(c => c.Name == qSpecializationIndex.OpenAIDeploymentConnection);
+                .FirstOrDefault(c => c.ChatCompletionDeployments.Contains(specialization.Deployment));
             if (aiSearchDeploymentConnection == null || openAIDeploymentConnection == null)
             {
                 return null;
