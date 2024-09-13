@@ -20,7 +20,7 @@ public sealed class SemanticKernelProvider
 
     public SemanticKernelProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHttpClientFactory httpClientFactory, QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
     {
-        this._kernel = InitializeCompletionKernels(serviceProvider, configuration, httpClientFactory, qAzureOpenAIChatOptions);
+        this._kernel = InitializeCompletionKernel(serviceProvider, configuration, httpClientFactory, qAzureOpenAIChatOptions);
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public sealed class SemanticKernelProvider
     /// </summary>
     public Kernel GetCompletionKernel() => this._kernel.Clone();
 
-    private static Kernel InitializeCompletionKernels(
+    private static Kernel InitializeCompletionKernel(
         IServiceProvider serviceProvider,
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
