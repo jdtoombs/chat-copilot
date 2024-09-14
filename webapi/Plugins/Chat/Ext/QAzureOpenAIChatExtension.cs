@@ -7,6 +7,8 @@ using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 namespace CopilotChat.WebApi.Plugins.Chat.Ext;
+
+using System;
 using System.Linq;
 
 /// <summary>
@@ -66,6 +68,7 @@ public class QAzureOpenAIChatExtension
                 .FirstOrDefault(c => c.Name == qSpecializationIndex.AISearchDeploymentConnection);
             var openAIDeploymentConnection = this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections
                 .FirstOrDefault(c => c.Name == qSpecializationIndex.OpenAIDeploymentConnection);
+            var EmbeddingEndpoint = this.GenerateEmbeddingEndpoint(openAIDeploymentConnection.Endpoint, qSpecializationIndex);
             if (aiSearchDeploymentConnection == null || openAIDeploymentConnection == null)
             {
                 return null;
@@ -92,7 +95,7 @@ public class QAzureOpenAIChatExtension
                         DocumentCount = specialization.DocumentCount,
                         Authentication = new OnYourDataApiKeyAuthenticationOptions (aiSearchDeploymentConnection.APIKey),
                         VectorizationSource = new OnYourDataEndpointVectorizationSource (
-                           openAIDeploymentConnection.EmbeddingEndpoint,
+                           EmbeddingEndpoint,
                            new OnYourDataApiKeyAuthenticationOptions (openAIDeploymentConnection.APIKey))
                     }
                 }
@@ -127,6 +130,11 @@ public class QAzureOpenAIChatExtension
             }
         }
         return null;
+    }
+
+    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, QAzureOpenAIChatOptions.QSpecializationIndex qSpecializationIndex){
+
+        return new Uri(connectionEndpoint, $"/openai/deployments/{qSpecializationIndex.EmbeddingDeployment}/embeddings?api-version=2023-05-15");
     }
     public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
     {
