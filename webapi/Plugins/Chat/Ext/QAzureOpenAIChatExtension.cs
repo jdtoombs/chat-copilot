@@ -71,7 +71,7 @@ public class QAzureOpenAIChatExtension
             var EmbeddingEndpoint = this.GenerateEmbeddingEndpoint(openAIDeploymentConnection.Endpoint, qSpecializationIndex);
             if (aiSearchDeploymentConnection == null || openAIDeploymentConnection == null)
             {
-                return null;
+                throw new InvalidOperationException("Configuration error: AI Search Deployment Connection or OpenAI Deployment Connection is missing.");
             }
             return new AzureChatExtensionsOptions()
             {
