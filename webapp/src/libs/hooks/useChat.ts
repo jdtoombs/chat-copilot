@@ -47,7 +47,9 @@ export const useChat = () => {
     const dispatch = useAppDispatch();
     const { specializations: specializationsState } = useAppSelector((state: RootState) => state.admin);
     const { instance, inProgress } = useMsal();
-    const { conversations, selectedId: currentConversationId } = useAppSelector((state: RootState) => state.conversations);
+    const { conversations, selectedId: currentConversationId } = useAppSelector(
+        (state: RootState) => state.conversations,
+    );
     const { activeUserInfo, features } = useAppSelector((state: RootState) => state.app);
     const { plugins } = useAppSelector((state: RootState) => state.plugins);
 
@@ -133,7 +135,9 @@ export const useChat = () => {
                 },
                 {
                     key: 'specialization',
-                    value: conversations[chatId].specializationId ? conversations[chatId].specializationId : defaultSpecializationId,
+                    value: conversations[chatId].specializationId
+                        ? conversations[chatId].specializationId
+                        : defaultSpecializationId,
                 },
             ],
         };
@@ -148,9 +152,11 @@ export const useChat = () => {
                 await chatService.editChatSepcializationAsync(
                     conversation.id,
                     defaultSpecializationId,
-                    await AuthHelper.getSKaaSAccessToken(instance, inProgress)
+                    await AuthHelper.getSKaaSAccessToken(instance, inProgress),
                 );
-                dispatch(editConversationSpecialization({ id: conversation.id, specializationId: defaultSpecializationId }));
+                dispatch(
+                    editConversationSpecialization({ id: conversation.id, specializationId: defaultSpecializationId }),
+                );
             }
             const askResult = await chatService
                 .getBotResponseAsync(
