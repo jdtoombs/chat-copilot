@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import {
-    Label,
     makeStyles,
     Persona,
     SelectTabEventHandler,
@@ -10,10 +9,13 @@ import {
     TabList,
     TabValue,
     tokens,
+    Dropdown,
+    Option
 } from '@fluentui/react-components';
 import { Map16Regular } from '@fluentui/react-icons';
-import React from 'react';
-import { useAppSelector } from '../../redux/app/hooks';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector} from '../../redux/app/hooks';
+import { useChat } from '../../libs/hooks';
 import { RootState } from '../../redux/app/store';
 import { FeatureKeys } from '../../redux/features/app/AppState';
 import { Alerts } from '../shared/Alerts';
@@ -23,6 +25,8 @@ import { ShareBotMenu } from './controls/ShareBotMenu';
 import { DocumentsTab } from './tabs/DocumentsTab';
 import { PersonaTab } from './tabs/PersonaTab';
 import { PlansTab } from './tabs/PlansTab';
+import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
+import {editConversationSpecialization} from '../../redux/features/conversations/conversationsSlice';
 
 // Enum for chat window tabs
 enum ChatWindowTabEnum {
@@ -65,6 +69,34 @@ const useClasses = makeStyles({
         flexDirection: 'column',
         ...shorthands.margin(0, '72px'),
     },
+    dropdown: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: 0,
+        ':hover': {
+            backgroundColor: 'transparent',
+        },
+        ':focus': {
+            backgroundColor: 'transparent',
+            border: 'none',
+            boxShadow: 'none',
+        },
+        ':active': {
+            backgroundColor: 'transparent',
+            border: 'none',
+            boxShadow: 'none',
+        },
+        '.ms-Dropdown-title': {
+            backgroundColor: 'transparent',
+            border: 'none',
+            padding: 0,
+            color: tokens.colorNeutralForeground1,
+        },
+        '.ms-Dropdown-caretDownWrapper': {
+            color: tokens.colorNeutralForeground1,
+        }
+    },
 });
 
 export const ChatWindow: React.FC = () => {
@@ -72,14 +104,31 @@ export const ChatWindow: React.FC = () => {
     const { features } = useAppSelector((state: RootState) => state.app);
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
     const [selectedTab, setSelectedTab] = React.useState<TabValue>(ChatWindowTabEnum.CHAT);
-
     const showShareBotMenu = features[FeatureKeys.BotAsDocs].enabled || features[FeatureKeys.MultiUserChat].enabled;
     const chatName = conversations[selectedId].title;
-    const { chatSpecialization } = useAppSelector((state: RootState) => state.admin);
-
+    const chat = useChat();
+    const dispatch = useAppDispatch();
+    const { chatSpecialization, specializations } = useAppSelector((state: RootState) => state.admin);
     const onTabSelect: SelectTabEventHandler = (_event, data) => {
         setSelectedTab(data.value);
     };
+    const onNewChatClick = () => {
+        const currentSpecializationId = conversations[selectedId].specializationId;
+        void chat.createChat(chatSpecialization?.name);
+        if (currentSpecializationId) {
+            void chat.editChatSpecialization(selectedId, currentSpecializationId).finally(() => {
+                const specializationMatch = specializations.find((spec) => spec.id === currentSpecializationId);
+                if (specializationMatch) {
+                    dispatch(setChatSpecialization(specializationMatch));
+                }
+                if (currentSpecializationId) {
+                    dispatch(editConversationSpecialization({ id: selectedId, specializationId: currentSpecializationId }));
+                }
+            });
+        }
+    };
+    useEffect(() => { 
+    }, [selectedId, conversations]);
 
     return (
         <div className={classes.root}>
@@ -97,9 +146,11 @@ export const ChatWindow: React.FC = () => {
                         }}
                         presence={{ status: 'available' }}
                     />
-                    <Label size="large" weight="semibold">
-                        {chatSpecialization?.name}
-                    </Label>
+                    <Dropdown placeholder={chatSpecialization?.name} className={classes.dropdown}>
+                        <Option onClick={onNewChatClick} key="newChat" value="newChat">
+                            New Chat
+                        </Option>
+                    </Dropdown>
                     <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
                         <Tab
                             data-testid="chatTab"
