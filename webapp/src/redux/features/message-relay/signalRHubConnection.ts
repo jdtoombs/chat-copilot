@@ -29,6 +29,7 @@ const enum SignalRCallbackMethods {
     GlobalDocumentUploaded = 'GlobalDocumentUploaded',
     ChatEdited = 'ChatEdited',
     ChatDeleted = 'ChatDeleted',
+    ChatHistoryDeleted = 'ChatHistoryDeleted',
     GlobalSiteMaintenance = 'GlobalSiteMaintenance',
     PluginStateChanged = 'PluginStateChanged',
 }
@@ -233,6 +234,17 @@ const registerSignalREvents = (hubConnection: signalR.HubConnection, store: Stor
                 });
         }
     });
+
+    hubConnection.on(
+        SignalRCallbackMethods.ChatHistoryDeleted,
+        (chatId: string, userId: string, message: IChatMessage) => {
+            console.log('chat history deleted callback: ' + chatId + ' : ' + userId);
+            store.dispatch({
+                type: 'conversations/addMessageToConversationFromServer',
+                payload: { chatId, message },
+            });
+        },
+    );
 
     hubConnection.on(SignalRCallbackMethods.GlobalSiteMaintenance, () => {
         store.dispatch(setMaintenance(true));

@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 using Microsoft.KernelMemory;
 
 namespace CopilotChat.WebApi.Controllers;
@@ -37,6 +38,7 @@ public class ChatHistoryController : ControllerBase
 {
     private const string ChatEditedClientCall = "ChatEdited";
     private const string ChatDeletedClientCall = "ChatDeleted";
+    private const string ChatHistoryDeletedClientCall = "ChatHistoryDeleted";
     private const string GetChatRoute = "GetChatRoute";
 
     private readonly ILogger<ChatHistoryController> _logger;
@@ -396,6 +398,71 @@ public class ChatHistoryController : ControllerBase
                 this._authInfo.UserId,
                 cancellationToken: cancellationToken
             );
+
+        return this.NoContent();
+    }
+
+
+    /// <summary>
+    /// Delete the chat history of a chat session.
+    /// </summary>
+    [Route("chats/{chatId:guid}/history")]
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
+    public async Task<IActionResult> DeleteChatSessionHistoryAsync(
+        [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
+        Guid chatId,
+        CancellationToken cancellationToken)
+    {
+        var chatIdString = chatId.ToString();
+        ChatSession? chat = null;
+        try
+        {
+            // Make sure the chat session exists
+            chat = await this._sessionRepository.FindByIdAsync(chatIdString);
+        }
+        catch (KeyNotFoundException)
+        {
+            return this.NotFound($"No chat session found for chat id '{chatId}'.");
+        }
+
+        // Delete chat messages in chat session.
+        try
+        {
+            var messages = await this._messageRepository.FindByChatIdAsync(chatIdString);
+            foreach (var message in messages)
+            {
+                await this._messageRepository.DeleteAsync(message);
+            }
+
+            // Create deleted chat history bot message
+            var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
+                chat.Id,
+                this._promptOptions.ChatHistoryDeletedMessage,
+                string.Empty,
+                null,
+                TokenUtils.EmptyTokenUsages()
+            );
+            await this._messageRepository.CreateAsync(chatMessage);
+
+            await messageRelayHubContext
+                .Clients.Group(chatIdString)
+                .SendAsync(
+                    ChatHistoryDeletedClientCall,
+                    chatIdString,
+                    this._authInfo.UserId,
+                    chatMessage,
+                    cancellationToken: cancellationToken
+                );
+        }
+        catch (AggregateException)
+        {
+            return this.StatusCode(500, $"Failed to delete chat history for chat id '{chatId}'.");
+        }
 
         return this.NoContent();
     }

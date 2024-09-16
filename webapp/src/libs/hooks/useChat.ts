@@ -470,6 +470,27 @@ export const useChat = () => {
                 );
             });
     };
+    ``;
+
+    const deleteChatHistory = async (chatId: string) => {
+        const friendlyChatName = getFriendlyChatName(conversations[chatId]);
+        const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+        await chatService
+            .deleteChatHistoryAsync(chatId, accessToken)
+            .then(async () => {})
+            .catch((e: any) => {
+                const errorDetails = (e as Error).message.includes('Failed to delete resources for chat id')
+                    ? "Some or all resources associated with this chat couldn't be deleted. Please try again."
+                    : `Details: ${(e as Error).message}`;
+                dispatch(
+                    addAlert({
+                        message: `Unable to delete chat history {${friendlyChatName}}. ${errorDetails}`,
+                        type: AlertType.Error,
+                        onRetry: () => void deleteChatHistory(chatId),
+                    }),
+                );
+            });
+    };
 
     const processPlan = async (chatId: string, planState: PlanState, serializedPlan: string, planGoal?: string) => {
         const kernelArguments: ContextVariable[] = [
@@ -514,6 +535,7 @@ export const useChat = () => {
         editChatSpecialization,
         getServiceInfo,
         deleteChat,
+        deleteChatHistory,
         processPlan,
     };
 };

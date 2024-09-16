@@ -135,6 +135,18 @@ export class ChatService extends BaseService {
         return result;
     };
 
+    public deleteChatHistoryAsync = async (chatId: string, accessToken: string): Promise<object> => {
+        const result = await this.getResponseAsync<object>(
+            {
+                commandPath: `chats/${chatId}/history`,
+                method: 'DELETE',
+            },
+            accessToken,
+        );
+
+        return result;
+    };
+
     public rateMessageAync = async (
         chatId: string,
         messageId: string,

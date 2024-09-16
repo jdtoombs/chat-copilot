@@ -108,6 +108,11 @@ export const ChatRoom: React.FC = () => {
         setShouldAutoScroll(true);
     };
 
+    const handleDeleteChatHistory = async () => {
+        await chat.deleteChatHistory(selectedId);
+        setShouldAutoScroll(true);
+    };
+
     if (conversations[selectedId].hidden) {
         return (
             <div className={classes.root}>
@@ -142,7 +147,12 @@ export const ChatRoom: React.FC = () => {
             )}
 
             <div className={classes.input}>
-                <ChatInput isDraggingOver={isDraggingOver} onDragLeave={onDragLeave} onSubmit={handleSubmit} />
+                <ChatInput
+                    isDraggingOver={isDraggingOver}
+                    onDragLeave={onDragLeave}
+                    onSubmit={handleSubmit}
+                    onDeleteChatHistory={handleDeleteChatHistory}
+                />
             </div>
         </div>
     );

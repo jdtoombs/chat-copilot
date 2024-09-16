@@ -2,7 +2,7 @@
 
 import { useMsal } from '@azure/msal-react';
 import { Button, Spinner, Textarea, makeStyles, mergeClasses, shorthands, tokens } from '@fluentui/react-components';
-import { AttachRegular, MicRegular, SendRegular } from '@fluentui/react-icons';
+import { ArrowUndoFilled, AttachRegular, MicRegular, SendRegular } from '@fluentui/react-icons';
 import debug from 'debug';
 import * as speechSdk from 'microsoft-cognitiveservices-speech-sdk';
 import React, { useRef, useState } from 'react';
@@ -76,9 +76,10 @@ interface ChatInputProps {
     isDraggingOver?: boolean;
     onDragLeave: React.DragEventHandler<HTMLDivElement | HTMLTextAreaElement>;
     onSubmit: (options: GetResponseOptions) => Promise<void>;
+    onDeleteChatHistory: () => Promise<void>;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeave, onSubmit }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeave, onSubmit, onDeleteChatHistory }) => {
     const classes = useClasses();
     const { instance, inProgress } = useMsal();
     const dispatch = useAppDispatch();
@@ -136,6 +137,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
                 setIsListening(false);
             });
         }
+    };
+
+    const handleDeleteChatHistory = () => {
+        onDeleteChatHistory().catch((error) => {
+            const message = `Error deleting chat history: ${(error as Error).message}`;
+            log(message);
+            dispatch(
+                addAlert({
+                    type: AlertType.Error,
+                    message,
+                }),
+            );
+        });
     };
 
     const handleSubmit = (value: string, messageType: ChatMessageType = ChatMessageType.Message) => {
@@ -264,6 +278,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
                         aria-label="Attach file button"
                     />
                     {importingDocuments && importingDocuments.length > 0 && <Spinner size="tiny" />}
+                </div>
+                <div>
+                    <Button onClick={handleDeleteChatHistory} icon={<ArrowUndoFilled />} />
                 </div>
                 <div className={classes.essentials}>
                     {recognizer && (
