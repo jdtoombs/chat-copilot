@@ -13,7 +13,7 @@ import {
     Option
 } from '@fluentui/react-components';
 import { Map16Regular } from '@fluentui/react-icons';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector} from '../../redux/app/hooks';
 import { useChat } from '../../libs/hooks';
 import { RootState } from '../../redux/app/store';
@@ -74,6 +74,7 @@ const useClasses = makeStyles({
         border: 'none',
         boxShadow: 'none',
         padding: 0,
+        width: '50px !important',
         ':hover': {
             backgroundColor: 'transparent',
         },
@@ -95,7 +96,7 @@ const useClasses = makeStyles({
         },
         '.ms-Dropdown-caretDownWrapper': {
             color: tokens.colorNeutralForeground1,
-        }
+        },
     },
 });
 
@@ -113,22 +114,17 @@ export const ChatWindow: React.FC = () => {
         setSelectedTab(data.value);
     };
     const onNewChatClick = () => {
-        const currentSpecializationId = conversations[selectedId].specializationId;
-        void chat.createChat(chatSpecialization?.name);
-        if (currentSpecializationId) {
-            void chat.editChatSpecialization(selectedId, currentSpecializationId).finally(() => {
-                const specializationMatch = specializations.find((spec) => spec.id === currentSpecializationId);
+        void chat.createChat(chatSpecialization?.id);
+        if (chatSpecialization) {
+            void chat.editChatSpecialization(selectedId, chatSpecialization.id).finally(() => {
+                const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
                 if (specializationMatch) {
                     dispatch(setChatSpecialization(specializationMatch));
                 }
-                if (currentSpecializationId) {
-                    dispatch(editConversationSpecialization({ id: selectedId, specializationId: currentSpecializationId }));
-                }
+                dispatch(editConversationSpecialization({ id: selectedId, specializationId: chatSpecialization.id }));
             });
         }
     };
-    useEffect(() => { 
-    }, [selectedId, conversations]);
 
     return (
         <div className={classes.root}>
@@ -146,7 +142,10 @@ export const ChatWindow: React.FC = () => {
                         }}
                         presence={{ status: 'available' }}
                     />
-                    <Dropdown placeholder={chatSpecialization?.name} className={classes.dropdown}>
+                    <Dropdown
+                        placeholder={chatSpecialization?.name}
+                        className={classes.dropdown}
+                    >
                         <Option onClick={onNewChatClick} key="newChat" value="newChat">
                             New Chat
                         </Option>
