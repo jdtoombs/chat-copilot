@@ -110,7 +110,8 @@ public class ChatPlugin
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         ILogger logger,
         AzureContentSafety? contentSafety = null,
-        bool isUserIntentExtractionEnabled = false) // Parameter for feature flag
+        bool isUserIntentExtractionEnabled = false
+    ) // Parameter for feature flag
     {
         this._logger = logger;
         this._kernel = kernel;
@@ -137,7 +138,8 @@ public class ChatPlugin
     public Task<string> ExtractChatHistory(
         [Description("Chat ID to extract history from")] string chatId,
         [Description("Maximum number of tokens")] int tokenLimit,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return this.GetAllowedChatHistoryAsync(chatId, tokenLimit, cancellationToken: cancellationToken);
     }
@@ -154,7 +156,8 @@ public class ChatPlugin
         string chatId,
         int tokenLimit,
         ChatHistory? chatHistory = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var sortedMessages = await this._chatMessageRepository.FindByChatIdAsync(chatId, 0, 100);
 
@@ -171,8 +174,11 @@ public class ChatPlugin
                 continue;
             }
 
-            var promptRole = chatMessage.AuthorRole == CopilotChatMessage.AuthorRoles.Bot ? AuthorRole.System : AuthorRole.User;
-            int tokenCount = chatHistory is not null ? TokenUtils.GetContextMessageTokenCount(promptRole, formattedMessage) : TokenUtils.TokenCount(formattedMessage);
+            var promptRole =
+                chatMessage.AuthorRole == CopilotChatMessage.AuthorRoles.Bot ? AuthorRole.System : AuthorRole.User;
+            int tokenCount = chatHistory is not null
+                ? TokenUtils.GetContextMessageTokenCount(promptRole, formattedMessage)
+                : TokenUtils.TokenCount(formattedMessage);
 
             if (remainingToken - tokenCount >= 0)
             {
@@ -214,7 +220,8 @@ public class ChatPlugin
         [Description("Unique and persistent identifier for the chat")] string chatId,
         [Description("Type of the message")] string messageType,
         KernelArguments context,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Set the system description in the prompt options
         await this.SetSystemDescriptionAsync(chatId, cancellationToken);
@@ -223,7 +230,14 @@ public class ChatPlugin
         await this.UpdateBotResponseStatusOnClientAsync(chatId, "Generating bot response", cancellationToken);
 
         this._logger.LogInformation("Saving user message to chat history");
-        var newUserMessage = await this.SaveNewMessageAsync(message, userId, userName, chatId, messageType, cancellationToken);
+        var newUserMessage = await this.SaveNewMessageAsync(
+            message,
+            userId,
+            userName,
+            chatId,
+            messageType,
+            cancellationToken
+        );
 
         // Clone the context to avoid modifying the original context variables.
         KernelArguments chatContext = new(context);
@@ -231,7 +245,13 @@ public class ChatPlugin
 
         this._logger.LogInformation("Getting chat response");
         // Directly get the chat response without extracting user intent
-        CopilotChatMessage chatMessage = await this.GetChatResponseAsync(chatId, userId, chatContext, newUserMessage, cancellationToken);
+        CopilotChatMessage chatMessage = await this.GetChatResponseAsync(
+            chatId,
+            userId,
+            chatContext,
+            newUserMessage,
+            cancellationToken
+        );
         context["input"] = chatMessage.Content;
 
         if (chatMessage.TokenUsage != null)
@@ -240,7 +260,9 @@ public class ChatPlugin
         }
         else
         {
-            this._logger.LogWarning("ChatPlugin.ChatAsync token usage unknown. Ensure token management has been implemented correctly.");
+            this._logger.LogWarning(
+                "ChatPlugin.ChatAsync token usage unknown. Ensure token management has been implemented correctly."
+            );
         }
 
         return context;
@@ -260,23 +282,30 @@ public class ChatPlugin
         string userId,
         KernelArguments chatContext,
         CopilotChatMessage userMessage,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // Start rendering system instructions
         var systemInstructionsTask = AsyncUtils.SafeInvokeAsync(
-            () => this.RenderSystemInstructions(chatId, chatContext, cancellationToken), nameof(RenderSystemInstructions));
+            () => this.RenderSystemInstructions(chatId, chatContext, cancellationToken),
+            nameof(RenderSystemInstructions)
+        );
 
         // Start extracting audience if the user is not a default user
         Task<string> audienceTask = Task.FromResult(string.Empty);
 
         audienceTask = AsyncUtils.SafeInvokeAsync(
-        () => this.GetAudienceAsync(chatContext, cancellationToken), nameof(GetAudienceAsync));
+            () => this.GetAudienceAsync(chatContext, cancellationToken),
+            nameof(GetAudienceAsync)
+        );
         // Conditionally start extracting user intent based on feature flag
         Task<string> userIntentTask = Task.FromResult(string.Empty);
         if (this._isUserIntentExtractionEnabled)
         {
             userIntentTask = AsyncUtils.SafeInvokeAsync(
-                () => this.GetUserIntentAsync(chatContext, cancellationToken), nameof(GetUserIntentAsync));
+                () => this.GetUserIntentAsync(chatContext, cancellationToken),
+                nameof(GetUserIntentAsync)
+            );
         }
 
         // Wait for system instructions to complete
@@ -299,16 +328,26 @@ public class ChatPlugin
         // Calculate max amount of tokens to use for memories
         int maxRequestTokenBudget = this.GetMaxRequestTokenBudget();
         int tokensUsed = TokenUtils.GetContextMessagesTokenCount(metaPrompt);
-        int chatMemoryTokenBudget = maxRequestTokenBudget
+        int chatMemoryTokenBudget =
+            maxRequestTokenBudget
             - tokensUsed
             - TokenUtils.GetContextMessageTokenCount(AuthorRole.User, userMessage.ToFormattedString());
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
         // Start querying relevant semantic and document memories
-        var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(this._promptOptions.DocumentMemoryName, chatId, chatMemoryTokenBudget);
+        var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(
+            this._promptOptions.DocumentMemoryName,
+            chatId,
+            chatMemoryTokenBudget
+        );
 
         // Start extracting chat history
-        var chatHistoryTask = this.GetAllowedChatHistoryAsync(chatId, maxRequestTokenBudget - tokensUsed, metaPrompt, cancellationToken);
+        var chatHistoryTask = this.GetAllowedChatHistoryAsync(
+            chatId,
+            maxRequestTokenBudget - tokensUsed,
+            metaPrompt,
+            cancellationToken
+        );
 
         // Wait for memory query and chat history tasks to complete
         var (memoryText, citationMap) = await memoryQueryTask;
@@ -320,7 +359,9 @@ public class ChatPlugin
         chatContext["knowledgeBase"] = memoryText;
         var allowedChatHistory = await chatHistoryTask;
         // Store token usage of prompt template
-        chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils.GetContextMessagesTokenCount(metaPrompt).ToString(CultureInfo.CurrentCulture);
+        chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils
+            .GetContextMessagesTokenCount(metaPrompt)
+            .ToString(CultureInfo.CurrentCulture);
 
         // Stream the response to the client
         var promptView = new BotResponsePrompt(
@@ -332,7 +373,14 @@ public class ChatPlugin
             metaPrompt
         );
 
-        return await this.HandleBotResponseAsync(chatId, userId, chatContext, promptView, citationMap.Values.AsEnumerable(), cancellationToken);
+        return await this.HandleBotResponseAsync(
+            chatId,
+            userId,
+            chatContext,
+            promptView,
+            citationMap.Values.AsEnumerable(),
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -341,7 +389,11 @@ public class ChatPlugin
     /// <param name="chatId">The chat ID</param>
     /// <param name="context">The KernelArguments.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    private async Task<string> RenderSystemInstructions(string chatId, KernelArguments context, CancellationToken cancellationToken)
+    private async Task<string> RenderSystemInstructions(
+        string chatId,
+        KernelArguments context,
+        CancellationToken cancellationToken
+    )
     {
         // Render system instruction components
         //await this.UpdateBotResponseStatusOnClientAsync(chatId, "Initializing prompt", cancellationToken);
@@ -367,10 +419,22 @@ public class ChatPlugin
         KernelArguments chatContext,
         BotResponsePrompt promptView,
         IEnumerable<CitationSource>? citations,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         CopilotChatMessage chatMessage = await AsyncUtils.SafeInvokeAsync(
-            () => this.StreamResponseToClientAsync(chatId, userId, (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!, promptView, chatContext, cancellationToken, citations), nameof(StreamResponseToClientAsync));
+            () =>
+                this.StreamResponseToClientAsync(
+                    chatId,
+                    userId,
+                    (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!,
+                    promptView,
+                    chatContext,
+                    cancellationToken,
+                    citations
+                ),
+            nameof(StreamResponseToClientAsync)
+        );
 
         // Save the message into chat history
         this._logger.LogInformation("Saving message to chat history");
@@ -379,14 +443,18 @@ public class ChatPlugin
         // Extract semantic chat memory
         this._logger.LogInformation("Generating semantic chat memory");
         await AsyncUtils.SafeInvokeAsync(
-            () => SemanticChatMemoryExtractor.ExtractSemanticChatMemoryAsync(
-                chatId,
-                this._memoryClient,
-                this._kernel,
-                chatContext,
-                this._promptOptions,
-                this._logger,
-                cancellationToken), nameof(SemanticChatMemoryExtractor.ExtractSemanticChatMemoryAsync));
+            () =>
+                SemanticChatMemoryExtractor.ExtractSemanticChatMemoryAsync(
+                    chatId,
+                    this._memoryClient,
+                    this._kernel,
+                    chatContext,
+                    this._promptOptions,
+                    this._logger,
+                    cancellationToken
+                ),
+            nameof(SemanticChatMemoryExtractor.ExtractSemanticChatMemoryAsync)
+        );
 
         // Calculate total token usage for dependency functions and prompt template
         this._logger.LogInformation("Saving token usage");
@@ -410,22 +478,25 @@ public class ChatPlugin
         // Clone the context to avoid modifying the original context variables
         KernelArguments audienceContext = new(context);
         int historyTokenBudget =
-            this._promptOptions.CompletionTokenLimit -
-            this._promptOptions.ResponseTokenLimit -
-            TokenUtils.TokenCount(string.Join("\n\n", new string[]
-                {
-                    this._promptOptions.SystemAudience,
-                    this._promptOptions.SystemAudienceContinuation,
-                })
+            this._promptOptions.CompletionTokenLimit
+            - this._promptOptions.ResponseTokenLimit
+            - TokenUtils.TokenCount(
+                string.Join(
+                    "\n\n",
+                    new string[] { this._promptOptions.SystemAudience, this._promptOptions.SystemAudienceContinuation }
+                )
             );
 
         audienceContext["tokenLimit"] = historyTokenBudget.ToString(new NumberFormatInfo());
-        var specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey] ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
+        var specializationKey =
+            context[this._qAzureOpenAIChatExtension.ContextKey]
+            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
         var completionFunction = this._kernel.CreateFunctionFromPrompt(
             this._promptOptions.SystemAudienceExtraction,
             await this.CreateIntentCompletionSettingsAsync((string)specializationKey),
             functionName: "SystemAudienceExtraction",
-            description: "Extract audience");
+            description: "Extract audience"
+        );
 
         var result = await completionFunction.InvokeAsync(this._kernel, audienceContext, cancellationToken);
 
@@ -455,24 +526,31 @@ public class ChatPlugin
         KernelArguments intentContext = new(context);
 
         int tokenBudget =
-            this._promptOptions.CompletionTokenLimit -
-            this._promptOptions.ResponseTokenLimit -
-            TokenUtils.TokenCount(string.Join("\n", new string[]
-                {
-                    this._promptOptions.SystemPersona,
-                    this._promptOptions.SystemIntent,
-                    this._promptOptions.SystemIntentContinuation
-                })
+            this._promptOptions.CompletionTokenLimit
+            - this._promptOptions.ResponseTokenLimit
+            - TokenUtils.TokenCount(
+                string.Join(
+                    "\n",
+                    new string[]
+                    {
+                        this._promptOptions.SystemPersona,
+                        this._promptOptions.SystemIntent,
+                        this._promptOptions.SystemIntentContinuation,
+                    }
+                )
             );
 
         intentContext["tokenLimit"] = tokenBudget.ToString(new NumberFormatInfo());
         intentContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
-        var specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey] ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
+        var specializationKey =
+            context[this._qAzureOpenAIChatExtension.ContextKey]
+            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
         var completionFunction = this._kernel.CreateFunctionFromPrompt(
             this._promptOptions.SystemIntentExtraction,
             await this.CreateIntentCompletionSettingsAsync((string)specializationKey),
             functionName: "UserIntentExtraction",
-            description: "Extract user intent");
+            description: "Extract user intent"
+        );
 
         var result = await completionFunction.InvokeAsync(this._kernel, intentContext, cancellationToken);
 
@@ -499,7 +577,14 @@ public class ChatPlugin
     /// <param name="chatId">The chat ID</param>
     /// <param name="type">Type of the message</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    private async Task<CopilotChatMessage> SaveNewMessageAsync(string message, string userId, string userName, string chatId, string type, CancellationToken cancellationToken)
+    private async Task<CopilotChatMessage> SaveNewMessageAsync(
+        string message,
+        string userId,
+        string userName,
+        string chatId,
+        string type,
+        CancellationToken cancellationToken
+    )
     {
         // Make sure the chat exists.
         if (!await this._chatSessionRepository.TryFindByIdAsync(chatId))
@@ -516,9 +601,11 @@ public class ChatPlugin
             null,
             CopilotChatMessage.AuthorRoles.User,
             // Default to a standard message if the `type` is not recognized
-            Enum.TryParse(type, out CopilotChatMessage.ChatMessageType typeAsEnum) && Enum.IsDefined(typeof(CopilotChatMessage.ChatMessageType), typeAsEnum)
+            Enum.TryParse(type, out CopilotChatMessage.ChatMessageType typeAsEnum)
+            && Enum.IsDefined(typeof(CopilotChatMessage.ChatMessageType), typeAsEnum)
                 ? typeAsEnum
-                : CopilotChatMessage.ChatMessageType.Message);
+                : CopilotChatMessage.ChatMessageType.Message
+        );
 
         await this._chatMessageRepository.CreateAsync(chatMessage);
         return chatMessage;
@@ -543,7 +630,7 @@ public class ChatPlugin
         CancellationToken cancellationToken,
         Dictionary<string, int>? tokenUsage = null,
         IEnumerable<CitationSource>? citations = null
-       )
+    )
     {
         // Make sure the chat exists.
         if (!await this._chatSessionRepository.TryFindByIdAsync(chatId))
@@ -573,7 +660,12 @@ public class ChatPlugin
     /// <param name="messageId">The chat message ID.</param>
     /// <param name="chatId">The chat ID that's used as the partition Id.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    private async Task UpdateChatMessageContentAsync(string updatedResponse, string messageId, string chatId, CancellationToken cancellationToken)
+    private async Task UpdateChatMessageContentAsync(
+        string updatedResponse,
+        string messageId,
+        string chatId,
+        CancellationToken cancellationToken
+    )
     {
         CopilotChatMessage? chatMessage = null;
         if (!await this._chatMessageRepository.TryFindByIdAsync(messageId, chatId, callback: v => chatMessage = v))
@@ -599,7 +691,10 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.ResponseFrequencyPenalty,
             PresencePenalty = this._promptOptions.ResponsePresencePenalty,
             ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            AzureChatExtensionsOptions = this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId) : null
+            AzureChatExtensionsOptions =
+                this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true
+                    ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId)
+                    : null,
         };
 #pragma warning restore SKEXP0010 //Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     }
@@ -618,7 +713,10 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.IntentFrequencyPenalty,
             PresencePenalty = this._promptOptions.IntentPresencePenalty,
             StopSequences = new string[] { "] bot:" },
-            AzureChatExtensionsOptions = this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId) : null
+            AzureChatExtensionsOptions =
+                this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true
+                    ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId)
+                    : null,
         };
 #pragma warning restore SKEXP0010 //Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     }
@@ -686,7 +784,8 @@ public class ChatPlugin
         BotResponsePrompt prompt,
         KernelArguments chatContext,
         CancellationToken cancellationToken,
-        IEnumerable<CitationSource>? citations = null)
+        IEnumerable<CitationSource>? citations = null
+    )
     {
         // Create the stream
         // Serialize the chatContext to JSON
@@ -749,10 +848,13 @@ public class ChatPlugin
             accumulatedContent.Append(contentPiece.ToString());
             if (contentPiece.InnerContent is not null)
             {
-                Azure.AI.OpenAI.StreamingChatCompletionsUpdate actx = (Azure.AI.OpenAI.StreamingChatCompletionsUpdate)contentPiece.InnerContent;
+                Azure.AI.OpenAI.StreamingChatCompletionsUpdate actx = (Azure.AI.OpenAI.StreamingChatCompletionsUpdate)
+                    contentPiece.InnerContent;
                 if (actx.AzureExtensionsContext != null && actx.AzureExtensionsContext.Citations != null)
                 {
-                    foreach (AzureChatExtensionDataSourceResponseCitation citation in actx.AzureExtensionsContext.Citations)
+                    foreach (
+                        AzureChatExtensionDataSourceResponseCitation citation in actx.AzureExtensionsContext.Citations
+                    )
                     {
                         var sourceName = citation.Filepath;
                         var link = citation.Filepath;
@@ -782,16 +884,20 @@ public class ChatPlugin
                             "png" => "image/png", // PNG images
                             "gif" => "image/gif", // GIF images
                             "csv" => "text/csv", // CSV files
-                            _ => "application/octet-stream" // Default content type for unknown extensions
+                            _ =>
+                                "application/octet-stream" // Default content type for unknown extensions
+                            ,
                         };
 
-                        responseCitations.Add(new CitationSource
-                        {
-                            Link = link,
-                            SourceName = sourceName,
-                            Snippet = citation.Content,
-                            SourceContentType = contentType, // Use the dynamically determined content type
-                        });
+                        responseCitations.Add(
+                            new CitationSource
+                            {
+                                Link = link,
+                                SourceName = sourceName,
+                                Snippet = citation.Content,
+                                SourceContentType = contentType, // Use the dynamically determined content type
+                            }
+                        );
                     }
                 }
             }
@@ -803,7 +909,8 @@ public class ChatPlugin
             {
                 if (match.Groups.Count > 1)
                 {
-                    var referenceIndex = int.Parse(match.Groups[1].Value.Substring(3), CultureInfo.InvariantCulture) - 1; // Extract the index from "docX"
+                    var referenceIndex =
+                        int.Parse(match.Groups[1].Value.Substring(3), CultureInfo.InvariantCulture) - 1; // Extract the index from "docX"
                     if (referenceIndex >= 0 && referenceIndex < responseCitations.Count)
                     {
                         referencedCitations.Add(responseCitations[referenceIndex].SourceName);
@@ -816,15 +923,18 @@ public class ChatPlugin
                 .ToList();
 
             // Replace citations with superscript numbers in the current content piece
-            var processedContentPiece = citationPattern.Replace(contentPiece.ToString(), match =>
-            {
-                var citationKey = match.Groups[1].Value;
-                if (!citationIndexMap.ContainsKey(citationKey))
+            var processedContentPiece = citationPattern.Replace(
+                contentPiece.ToString(),
+                match =>
                 {
-                    citationIndexMap[citationKey] = citationIndexMap.Count + 1;
+                    var citationKey = match.Groups[1].Value;
+                    if (!citationIndexMap.ContainsKey(citationKey))
+                    {
+                        citationIndexMap[citationKey] = citationIndexMap.Count + 1;
+                    }
+                    return $"^{citationIndexMap[citationKey]}^";
                 }
-                return $"^{citationIndexMap[citationKey]}^";
-            });
+            );
 
             // Update the message content and citations on the client
             chatMessage.Content += processedContentPiece;
@@ -857,10 +967,13 @@ public class ChatPlugin
         string content,
         CancellationToken cancellationToken,
         IEnumerable<CitationSource>? citations = null,
-        Dictionary<string, int>? tokenUsage = null)
+        Dictionary<string, int>? tokenUsage = null
+    )
     {
         var chatMessage = CopilotChatMessage.CreateBotResponseMessage(chatId, content, prompt, citations, tokenUsage);
-        await this._messageRelayHubContext.Clients.Group(chatId).SendAsync("ReceiveMessage", chatId, userId, chatMessage, cancellationToken);
+        await this
+            ._messageRelayHubContext.Clients.Group(chatId)
+            .SendAsync("ReceiveMessage", chatId, userId, chatMessage, cancellationToken);
         return chatMessage;
     }
 
@@ -871,7 +984,9 @@ public class ChatPlugin
     /// <param name="cancellationToken">The cancellation token.</param>
     private async Task UpdateMessageOnClient(CopilotChatMessage message, CancellationToken cancellationToken)
     {
-        await this._messageRelayHubContext.Clients.Group(message.ChatId).SendAsync("ReceiveMessageUpdate", message, cancellationToken);
+        await this
+            ._messageRelayHubContext.Clients.Group(message.ChatId)
+            .SendAsync("ReceiveMessageUpdate", message, cancellationToken);
     }
 
     /// <summary>
@@ -880,9 +995,15 @@ public class ChatPlugin
     /// <param name="chatId">The chat ID</param>
     /// <param name="status">Current status of the response</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    private async Task UpdateBotResponseStatusOnClientAsync(string chatId, string status, CancellationToken cancellationToken)
+    private async Task UpdateBotResponseStatusOnClientAsync(
+        string chatId,
+        string status,
+        CancellationToken cancellationToken
+    )
     {
-        await this._messageRelayHubContext.Clients.Group(chatId).SendAsync("ReceiveBotResponseStatus", chatId, status, cancellationToken);
+        await this
+            ._messageRelayHubContext.Clients.Group(chatId)
+            .SendAsync("ReceiveBotResponseStatus", chatId, status, cancellationToken);
     }
 
     /// <summary>

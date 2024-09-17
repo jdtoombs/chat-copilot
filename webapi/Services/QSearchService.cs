@@ -23,9 +23,15 @@ public class QSearchService : IQSearchService
     private readonly SpecializationRepository _specializationRepository;
     private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
-    public QSearchService(QAzureOpenAIChatOptions qAzureOpenAIChatOptions, SpecializationRepository specializationSourceRepository)
+    public QSearchService(
+        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
+        SpecializationRepository specializationSourceRepository
+    )
     {
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(qAzureOpenAIChatOptions, specializationSourceRepository);
+        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
+            qAzureOpenAIChatOptions,
+            specializationSourceRepository
+        );
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
         this._httpClient = new(this._httpClientHandler);
         this._specializationRepository = specializationSourceRepository;
@@ -69,29 +75,30 @@ public class QSearchService : IQSearchService
         if (searchResponse != null)
         {
 #pragma warning disable CS8601 // Possible null reference assignment.
-            var groupedByfilename = searchResponse.values.Where(res => res.highlights != null)
-                         .GroupBy(value => value.filename)
-                         .Select(g => new QSearchResultValue
-                         {
-                             filename = g.Key,
-                             matches = g.Select((value, index) => new QSearchMatch
-                             {
-                                 id = value.id,
-                                 label = "Match-" + (index + 1),
-                                 content = value.highlights.content,
-                                 metadata = JsonSerializer.Deserialize<QSearchMetadata>(value.metaJsonString)
-                             })
-                                        .ToArray(),
-                         });
+            var groupedByfilename = searchResponse
+                .values.Where(res => res.highlights != null)
+                .GroupBy(value => value.filename)
+                .Select(g => new QSearchResultValue
+                {
+                    filename = g.Key,
+                    matches = g.Select(
+                            (value, index) =>
+                                new QSearchMatch
+                                {
+                                    id = value.id,
+                                    label = "Match-" + (index + 1),
+                                    content = value.highlights.content,
+                                    metadata = JsonSerializer.Deserialize<QSearchMetadata>(value.metaJsonString),
+                                }
+                        )
+                        .ToArray(),
+                });
 #pragma warning restore CS8601 // Possible null reference assignment.
-            return new QSearchResult
-            {
-                count = searchResponse.Count,
-                values = groupedByfilename
-            };
+            return new QSearchResult { count = searchResponse.Count, values = groupedByfilename };
         }
         return new QSearchResult();
     }
+
     public void Dispose()
     {
         this.Dispose(true);
@@ -106,6 +113,7 @@ public class QSearchService : IQSearchService
             this._httpClientHandler?.Dispose();
         }
     }
+
     private async Task<string?> GetIndexName(string specializationId)
     {
         var specialiazation = await this._specializationRepository.FindByIdAsync(specializationId);

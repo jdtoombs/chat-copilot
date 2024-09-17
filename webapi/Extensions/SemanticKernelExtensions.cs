@@ -50,18 +50,17 @@ internal static class SemanticKernelExtensions
         builder.InitializeKernelProvider();
 
         // Semantic Kernel
-        builder.Services.AddScoped<Kernel>(
-            sp =>
-            {
-                var provider = sp.GetRequiredService<SemanticKernelProvider>();
-                var kernel = provider.GetCompletionKernel();
+        builder.Services.AddScoped<Kernel>(sp =>
+        {
+            var provider = sp.GetRequiredService<SemanticKernelProvider>();
+            var kernel = provider.GetCompletionKernel();
 
-                sp.GetRequiredService<RegisterFunctionsWithKernel>()(sp, kernel);
+            sp.GetRequiredService<RegisterFunctionsWithKernel>()(sp, kernel);
 
-                // If KernelSetupHook is not null, invoke custom kernel setup.
-                sp.GetService<KernelSetupHook>()?.Invoke(sp, kernel);
-                return kernel;
-            });
+            // If KernelSetupHook is not null, invoke custom kernel setup.
+            sp.GetService<KernelSetupHook>()?.Invoke(sp, kernel);
+            return kernel;
+        });
 
         // Azure Content Safety
         builder.Services.AddContentSafety();
@@ -116,8 +115,10 @@ internal static class SemanticKernelExtensions
                 documentImportOptions: sp.GetRequiredService<IOptions<DocumentMemoryOptions>>(),
                 qAzureOpenAIChatOptions: sp.GetRequiredService<IOptions<QAzureOpenAIChatOptions>>(),
                 contentSafety: sp.GetService<AzureContentSafety>(),
-                logger: sp.GetRequiredService<ILogger<ChatPlugin>>()),
-            nameof(ChatPlugin));
+                logger: sp.GetRequiredService<ILogger<ChatPlugin>>()
+            ),
+            nameof(ChatPlugin)
+        );
 
         return kernel;
     }
@@ -177,7 +178,9 @@ internal static class SemanticKernelExtensions
 
                 // Get the type of the class from the current assembly
                 var assembly = Assembly.GetExecutingAssembly();
-                var classType = assembly.GetTypes().FirstOrDefault(t => t.Name.Contains(className, StringComparison.CurrentCultureIgnoreCase));
+                var classType = assembly
+                    .GetTypes()
+                    .FirstOrDefault(t => t.Name.Contains(className, StringComparison.CurrentCultureIgnoreCase));
 
                 // If the type is found, create an instance of the class using the default constructor
                 if (classType != null)
@@ -194,7 +197,10 @@ internal static class SemanticKernelExtensions
                 }
                 else
                 {
-                    logger.LogError("Class type not found. Make sure the class type matches exactly with the file name {FileName}", className);
+                    logger.LogError(
+                        "Class type not found. Make sure the class type matches exactly with the file name {FileName}",
+                        className
+                    );
                 }
             }
         }
@@ -208,14 +214,19 @@ internal static class SemanticKernelExtensions
     internal static void AddContentSafety(this IServiceCollection services)
     {
         IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-        var options = configuration.GetSection(ContentSafetyOptions.PropertyName).Get<ContentSafetyOptions>() ?? new ContentSafetyOptions { Enabled = false };
+        var options =
+            configuration.GetSection(ContentSafetyOptions.PropertyName).Get<ContentSafetyOptions>()
+            ?? new ContentSafetyOptions { Enabled = false };
         services.AddSingleton<IContentSafetyService>(sp => new AzureContentSafety(options.Endpoint, options.Key));
     }
 
     /// <summary>
     /// Get the embedding model from the configuration.
     /// </summary>
-    private static ChatArchiveEmbeddingConfig WithBotConfig(this IServiceProvider provider, IConfiguration configuration)
+    private static ChatArchiveEmbeddingConfig WithBotConfig(
+        this IServiceProvider provider,
+        IConfiguration configuration
+    )
     {
         var memoryOptions = provider.GetRequiredService<IOptions<KernelMemoryConfig>>().Value;
 
@@ -223,25 +234,28 @@ internal static class SemanticKernelExtensions
         {
             case string x when x.Equals("AzureOpenAI", StringComparison.OrdinalIgnoreCase):
             case string y when y.Equals("AzureOpenAIEmbedding", StringComparison.OrdinalIgnoreCase):
-                var azureAIOptions = memoryOptions.GetServiceConfig<AzureOpenAIConfig>(configuration, "AzureOpenAIEmbedding");
-                return
-                    new ChatArchiveEmbeddingConfig
-                    {
-                        AIService = ChatArchiveEmbeddingConfig.AIServiceType.AzureOpenAIEmbedding,
-                        DeploymentOrModelId = azureAIOptions.Deployment,
-                    };
+                var azureAIOptions = memoryOptions.GetServiceConfig<AzureOpenAIConfig>(
+                    configuration,
+                    "AzureOpenAIEmbedding"
+                );
+                return new ChatArchiveEmbeddingConfig
+                {
+                    AIService = ChatArchiveEmbeddingConfig.AIServiceType.AzureOpenAIEmbedding,
+                    DeploymentOrModelId = azureAIOptions.Deployment,
+                };
 
             case string x when x.Equals("OpenAI", StringComparison.OrdinalIgnoreCase):
                 var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
-                return
-                    new ChatArchiveEmbeddingConfig
-                    {
-                        AIService = ChatArchiveEmbeddingConfig.AIServiceType.OpenAI,
-                        DeploymentOrModelId = openAIOptions.EmbeddingModel,
-                    };
+                return new ChatArchiveEmbeddingConfig
+                {
+                    AIService = ChatArchiveEmbeddingConfig.AIServiceType.OpenAI,
+                    DeploymentOrModelId = openAIOptions.EmbeddingModel,
+                };
 
             default:
-                throw new ArgumentException($"Invalid {nameof(memoryOptions.Retrieval.EmbeddingGeneratorType)} value in 'SemanticMemory' settings.");
+                throw new ArgumentException(
+                    $"Invalid {nameof(memoryOptions.Retrieval.EmbeddingGeneratorType)} value in 'SemanticMemory' settings."
+                );
         }
     }
 }

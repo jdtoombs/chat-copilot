@@ -19,6 +19,7 @@ public sealed class SemanticKernelProvider
     private readonly Kernel _kernel;
 
     public SemanticKernelProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHttpClientFactory httpClientFactory, QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
+
     {
         this._kernel = InitializeCompletionKernel(serviceProvider, configuration, httpClientFactory, qAzureOpenAIChatOptions);
     }
@@ -33,6 +34,7 @@ public sealed class SemanticKernelProvider
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
+
     {
         var builder = Kernel.CreateBuilder();
 
@@ -65,12 +67,15 @@ public sealed class SemanticKernelProvider
                 builder.AddOpenAIChatCompletion(
                     openAIOptions.TextModel,
                     openAIOptions.APIKey,
-                    httpClient: httpClientFactory.CreateClient());
+                    httpClient: httpClientFactory.CreateClient()
+                );
 #pragma warning restore CA2000
                 break;
 
             default:
-                throw new ArgumentException($"Invalid {nameof(memoryOptions.TextGeneratorType)} value in 'KernelMemory' settings.");
+                throw new ArgumentException(
+                    $"Invalid {nameof(memoryOptions.TextGeneratorType)} value in 'KernelMemory' settings."
+                );
         }
 
         return builder.Build();
