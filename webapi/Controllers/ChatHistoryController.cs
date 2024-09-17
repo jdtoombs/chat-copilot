@@ -454,7 +454,6 @@ public class ChatHistoryController : ControllerBase
                 .SendAsync(
                     ChatHistoryDeletedClientCall,
                     chatIdString,
-                    this._authInfo.UserId,
                     chatMessage,
                     cancellationToken: cancellationToken
                 );

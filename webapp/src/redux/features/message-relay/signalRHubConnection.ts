@@ -235,16 +235,12 @@ const registerSignalREvents = (hubConnection: signalR.HubConnection, store: Stor
         }
     });
 
-    hubConnection.on(
-        SignalRCallbackMethods.ChatHistoryDeleted,
-        (chatId: string, userId: string, message: IChatMessage) => {
-            console.log('chat history deleted callback: ' + chatId + ' : ' + userId);
-            store.dispatch({
-                type: 'conversations/deleteConversationHistory',
-                payload: { chatId, message },
-            });
-        },
-    );
+    hubConnection.on(SignalRCallbackMethods.ChatHistoryDeleted, (chatId: string, message: IChatMessage) => {
+        store.dispatch({
+            type: 'conversations/deleteConversationHistory',
+            payload: { chatId, message },
+        });
+    });
 
     hubConnection.on(SignalRCallbackMethods.GlobalSiteMaintenance, () => {
         store.dispatch(setMaintenance(true));
