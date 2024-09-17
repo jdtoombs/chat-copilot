@@ -18,10 +18,19 @@ public sealed class SemanticKernelProvider
 {
     private readonly Kernel _kernel;
 
-    public SemanticKernelProvider(IServiceProvider serviceProvider, IConfiguration configuration, IHttpClientFactory httpClientFactory, QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
-
+    public SemanticKernelProvider(
+        IServiceProvider serviceProvider,
+        IConfiguration configuration,
+        IHttpClientFactory httpClientFactory,
+        QAzureOpenAIChatOptions qAzureOpenAIChatOptions
+    )
     {
-        this._kernel = InitializeCompletionKernel(serviceProvider, configuration, httpClientFactory, qAzureOpenAIChatOptions);
+        this._kernel = InitializeCompletionKernel(
+            serviceProvider,
+            configuration,
+            httpClientFactory,
+            qAzureOpenAIChatOptions
+        );
     }
 
     /// <summary>
@@ -33,8 +42,8 @@ public sealed class SemanticKernelProvider
         IServiceProvider serviceProvider,
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions)
-
+        QAzureOpenAIChatOptions qAzureOpenAIChatOptions
+    )
     {
         var builder = Kernel.CreateBuilder();
 
@@ -47,7 +56,9 @@ public sealed class SemanticKernelProvider
             case string x when x.Equals("AzureOpenAI", StringComparison.OrdinalIgnoreCase):
             case string y when y.Equals("AzureOpenAIText", StringComparison.OrdinalIgnoreCase):
                 var defaultModel = qAzureOpenAIChatOptions.DefaultModel;
-                foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections)
+                foreach (
+                    QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections
+                )
                 {
                     foreach (var deployment in connection.ChatCompletionDeployments)
                     {
@@ -57,7 +68,8 @@ public sealed class SemanticKernelProvider
                             connection.Endpoint?.ToString(),
                             connection.APIKey,
                             httpClient: httpClientFactory.CreateClient(),
-                            serviceId: deployment == defaultModel ? "default" : deployment);
+                            serviceId: deployment == defaultModel ? "default" : deployment
+                        );
                     }
                 }
                 break;

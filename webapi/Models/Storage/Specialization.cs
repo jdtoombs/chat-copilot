@@ -103,7 +103,17 @@ public class Specialization : IStorageEntity
     /// </summary>>
     public int DocumentCount { get; set; } = 20;
 
-    public Specialization(string Label, string Name, string Description, string RoleInformation, string? IndexName, string? Deployment, string ImageFilePath, string IconFilePath, IList<string> GroupMemberships)
+    public Specialization(
+        string Label,
+        string Name,
+        string Description,
+        string RoleInformation,
+        string? IndexName,
+        string? Deployment,
+        string ImageFilePath,
+        string IconFilePath,
+        IList<string> GroupMemberships
+    )
     {
         this.Id = Guid.NewGuid().ToString();
         this.Label = Label;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 namespace CopilotChat.WebApi.Models.Request;
+
 using System.Collections.Generic;
 
 /// <summary>

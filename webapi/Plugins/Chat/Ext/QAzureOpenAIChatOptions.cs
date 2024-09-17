@@ -19,10 +19,14 @@ public class QAzureOpenAIChatOptions
     public string DefaultSpecializationImage { get; set; } = "";
     public string DefaultSpecializationIcon { get; set; } = "";
     public string AdminGroupMembershipId { get; set; } = "";
+
     [Required]
-    public IList<OpenAIDeploymentConnection> OpenAIDeploymentConnections { get; set; } = new List<OpenAIDeploymentConnection>();
+    public IList<OpenAIDeploymentConnection> OpenAIDeploymentConnections { get; set; } =
+        new List<OpenAIDeploymentConnection>();
+
     [Required]
-    public IList<AISearchDeploymentConnection> AISearchDeploymentConnections { get; set; } = new List<AISearchDeploymentConnection>();
+    public IList<AISearchDeploymentConnection> AISearchDeploymentConnections { get; set; } =
+        new List<AISearchDeploymentConnection>();
 
     [Required]
     public IList<QSpecializationIndex> SpecializationIndexes { get; set; } = new List<QSpecializationIndex>();

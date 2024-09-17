@@ -122,8 +122,16 @@ public class ChatPlugin
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
         this._qSpecializationService = new QSpecializationService(specializationSourceRepository);
-        this._semanticMemoryRetriever = new SemanticMemoryRetriever(promptOptions, chatSessionRepository, memoryClient, logger);
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(qAzureOpenAIChatOptions.Value, specializationSourceRepository);
+        this._semanticMemoryRetriever = new SemanticMemoryRetriever(
+            promptOptions,
+            chatSessionRepository,
+            memoryClient,
+            logger
+        );
+        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
+            qAzureOpenAIChatOptions.Value,
+            specializationSourceRepository
+        );
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
     }
@@ -797,19 +805,21 @@ public class ChatPlugin
         chatHistory.AddUserMessage(combinedPrompt);
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
-        var specialization = specializationkey == "general"
-            ? null
-            : await this._qSpecializationService.GetSpecializationAsync(specializationkey);
-        var serviceId = (specialization == null || specialization.Deployment == defaultModel)
-            ? "default"
-            : specialization.Deployment;
+        var specialization =
+            specializationkey == "general"
+                ? null
+                : await this._qSpecializationService.GetSpecializationAsync(specializationkey);
+        var serviceId =
+            (specialization == null || specialization.Deployment == defaultModel)
+                ? "default"
+                : specialization.Deployment;
         var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
-        var stream =
-            chatCompletion.GetStreamingChatMessageContentsAsync(
-                chatHistory,
-                await this.CreateChatRequestSettingsAsync(specializationkey),
-                this._kernel,
-                cancellationToken);
+        var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
+            chatHistory,
+            await this.CreateChatRequestSettingsAsync(specializationkey),
+            this._kernel,
+            cancellationToken
+        );
 
         var responseCitations = new List<CitationSource>();
         var citationCountMap = new Dictionary<string, int>();

@@ -64,19 +64,29 @@ public class QAzureOpenAIChatExtension
 
         if (specialization != null && specialization.IndexName != null)
         {
-            QAzureOpenAIChatOptions.QSpecializationIndex? qSpecializationIndex = this.GetSpecializationIndexByName(specialization.IndexName);
+            QAzureOpenAIChatOptions.QSpecializationIndex? qSpecializationIndex = this.GetSpecializationIndexByName(
+                specialization.IndexName
+            );
             if (qSpecializationIndex == null)
             {
                 return null;
             }
-            var aiSearchDeploymentConnection = this._qAzureOpenAIChatOptions.AISearchDeploymentConnections
-                .FirstOrDefault(c => c.Name == qSpecializationIndex.AISearchDeploymentConnection);
-            var openAIDeploymentConnection = this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections
-                .FirstOrDefault(c => c.Name == qSpecializationIndex.OpenAIDeploymentConnection);
-            var EmbeddingEndpoint = this.GenerateEmbeddingEndpoint(openAIDeploymentConnection.Endpoint, qSpecializationIndex);
+            var aiSearchDeploymentConnection =
+                this._qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(c =>
+                    c.Name == qSpecializationIndex.AISearchDeploymentConnection
+                );
+            var openAIDeploymentConnection = this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections.FirstOrDefault(
+                c => c.Name == qSpecializationIndex.OpenAIDeploymentConnection
+            );
+            var EmbeddingEndpoint = this.GenerateEmbeddingEndpoint(
+                openAIDeploymentConnection.Endpoint,
+                qSpecializationIndex
+            );
             if (aiSearchDeploymentConnection == null || openAIDeploymentConnection == null)
             {
-                throw new InvalidOperationException("Configuration error: AI Search Deployment Connection or OpenAI Deployment Connection is missing.");
+                throw new InvalidOperationException(
+                    "Configuration error: AI Search Deployment Connection or OpenAI Deployment Connection is missing."
+                );
             }
             return new AzureChatExtensionsOptions()
             {
@@ -85,8 +95,8 @@ public class QAzureOpenAIChatExtension
                     new AzureSearchChatExtensionConfiguration()
                     {
                         Filter = null,
-                        IndexName  = specialization.IndexName,
-                        SearchEndpoint= aiSearchDeploymentConnection.Endpoint,
+                        IndexName = specialization.IndexName,
+                        SearchEndpoint = aiSearchDeploymentConnection.Endpoint,
                         Strictness = specialization.Strictness,
                         FieldMappingOptions = new AzureSearchIndexFieldMappingOptions
                         {
@@ -99,12 +109,13 @@ public class QAzureOpenAIChatExtension
                         ShouldRestrictResultScope = qSpecializationIndex!.RestrictResultScope,
                         RoleInformation = specialization.RoleInformation,
                         DocumentCount = specialization.DocumentCount,
-                        Authentication = new OnYourDataApiKeyAuthenticationOptions (aiSearchDeploymentConnection.APIKey),
-                        VectorizationSource = new OnYourDataEndpointVectorizationSource (
-                           EmbeddingEndpoint,
-                           new OnYourDataApiKeyAuthenticationOptions (openAIDeploymentConnection.APIKey))
-                    }
-                }
+                        Authentication = new OnYourDataApiKeyAuthenticationOptions(aiSearchDeploymentConnection.APIKey),
+                        VectorizationSource = new OnYourDataEndpointVectorizationSource(
+                            EmbeddingEndpoint,
+                            new OnYourDataApiKeyAuthenticationOptions(openAIDeploymentConnection.APIKey)
+                        ),
+                    },
+                },
             };
         }
         return null;
@@ -116,7 +127,9 @@ public class QAzureOpenAIChatExtension
     public List<string> GetAllSpecializationIndexNames()
     {
         var indexNames = new List<string>();
-        foreach (QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes)
+        foreach (
+            QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes
+        )
         {
             indexNames.Add(_qSpecializationIndex.IndexName);
         }
@@ -128,7 +141,9 @@ public class QAzureOpenAIChatExtension
     /// </summary>
     public QAzureOpenAIChatOptions.QSpecializationIndex? GetSpecializationIndexByName(string indexName)
     {
-        foreach (QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes)
+        foreach (
+            QAzureOpenAIChatOptions.QSpecializationIndex _qSpecializationIndex in this._qAzureOpenAIChatOptions.SpecializationIndexes
+        )
         {
             if (_qSpecializationIndex.IndexName == indexName)
             {
@@ -138,15 +153,24 @@ public class QAzureOpenAIChatExtension
         return null;
     }
 
-    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, QAzureOpenAIChatOptions.QSpecializationIndex qSpecializationIndex)
+    public Uri? GenerateEmbeddingEndpoint(
+        Uri connectionEndpoint,
+        QAzureOpenAIChatOptions.QSpecializationIndex qSpecializationIndex
+    )
     {
-        return new Uri(connectionEndpoint, $"/openai/deployments/{qSpecializationIndex.EmbeddingDeployment}/embeddings?api-version=2023-05-15");
+        return new Uri(
+            connectionEndpoint,
+            $"/openai/deployments/{qSpecializationIndex.EmbeddingDeployment}/embeddings?api-version=2023-05-15"
+        );
     }
+
     public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
     {
-        return this._qAzureOpenAIChatOptions.AISearchDeploymentConnections
-            .FirstOrDefault(connection => connection.Name == connectionName);
+        return this._qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(connection =>
+            connection.Name == connectionName
+        );
     }
+
     public (string? ApiKey, string? Endpoint) GetAISearchDeploymentConnectionDetails(string indexName)
     {
         var specializationIndex = this.GetSpecializationIndexByName(indexName);
@@ -154,7 +178,9 @@ public class QAzureOpenAIChatExtension
         {
             return (null, null);
         }
-        var aiSearchDeploymentConnection = this.GetAISearchDeploymentConnection(specializationIndex.AISearchDeploymentConnection);
+        var aiSearchDeploymentConnection = this.GetAISearchDeploymentConnection(
+            specializationIndex.AISearchDeploymentConnection
+        );
         return (aiSearchDeploymentConnection?.APIKey, aiSearchDeploymentConnection?.Endpoint.ToString());
     }
 
@@ -164,7 +190,9 @@ public class QAzureOpenAIChatExtension
     public List<string> GetAllChatCompletionDeployments()
     {
         var chatCompletionDeployments = new List<string>();
-        foreach (QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections)
+        foreach (
+            QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections
+        )
         {
             foreach (var deployment in connection.ChatCompletionDeployments)
             {
