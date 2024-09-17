@@ -381,7 +381,7 @@ public class ChatHistoryController : ControllerBase
         // Delete any resources associated with the chat session.
         try
         {
-            await this.DeleteChatResourcesAsync(chatIdString, true, cancellationToken);
+            await this.DeleteChatResourcesAsync(chatIdString, cancellationToken);
         }
         catch (AggregateException)
         {
@@ -433,7 +433,12 @@ public class ChatHistoryController : ControllerBase
         // Delete chat messages in chat session.
         try
         {
-            await this.DeleteChatResourcesAsync(chatIdString, false, cancellationToken);
+            // Create and store the tasks for deleting chat messages.
+            var messages = await this._messageRepository.FindByChatIdAsync(chatIdString);
+            foreach (var message in messages)
+            {
+                await this._messageRepository.DeleteAsync(message);
+            }
 
             // Create deleted chat history bot message
             var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
@@ -467,18 +472,15 @@ public class ChatHistoryController : ControllerBase
     /// </summary>
     /// <param name="chatId">The chat id.</param>
     /// <param name="shouldDeleteParticipants">Flag to determine if participants should be deleted.</param>
-    private async Task DeleteChatResourcesAsync(string chatId, bool shouldDeleteParticipants, CancellationToken cancellationToken)
+    private async Task DeleteChatResourcesAsync(string chatId, CancellationToken cancellationToken)
     {
         var cleanupTasks = new List<Task>();
 
-        if (shouldDeleteParticipants)
+        // Create and store the tasks for deleting all users tied to the chat.
+        var participants = await this._participantRepository.FindByChatIdAsync(chatId);
+        foreach (var participant in participants)
         {
-            // Create and store the tasks for deleting all users tied to the chat.
-            var participants = await this._participantRepository.FindByChatIdAsync(chatId);
-            foreach (var participant in participants)
-            {
-                cleanupTasks.Add(this._participantRepository.DeleteAsync(participant));
-            }
+            cleanupTasks.Add(this._participantRepository.DeleteAsync(participant));
         }
 
         // Create and store the tasks for deleting chat messages.
