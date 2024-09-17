@@ -9,8 +9,12 @@ import {
     TabList,
     TabValue,
     tokens,
-    Dropdown,
-    Option
+    Button,
+    Menu,
+    MenuItem,
+    MenuTrigger,
+    MenuList,
+    MenuPopover
 } from '@fluentui/react-components';
 import { Map16Regular } from '@fluentui/react-icons';
 import React from 'react';
@@ -26,7 +30,7 @@ import { DocumentsTab } from './tabs/DocumentsTab';
 import { PersonaTab } from './tabs/PersonaTab';
 import { PlansTab } from './tabs/PlansTab';
 import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
-import {editConversationSpecialization} from '../../redux/features/conversations/conversationsSlice';
+import {editConversationSpecialization, editConversationSystemDescription} from '../../redux/features/conversations/conversationsSlice';
 
 // Enum for chat window tabs
 enum ChatWindowTabEnum {
@@ -69,33 +73,20 @@ const useClasses = makeStyles({
         flexDirection: 'column',
         ...shorthands.margin(0, '72px'),
     },
-    dropdown: {
+    menu: {
         backgroundColor: 'transparent',
         border: 'none',
         boxShadow: 'none',
-        padding: 0,
-        width: '50px !important',
+        padding: '4px',
+        width: '50px',
         ':hover': {
-            backgroundColor: 'transparent',
+            border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
         },
         ':focus': {
-            backgroundColor: 'transparent',
-            border: 'none',
-            boxShadow: 'none',
+            border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
         },
         ':active': {
-            backgroundColor: 'transparent',
-            border: 'none',
-            boxShadow: 'none',
-        },
-        '.ms-Dropdown-title': {
-            backgroundColor: 'transparent',
-            border: 'none',
-            padding: 0,
-            color: tokens.colorNeutralForeground1,
-        },
-        '.ms-Dropdown-caretDownWrapper': {
-            color: tokens.colorNeutralForeground1,
+            border: `0.5px solid ${tokens.colorNeutralStroke1Pressed}`,
         },
     },
 });
@@ -122,6 +113,12 @@ export const ChatWindow: React.FC = () => {
                     dispatch(setChatSpecialization(specializationMatch));
                 }
                 dispatch(editConversationSpecialization({ id: selectedId, specializationId: chatSpecialization.id }));
+                dispatch(
+                    editConversationSystemDescription({
+                        id: selectedId,
+                        newSystemDescription: chatSpecialization.roleInformation,
+                    }),
+                );
             });
         }
     };
@@ -142,14 +139,20 @@ export const ChatWindow: React.FC = () => {
                         }}
                         presence={{ status: 'available' }}
                     />
-                    <Dropdown
-                        placeholder={chatSpecialization?.name}
-                        className={classes.dropdown}
-                    >
-                        <Option onClick={onNewChatClick} key="newChat" value="newChat">
-                            New Chat
-                        </Option>
-                    </Dropdown>
+                    <Menu>
+                        <MenuTrigger>
+                            <Button appearance="transparent" className={classes.menu}>
+                                {chatSpecialization?.name}
+                            </Button>
+                        </MenuTrigger>
+                        <MenuPopover>
+                            <MenuList>
+                                <MenuItem onClick={onNewChatClick} key="newChat">
+                                    New Chat
+                                </MenuItem>
+                            </MenuList>
+                        </MenuPopover>
+                    </Menu>
                     <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
                         <Tab
                             data-testid="chatTab"
