@@ -16,7 +16,7 @@ import {
     MenuList,
     MenuPopover
 } from '@fluentui/react-components';
-import { Map16Regular } from '@fluentui/react-icons';
+import { Map16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
 import React from 'react';
 import { useAppDispatch, useAppSelector} from '../../redux/app/hooks';
 import { useChat } from '../../libs/hooks';
@@ -81,6 +81,7 @@ const useClasses = makeStyles({
         width: '50px',
         ':hover': {
             border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
+            color: 'black',
         },
         ':focus': {
             border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
@@ -141,7 +142,7 @@ export const ChatWindow: React.FC = () => {
                     />
                     <Menu>
                         <MenuTrigger>
-                            <Button appearance="transparent" className={classes.menu}>
+                            <Button appearance="transparent" className={classes.menu} icon={<ChevronDown16Regular />} iconPosition="after">
                                 {chatSpecialization?.name}
                             </Button>
                         </MenuTrigger>
