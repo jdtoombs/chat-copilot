@@ -132,8 +132,8 @@ public class QAzureOpenAIChatExtension
         return null;
     }
 
-    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, QAzureOpenAIChatOptions.QSpecializationIndex qSpecializationIndex){
-
+    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, QAzureOpenAIChatOptions.QSpecializationIndex qSpecializationIndex)
+    {
         return new Uri(connectionEndpoint, $"/openai/deployments/{qSpecializationIndex.EmbeddingDeployment}/embeddings?api-version=2023-05-15");
     }
     public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
