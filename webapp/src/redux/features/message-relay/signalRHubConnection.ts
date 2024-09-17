@@ -240,7 +240,7 @@ const registerSignalREvents = (hubConnection: signalR.HubConnection, store: Stor
         (chatId: string, userId: string, message: IChatMessage) => {
             console.log('chat history deleted callback: ' + chatId + ' : ' + userId);
             store.dispatch({
-                type: 'conversations/addMessageToConversationFromServer',
+                type: 'conversations/deleteConversationHistory',
                 payload: { chatId, message },
             });
         },
