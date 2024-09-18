@@ -10,6 +10,7 @@ import { FeatureKeys, Features } from '../../redux/features/app/AppState';
 import { SharedStyles } from '../../styles';
 import { ChatInput } from './ChatInput';
 import { ChatHistory } from './chat-history/ChatHistory';
+import { ChatSuggestionList } from './suggestions/ChatSuggestionList';
 
 const useClasses = makeStyles({
     root: {
@@ -35,6 +36,10 @@ const useClasses = makeStyles({
         flexDirection: 'row',
         justifyContent: 'center',
         ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingVerticalNone),
+    },
+    suggestions: {
+        display: 'flex',
+        flexDirection: 'row',
     },
     carouselroot: {
         display: 'flex',
@@ -140,7 +145,9 @@ export const ChatRoom: React.FC = () => {
                     </div>
                 </div>
             )}
-
+            <div className={classes.suggestions}>
+                <ChatSuggestionList />
+            </div>
             <div className={classes.input}>
                 <ChatInput isDraggingOver={isDraggingOver} onDragLeave={onDragLeave} onSubmit={handleSubmit} />
             </div>

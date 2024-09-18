@@ -3,12 +3,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IChatMessage } from '../../../libs/models/ChatMessage';
 import { IChatUser } from '../../../libs/models/ChatUser';
+import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
 import { ChatState } from './ChatState';
 import {
     ConversationInputChange,
     Conversations,
     ConversationSpecializationChange,
     ConversationsState,
+    ConversationSuggestionsChange,
     ConversationSystemDescriptionChange,
     ConversationTitleChange,
     initialState,
@@ -211,6 +213,9 @@ export const conversationsSlice = createSlice({
                 );
             }
         },
+        updateSuggestions: (state: ConversationsState, action: PayloadAction<ConversationSuggestionsChange>) => {
+            setConversationSuggestions(state, action.payload.id, action.payload.chatSuggestionMessage);
+        }
     },
 });
 
@@ -233,6 +238,30 @@ const updateUserTypingState = (state: ConversationsState, userId: string, chatId
     }
 };
 
+const setConversationSuggestions = (state: ConversationsState, chatId: string, chatMessage: IAskResult) => {
+    const conversation = state.conversations[chatId];
+    let arraySuggestions: string[] = [];
+    try {
+        const response = chatMessage.variables.find((a) => a.key === 'input');
+        if (!response) {
+            throw Error(`No response key.`)
+        }
+        const parsed: any = JSON.parse(response.value) as unknown;
+        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+            arraySuggestions = parsed;
+        } else {
+            console.log(`Parsed content is not a valid array of strings.`);
+        }
+    } catch (e) {
+        console.log(`Failed to parse valid JSON array from chat response. ${JSON.stringify(chatMessage, null, 2)}`);
+    }
+    conversation.suggestions = {
+        current: arraySuggestions,
+        ids: [] //chatMessage.id != null ? conversation.suggestions.ids.concat(chatMessage.id) : conversation.suggestions.ids
+    };
+    conversation.messages = conversation.messages.filter((message) => message.content !== chatMessage.value);
+}
+
 export const {
     setConversations,
     editConversationTitle,
@@ -254,6 +283,7 @@ export const {
     disableConversation,
     updatePluginState,
     editConversationSpecialization,
+    updateSuggestions,
 } = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

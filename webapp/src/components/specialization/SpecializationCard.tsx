@@ -15,11 +15,12 @@ import { useChat } from '../../libs/hooks';
 import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
+import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
+    updateSuggestions,
 } from '../../redux/features/conversations/conversationsSlice';
-import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 
 const useStyles = makeStyles({
     main: {
@@ -97,6 +98,9 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                     newSystemDescription: specialization.roleInformation,
                 }),
             );
+        });
+        void chat.getSuggestions({ chatId: selectedId }).then((response) => {
+            dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }))
         });
     };
 
