@@ -401,7 +401,6 @@ public class ChatHistoryController : ControllerBase
         return this.NoContent();
     }
 
-
     /// <summary>
     /// Delete the chat history of a chat session.
     /// </summary>
@@ -415,7 +414,8 @@ public class ChatHistoryController : ControllerBase
     public async Task<IActionResult> DeleteChatSessionHistoryAsync(
         [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
         Guid chatId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var chatIdString = chatId.ToString();
         ChatSession? chat = null;
