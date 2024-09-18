@@ -63,6 +63,13 @@ const useClasses = makeStyles({
         alignItems: 'center',
         display: 'flex',
         flexDirection: 'row',
+        flexGrow: 1,
+    },
+    rightSection: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: tokens.spacingHorizontalM, // Add gap between Persona and Menu
     },
     controls: {
         display: 'flex',
@@ -78,7 +85,7 @@ const useClasses = makeStyles({
         border: 'none',
         boxShadow: 'none',
         padding: '4px',
-        width: '50px',
+        width: 'auto',
         ':hover': {
             border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
             color: 'black',
@@ -128,32 +135,6 @@ export const ChatWindow: React.FC = () => {
         <div className={classes.root}>
             <div className={classes.header}>
                 <div className={classes.title}>
-                    <Persona
-                        key={'Semantic Kernel Bot'}
-                        size="medium"
-                        avatar={{
-                            image: {
-                                src: chatSpecialization?.iconFilePath
-                                    ? chatSpecialization.iconFilePath
-                                    : conversations[selectedId].botProfilePicture,
-                            },
-                        }}
-                        presence={{ status: 'available' }}
-                    />
-                    <Menu>
-                        <MenuTrigger>
-                            <Button appearance="transparent" className={classes.menu} icon={<ChevronDown16Regular />} iconPosition="after">
-                                {chatSpecialization?.name}
-                            </Button>
-                        </MenuTrigger>
-                        <MenuPopover>
-                            <MenuList>
-                                <MenuItem onClick={onNewChatClick} key="newChat">
-                                    New Chat
-                                </MenuItem>
-                            </MenuList>
-                        </MenuPopover>
-                    </Menu>
                     <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
                         <Tab
                             data-testid="chatTab"
@@ -198,6 +179,39 @@ export const ChatWindow: React.FC = () => {
                             </>
                         )}
                     </TabList>
+                </div>
+                <div className={classes.rightSection}>
+                    <Menu>
+                        <MenuTrigger>
+                            <Button
+                                appearance="transparent"
+                                className={classes.menu}
+                                icon={<ChevronDown16Regular />}
+                                iconPosition="after"
+                            >
+                                {chatSpecialization?.name}
+                            </Button>
+                        </MenuTrigger>
+                        <MenuPopover>
+                            <MenuList>
+                                <MenuItem onClick={onNewChatClick} key="newChat">
+                                    New Chat
+                                </MenuItem>
+                            </MenuList>
+                        </MenuPopover>
+                    </Menu>
+                    <Persona
+                        key={'Semantic Kernel Bot'}
+                        size="medium"
+                        avatar={{
+                            image: {
+                                src: chatSpecialization?.iconFilePath
+                                    ? chatSpecialization.iconFilePath
+                                    : conversations[selectedId].botProfilePicture,
+                            },
+                        }}
+                        presence={{ status: 'available' }}
+                    />
                 </div>
                 <div className={classes.controls}>
                     {!features[FeatureKeys.SimplifiedExperience].enabled && (
