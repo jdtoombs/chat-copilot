@@ -96,6 +96,8 @@ public class SpecializationController : ControllerBase
     [Route("specialization/deployments")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public List<string> GetAllChatCompletionDeployments()
     {
         return this._qAzureOpenAIChatExtension.GetAllChatCompletionDeployments();

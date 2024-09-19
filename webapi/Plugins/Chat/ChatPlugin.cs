@@ -814,6 +814,10 @@ public class ChatPlugin
                 ? "default"
                 : specialization.Deployment;
         var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
+        if (chatCompletion == null)
+        {
+            throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
+        }
         var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
             chatHistory,
             await this.CreateChatRequestSettingsAsync(specializationkey),

@@ -78,6 +78,10 @@ public class QAzureOpenAIChatExtension
             var openAIDeploymentConnection = this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections.FirstOrDefault(
                 c => c.Name == qSpecializationIndex.OpenAIDeploymentConnection
             );
+            if (openAIDeploymentConnection.Endpoint == null || openAIDeploymentConnection.APIKey == null)
+            {
+                throw new InvalidOperationException("OpenAI Deployment Connection or its endpoint  is missing.");
+            }
             var EmbeddingEndpoint = this.GenerateEmbeddingEndpoint(
                 openAIDeploymentConnection.Endpoint,
                 qSpecializationIndex
