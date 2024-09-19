@@ -14,13 +14,17 @@ const useClasses = makeStyles({
   }
 });
 
-export const ChatSuggestionList: React.FC = () => {
+interface ChatSuggestionListProps {
+  onClickSuggestion: (message: string) => void;
+}
+
+export const ChatSuggestionList: React.FC<ChatSuggestionListProps> = ({ onClickSuggestion }: ChatSuggestionListProps) => {
   const conversation = useAppSelector((state: RootState) => state.conversations);
   const classes = useClasses();
   return (
     <div className={classes.root}>
       {
-        conversation.conversations[conversation.selectedId].suggestions.current.map((suggestion, idx) => <ChatSuggestion key={`suggestions-${idx}`} suggestionTitleText={"Suggestion"} suggestionMainText={suggestion} />)
+        conversation.conversations[conversation.selectedId].suggestions.current.map((suggestion, idx) => <ChatSuggestion onClick={onClickSuggestion} key={`suggestions-${idx}`} suggestionMainText={suggestion} />)
       }
     </div>
   )

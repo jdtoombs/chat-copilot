@@ -1,10 +1,5 @@
 import { Card, CardHeader, Text, makeStyles, tokens } from "@fluentui/react-components";
 import React from "react";
-import { useChat } from "../../../libs/hooks";
-import { GetResponseOptions } from "../../../libs/hooks/useChat";
-import { ChatMessageType } from "../../../libs/models/ChatMessage";
-import { useAppSelector } from "../../../redux/app/hooks";
-import { RootState } from "../../../redux/app/store";
 
 const useStyles = makeStyles({
     main: {
@@ -50,27 +45,18 @@ const useStyles = makeStyles({
 });
 
 interface ChatSuggestionProps {
-  suggestionTitleText: string;
+  onClick: (message: string) => void;
   suggestionMainText: string;
 }
 
-export const ChatSuggestion: React.FC<ChatSuggestionProps> = ({ suggestionMainText}) => {
+export const ChatSuggestion: React.FC<ChatSuggestionProps> = ({ suggestionMainText, onClick }) => {
   const styles = useStyles();
-  const chat = useChat();
-  const converstationState = useAppSelector((state: RootState) => state.conversations);
   const suggestionDivID = React.useId();
   const cardId = React.useId();
-  const onSendSuggestion = () => {
-    const messageBody: GetResponseOptions = {
-      messageType: ChatMessageType.Message,
-      value: suggestionMainText,
-      chatId: converstationState.selectedId
-    }
-    void chat.getResponse(messageBody);
-  }
+
   return (
     <div className={ styles.root } key={suggestionDivID}>
-      <Card className={styles.card} data-testid="chatSuggestionItem" onClick={onSendSuggestion} key={cardId}>
+      <Card className={styles.card} data-testid="chatSuggestionItem" onClick={() => { onClick(suggestionMainText) } } key={cardId}>
         <CardHeader header={<Text weight="semibold">{suggestionMainText}</Text>}/>
       </Card>
     </div>

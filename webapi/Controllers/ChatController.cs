@@ -53,6 +53,7 @@ public class ChatController : ControllerBase, IDisposable
 
     private const string ChatPluginName = nameof(ChatPlugin);
     private const string ChatFunctionName = "Chat";
+    private const string SilentChatFunctionName = "ChatSilent";
     private const string GeneratingResponseClientCall = "ReceiveBotResponseStatus";
 
     public ChatController(
@@ -154,6 +155,105 @@ public class ChatController : ControllerBase, IDisposable
             }
 
             this._telemetryService.TrackPluginFunction(ChatPluginName, ChatFunctionName, false);
+
+            throw;
+        }
+
+        AskResult chatAskResult =
+            new()
+            {
+                Value = result.ToString() ?? string.Empty,
+                Variables = contextVariables.Select(v => new KeyValuePair<string, object?>(v.Key, v.Value)),
+            };
+
+        // Broadcast AskResult to all users
+        await messageRelayHubContext
+            .Clients.Group(chatIdString)
+            .SendAsync(GeneratingResponseClientCall, chatIdString, null);
+
+        return this.Ok(chatAskResult);
+    }
+
+    /// <summary>
+    /// Invokes the chat function to get a response from the bot.
+    /// </summary>
+    /// <param name="kernel">Semantic kernel obtained through dependency injection.</param>
+    /// <param name="messageRelayHubContext">Message Hub that performs the real time relay service.</param>
+    /// <param name="chatSessionRepository">Repository of chat sessions.</param>
+    /// <param name="chatParticipantRepository">Repository of chat participants.</param>
+    /// <param name="authInfo">Auth info for the current request.</param>
+    /// <param name="ask">Prompt along with its parameters.</param>
+    /// <param name="chatId">Chat ID.</param>
+    /// <returns>Results containing the response from the model.</returns>
+    [Route("chats/{chatId:guid}/messages/silent")]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
+    public async Task<IActionResult> ChatSilentAsync(
+        [FromServices] Kernel kernel,
+        [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
+        [FromServices] ChatSessionRepository chatSessionRepository,
+        [FromServices] ChatParticipantRepository chatParticipantRepository,
+        [FromServices] IAuthInfo authInfo,
+        [FromBody] Ask ask,
+        [FromRoute] Guid chatId
+    )
+    {
+        this._logger.LogDebug("Chat message received.");
+
+        string chatIdString = chatId.ToString();
+
+        // Put ask's variables in the context we will use.
+        var contextVariables = GetContextVariables(ask, authInfo, chatIdString);
+
+        // Verify that the chat exists and that the user has access to it.
+        ChatSession? chat = null;
+        if (!(await chatSessionRepository.TryFindByIdAsync(chatIdString, callback: c => chat = c)))
+        {
+            return this.NotFound("Failed to find chat session for the chatId specified in variables.");
+        }
+
+        if (!(await chatParticipantRepository.IsUserInChatAsync(authInfo.UserId, chatIdString)))
+        {
+            return this.Forbid("User does not have access to the chatId specified in variables.");
+        }
+
+        // Register plugins that have been enabled
+        var openApiPluginAuthHeaders = this.GetPluginAuthHeaders(this.HttpContext.Request.Headers);
+        await this.RegisterFunctionsAsync(kernel, openApiPluginAuthHeaders, contextVariables);
+
+        // Register hosted plugins that have been enabled
+        await this.RegisterHostedFunctionsAsync(kernel, chat!.EnabledPlugins);
+
+        // Get the function to invoke
+        KernelFunction? chatFunction = kernel.Plugins.GetFunction(ChatPluginName, SilentChatFunctionName);
+        var computed = nameof(chatFunction);
+        Console.WriteLine($"Got chat function with const name {SilentChatFunctionName} and computed {computed}");
+        // Run the function.
+        FunctionResult? result = null;
+        try
+        {
+            using CancellationTokenSource? cts = this._serviceOptions.TimeoutLimitInS is not null
+                // Create a cancellation token source with the timeout if specified
+                ? new CancellationTokenSource(TimeSpan.FromSeconds((double)this._serviceOptions.TimeoutLimitInS))
+                : null;
+
+            result = await kernel.InvokeAsync(chatFunction!, contextVariables, cts?.Token ?? default);
+            this._telemetryService.TrackPluginFunction(ChatPluginName, SilentChatFunctionName, true);
+        }
+        catch (Exception ex)
+        {
+            if (ex is OperationCanceledException || ex.InnerException is OperationCanceledException)
+            {
+                // Log the timeout and return a 504 response
+                this._logger.LogError("The {FunctionName} operation timed out.", SilentChatFunctionName);
+                return this.StatusCode(StatusCodes.Status504GatewayTimeout, $"The chat {SilentChatFunctionName} timed out.");
+            }
+
+            this._telemetryService.TrackPluginFunction(ChatPluginName, SilentChatFunctionName, false);
 
             throw;
         }

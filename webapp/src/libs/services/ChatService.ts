@@ -226,6 +226,27 @@ export class ChatService extends BaseService {
         return result;
     };
 
+    public getBotResponseSilentAsync = async (
+        ask: IAsk,
+        accessToken: string,
+        enabledPlugins?: Plugin[],
+    ): Promise<IAskResult> => {
+        // If function requires any additional api properties, append to context
+        const chatId = ask.variables?.find((variable) => variable.key === 'chatId')?.value as string;
+
+        const result = await this.getResponseAsync<IAskResult>(
+            {
+                commandPath: `chats/${chatId}/messages/silent`,
+                method: 'POST',
+                body: ask,
+            },
+            accessToken,
+            enabledPlugins,
+        );
+
+        return result;
+    };
+
     public joinChatAsync = async (chatId: string, accessToken: string): Promise<IChatSession> => {
         await this.getResponseAsync<any>(
             {

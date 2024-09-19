@@ -255,6 +255,25 @@ const setConversationSuggestions = (state: ConversationsState, chatId: string, c
     } catch (e) {
         console.log(`Failed to parse valid JSON array from chat response. ${JSON.stringify(chatMessage, null, 2)}`);
     }
+    try {
+        const response = chatMessage.variables.find((a) => a.key === 'input');
+        if (!response) {
+            throw Error(`No response key.`)
+        }
+        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
+        const match = regex.exec(response.value);
+         if (!match) {
+            throw Error(`No regex match.`)
+        }
+        const parsed: any = JSON.parse(match[1]) as unknown;
+        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+            arraySuggestions = parsed;
+        } else {
+            console.log(`Parsed content is not a valid array of strings.`);
+        }
+    } catch (e) {
+        console.log(`Failed to parse valid JSON array from chat response. ${JSON.stringify(chatMessage, null, 2)}`);
+    }
     conversation.suggestions = {
         current: arraySuggestions,
         ids: [] //chatMessage.id != null ? conversation.suggestions.ids.concat(chatMessage.id) : conversation.suggestions.ids

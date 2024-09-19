@@ -4,6 +4,7 @@ import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import React, { useState } from 'react';
 import { SpecializationCardList } from '../../components/specialization/SpecializationCardList';
 import { GetResponseOptions, useChat } from '../../libs/hooks/useChat';
+import { ChatMessageType } from '../../libs/models/ChatMessage';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { FeatureKeys, Features } from '../../redux/features/app/AppState';
@@ -76,6 +77,7 @@ export const ChatRoom: React.FC = () => {
     const { specializations } = useAppSelector((state: RootState) => state.admin);
 
     const [showSpecialization, setShowSpecialization] = useState(true);
+    const [showSuggestions, setShowSuggestions] = useState(true);
 
     React.useEffect(() => {
         if (!shouldAutoScroll) return;
@@ -101,6 +103,10 @@ export const ChatRoom: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        if (Object.keys(messages).length <= 1) {
+            setShowSuggestions(true);
+        }
+
         if (Object.keys(messages).length <= 1 && conversations[selectedId].specializationId === '') {
             setShowSpecialization(true);
         } else {
@@ -112,6 +118,16 @@ export const ChatRoom: React.FC = () => {
         await chat.getResponse(options);
         setShouldAutoScroll(true);
     };
+
+    const suggestionClick = (message: string) => {
+         const messageBody: GetResponseOptions = {
+            messageType: ChatMessageType.Message,
+            value: message,
+            chatId: selectedId
+        }
+        void chat.getResponse(messageBody);
+        setShowSuggestions(false);
+    }
 
     if (conversations[selectedId].hidden) {
         return (
@@ -145,9 +161,12 @@ export const ChatRoom: React.FC = () => {
                     </div>
                 </div>
             )}
-            <div className={classes.suggestions}>
-                <ChatSuggestionList />
-            </div>
+            {showSuggestions && (
+                <div className={classes.suggestions}>
+                    <ChatSuggestionList onClickSuggestion={suggestionClick} />
+                </div>
+            )
+            }
             <div className={classes.input}>
                 <ChatInput isDraggingOver={isDraggingOver} onDragLeave={onDragLeave} onSubmit={handleSubmit} />
             </div>

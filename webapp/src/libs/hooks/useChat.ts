@@ -109,7 +109,7 @@ export const useChat = () => {
 
     const getSuggestions = async ({ chatId }: { chatId: string}) => {
         const ask = {
-            input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Format them as a JSON array. Respond with nothing but a valid JSON object, do not include backticks or a leading json in your response.`,
+            input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Format them as a JSON array of strings.`,
             variables: [
                 {
                     key: 'chatId',
@@ -128,7 +128,7 @@ export const useChat = () => {
              ]
         }
         return chatService
-            .getBotResponseAsync(
+            .getBotResponseSilentAsync(
                 ask,
                 await AuthHelper.getSKaaSAccessToken(instance, inProgress),
                 getEnabledPlugins(),
