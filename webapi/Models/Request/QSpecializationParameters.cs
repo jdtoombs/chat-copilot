@@ -53,6 +53,24 @@ public class QSpecializationParameters
     public string? Deployment { get; set; } = string.Empty;
 
     /// <summary>
+    /// Restrict Result Scope of the specialization
+    /// </summary>
+    [JsonPropertyName("restrictResultScope")]
+    public bool? RestrictResultScope { get; set; } = false;
+
+    /// <summary>
+    /// Strictness of the specialization
+    /// </summary>
+    [JsonPropertyName("strictness")]
+    public int? Strictness { get; set; } = 3;
+
+    /// <summary>
+    /// Document Count of the specialization
+    /// </summary>
+    [JsonPropertyName("documentCount")]
+    public int? DocumentCount { get; set; } = 5;
+
+    /// <summary>
     /// Image FilePath of the specialization.
     /// </summary>
     [JsonPropertyName("imageFilePath")]

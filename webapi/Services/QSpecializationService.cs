@@ -55,6 +55,9 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationParameters.RoleInformation,
                 qSpecializationParameters.IndexName,
                 qSpecializationParameters.Deployment,
+                qSpecializationParameters.RestrictResultScope,
+                qSpecializationParameters.Strictness,
+                qSpecializationParameters.DocumentCount,
                 qSpecializationParameters.ImageFilePath!,
                 qSpecializationParameters.IconFilePath,
                 qSpecializationParameters.GroupMemberships
@@ -100,6 +103,18 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationParameters.Deployment != null
                     ? qSpecializationParameters.Deployment
                     : specializationToUpdate!.Deployment;
+            specializationToUpdate!.RestrictResultScope =
+                qSpecializationParameters.RestrictResultScope != null
+                    ? qSpecializationParameters.RestrictResultScope
+                    : specializationToUpdate!.RestrictResultScope;
+            specializationToUpdate!.Strictness =
+                qSpecializationParameters.Strictness != null
+                    ? qSpecializationParameters.Strictness
+                    : specializationToUpdate!.Strictness;
+            specializationToUpdate!.DocumentCount =
+                qSpecializationParameters.DocumentCount != null
+                    ? qSpecializationParameters.DocumentCount
+                    : specializationToUpdate!.DocumentCount;
             specializationToUpdate!.ImageFilePath =
                 qSpecializationParameters.ImageFilePath != null
                     ? qSpecializationParameters.ImageFilePath
