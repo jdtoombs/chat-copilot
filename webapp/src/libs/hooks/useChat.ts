@@ -95,7 +95,7 @@ export const useChat = () => {
                         disabled: false,
                         hidden: false,
                         specializationId,
-                        suggestions: { ids: [], current: [] }
+                        suggestions: { ids: [], current: [] },
                     };
 
                     dispatch(addConversation(newChat));
@@ -107,7 +107,7 @@ export const useChat = () => {
         }
     };
 
-    const getSuggestions = async ({ chatId }: { chatId: string}) => {
+    const getSuggestions = async ({ chatId }: { chatId: string }) => {
         const ask = {
             input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Format them as a JSON array of strings.`,
             variables: [
@@ -124,9 +124,9 @@ export const useChat = () => {
                     value: conversations[chatId].specializationId
                         ? conversations[chatId].specializationId
                         : defaultSpecializationId,
-                 }
-             ]
-        }
+                },
+            ],
+        };
         return chatService
             .getBotResponseSilentAsync(
                 ask,
@@ -136,7 +136,7 @@ export const useChat = () => {
             .catch((e: any) => {
                 throw e;
             });
-    }
+    };
 
     const getResponse = async ({ messageType, value, chatId, kernelArguments, processPlan }: GetResponseOptions) => {
         /* eslint-disable
@@ -265,7 +265,7 @@ export const useChat = () => {
                         disabled: false,
                         hidden: !features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
                         specializationId: chatSession.specializationId,
-                        suggestions: { ids: [], current: [] }
+                        suggestions: { ids: [], current: [] },
                     };
                 }
 
@@ -324,7 +324,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: chatSession.specializationId,
-                    suggestions: { ids: [], current: [] }
+                    suggestions: { ids: [], current: [] },
                 };
 
                 dispatch(addConversation(newChat));
@@ -444,7 +444,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: result.specializationId,
-                    suggestions: { ids: [], current: [] }
+                    suggestions: { ids: [], current: [] },
                 };
 
                 dispatch(addConversation(newChat));

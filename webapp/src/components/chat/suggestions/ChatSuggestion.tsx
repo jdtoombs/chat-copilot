@@ -1,5 +1,5 @@
-import { Card, CardHeader, Text, makeStyles, tokens } from "@fluentui/react-components";
-import React from "react";
+import { Card, CardHeader, Text, makeStyles, tokens } from '@fluentui/react-components';
+import React from 'react';
 
 const useStyles = makeStyles({
     main: {
@@ -45,20 +45,27 @@ const useStyles = makeStyles({
 });
 
 interface ChatSuggestionProps {
-  onClick: (message: string) => void;
-  suggestionMainText: string;
+    onClick: (message: string) => void;
+    suggestionMainText: string;
 }
 
 export const ChatSuggestion: React.FC<ChatSuggestionProps> = ({ suggestionMainText, onClick }) => {
-  const styles = useStyles();
-  const suggestionDivID = React.useId();
-  const cardId = React.useId();
+    const styles = useStyles();
+    const suggestionDivID = React.useId();
+    const cardId = React.useId();
 
-  return (
-    <div className={ styles.root } key={suggestionDivID}>
-      <Card className={styles.card} data-testid="chatSuggestionItem" onClick={() => { onClick(suggestionMainText) } } key={cardId}>
-        <CardHeader header={<Text weight="semibold">{suggestionMainText}</Text>}/>
-      </Card>
-    </div>
-  )
-}
+    return (
+        <div className={styles.root} key={suggestionDivID}>
+            <Card
+                className={styles.card}
+                data-testid="chatSuggestionItem"
+                onClick={() => {
+                    onClick(suggestionMainText);
+                }}
+                key={cardId}
+            >
+                <CardHeader header={<Text weight="semibold">{suggestionMainText}</Text>} />
+            </Card>
+        </div>
+    );
+};

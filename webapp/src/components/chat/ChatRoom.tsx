@@ -120,14 +120,14 @@ export const ChatRoom: React.FC = () => {
     };
 
     const suggestionClick = (message: string) => {
-         const messageBody: GetResponseOptions = {
+        const messageBody: GetResponseOptions = {
             messageType: ChatMessageType.Message,
             value: message,
-            chatId: selectedId
-        }
+            chatId: selectedId,
+        };
         void chat.getResponse(messageBody);
         setShowSuggestions(false);
-    }
+    };
 
     if (conversations[selectedId].hidden) {
         return (
@@ -165,8 +165,7 @@ export const ChatRoom: React.FC = () => {
                 <div className={classes.suggestions}>
                     <ChatSuggestionList onClickSuggestion={suggestionClick} />
                 </div>
-            )
-            }
+            )}
             <div className={classes.input}>
                 <ChatInput isDraggingOver={isDraggingOver} onDragLeave={onDragLeave} onSubmit={handleSubmit} />
             </div>

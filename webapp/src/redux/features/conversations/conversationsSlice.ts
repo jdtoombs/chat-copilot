@@ -225,7 +225,7 @@ export const conversationsSlice = createSlice({
         },
         updateSuggestions: (state: ConversationsState, action: PayloadAction<ConversationSuggestionsChange>) => {
             setConversationSuggestions(state, action.payload.id, action.payload.chatSuggestionMessage);
-        }
+        },
     },
 });
 
@@ -254,10 +254,10 @@ const setConversationSuggestions = (state: ConversationsState, chatId: string, c
     try {
         const response = chatMessage.variables.find((a) => a.key === 'input');
         if (!response) {
-            throw Error(`No response key.`)
+            throw Error(`No response key.`);
         }
         const parsed: any = JSON.parse(response.value) as unknown;
-        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
             arraySuggestions = parsed;
         } else {
             console.log(`Parsed content is not a valid array of strings.`);
@@ -268,15 +268,15 @@ const setConversationSuggestions = (state: ConversationsState, chatId: string, c
     try {
         const response = chatMessage.variables.find((a) => a.key === 'input');
         if (!response) {
-            throw Error(`No response key.`)
+            throw Error(`No response key.`);
         }
         const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
         const match = regex.exec(response.value);
-         if (!match) {
-            throw Error(`No regex match.`)
+        if (!match) {
+            throw Error(`No regex match.`);
         }
         const parsed: any = JSON.parse(match[1]) as unknown;
-        if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
             arraySuggestions = parsed;
         } else {
             console.log(`Parsed content is not a valid array of strings.`);
@@ -286,10 +286,10 @@ const setConversationSuggestions = (state: ConversationsState, chatId: string, c
     }
     conversation.suggestions = {
         current: arraySuggestions,
-        ids: [] //chatMessage.id != null ? conversation.suggestions.ids.concat(chatMessage.id) : conversation.suggestions.ids
+        ids: [], //chatMessage.id != null ? conversation.suggestions.ids.concat(chatMessage.id) : conversation.suggestions.ids
     };
     conversation.messages = conversation.messages.filter((message) => message.content !== chatMessage.value);
-}
+};
 
 export const {
     setConversations,

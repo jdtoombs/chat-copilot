@@ -352,7 +352,7 @@ public class ChatPlugin
         public string Audience; //Participants from relevant chat context.
         public string UserIntent; //User intent extract from chat history.
         public string SystemInstructions; //General system instructions to be included with every prompt.
-        public ChatHistory MetaPrompt; //Chat history that can be appeneded with further details such as semantic memories.
+        public ChatHistory MetaPrompt; //Chat history that can be appended with further details such as semantic memories.
     }
 
     /// <summary>
@@ -361,7 +361,11 @@ public class ChatPlugin
     /// <param name="chatId"> Current chat guid </param>
     /// <param name="chatContext"> Current chat context, which will determine the prompt config struct. </param>
     /// <param name="cancellationToken"> Cancellation token. </param>
-    private async Task<PromptConfig> GetPromptConfig(string chatId, KernelArguments chatContext, CancellationToken cancellationToken)
+    private async Task<PromptConfig> GetPromptConfig(
+        string chatId,
+        KernelArguments chatContext,
+        CancellationToken cancellationToken
+    )
     {
         // Start rendering system instructions
         var systemInstructionsTask = AsyncUtils.SafeInvokeAsync(
@@ -402,7 +406,13 @@ public class ChatPlugin
             metaPrompt.AddSystemMessage(userIntent);
         }
 
-        return new PromptConfig { Audience = audience, UserIntent = userIntent, MetaPrompt = metaPrompt, SystemInstructions = systemInstructions };
+        return new PromptConfig
+        {
+            Audience = audience,
+            UserIntent = userIntent,
+            MetaPrompt = metaPrompt,
+            SystemInstructions = systemInstructions,
+        };
     }
 
     /// <summary>
@@ -414,13 +424,18 @@ public class ChatPlugin
     /// <param name="tokenBudget">Amount of tokens to consume while querying memories.</param>
     /// <param name="chatContext">Current chat context.</param>
     /// <param name="promptConfig">Prompt configuration to guide querying.</param>
-    private async Task<(string, IDictionary<string, CitationSource>)> GetAndInjectSemanticMemories(string chatId, int tokenBudget, KernelArguments chatContext, PromptConfig promptConfig)
+    private async Task<(string, IDictionary<string, CitationSource>)> GetAndInjectSemanticMemories(
+        string chatId,
+        int tokenBudget,
+        KernelArguments chatContext,
+        PromptConfig promptConfig
+    )
     {
         var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(
-           this._promptOptions.DocumentMemoryName,
-           chatId,
-           tokenBudget
-       );
+            this._promptOptions.DocumentMemoryName,
+            chatId,
+            tokenBudget
+        );
         var (memoryText, citationMap) = await memoryQueryTask;
         chatContext["knowledgeBase"] = memoryText;
         // Store token usage of prompt template
@@ -441,7 +456,14 @@ public class ChatPlugin
     /// <param name="promptConfig">Prompt configuration struct containing some standard prompt info.</param>
     /// <param name="userMessage">The user's specific query.</param>
     /// <param name="cancellationToken">For cancelling the request.</param>
-    private async Task<BotResponsePrompt> GetBotResponsePromptAsync(string userId, string chatId, string memoryText, PromptConfig promptConfig, CopilotChatMessage userMessage, CancellationToken cancellationToken)
+    private async Task<BotResponsePrompt> GetBotResponsePromptAsync(
+        string userId,
+        string chatId,
+        string memoryText,
+        PromptConfig promptConfig,
+        CopilotChatMessage userMessage,
+        CancellationToken cancellationToken
+    )
     {
         // Calculate max amount of tokens to use for memories
         int maxRequestTokenBudget = this.GetMaxRequestTokenBudget();
@@ -498,7 +520,14 @@ public class ChatPlugin
     {
         var promptConfig = await this.GetPromptConfig(chatId, chatContext, cancellationToken);
         var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(chatId, 0, chatContext, promptConfig);
-        var botPrompt = await this.GetBotResponsePromptAsync(userId, chatId, memoryText, promptConfig, userMessage, cancellationToken);
+        var botPrompt = await this.GetBotResponsePromptAsync(
+            userId,
+            chatId,
+            memoryText,
+            promptConfig,
+            userMessage,
+            cancellationToken
+        );
 
         return await this.StreamBotResponseAsync(
             chatId,
@@ -529,7 +558,14 @@ public class ChatPlugin
     {
         var promptConfig = await this.GetPromptConfig(chatId, chatContext, cancellationToken);
         var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(chatId, 0, chatContext, promptConfig);
-        var botPrompt = await this.GetBotResponsePromptAsync(userId, chatId, memoryText, promptConfig, userMessage, cancellationToken);
+        var botPrompt = await this.GetBotResponsePromptAsync(
+            userId,
+            chatId,
+            memoryText,
+            promptConfig,
+            userMessage,
+            cancellationToken
+        );
 
         return await this.OneOffBotResponseAsync(
             chatId,
@@ -576,7 +612,14 @@ public class ChatPlugin
             cancellationToken
         );
         // Return the constructed message without saving to chat history.
-        var chatmessage = new CopilotChatMessage(userId, "Bot", chatId, stream.Content ?? "No message returned", combinedPrompt, citations);
+        var chatmessage = new CopilotChatMessage(
+            userId,
+            "Bot",
+            chatId,
+            stream.Content ?? "No message returned",
+            combinedPrompt,
+            citations
+        );
         return chatmessage;
     }
 
