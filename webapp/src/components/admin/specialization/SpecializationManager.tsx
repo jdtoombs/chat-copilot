@@ -1,6 +1,19 @@
 import React, { useEffect, useId, useState } from 'react';
 
-import { Button, Dropdown, Input, makeStyles, Option, shorthands, Textarea, tokens } from '@fluentui/react-components';
+import {
+    Button,
+    Checkbox,
+    CheckboxOnChangeData,
+    Dropdown,
+    Input,
+    makeStyles,
+    Option,
+    shorthands,
+    Slider,
+    SliderOnChangeData,
+    Textarea,
+    tokens,
+} from '@fluentui/react-components';
 import { useSpecialization } from '../../../libs/hooks';
 import { useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
@@ -58,6 +71,17 @@ const useClasses = makeStyles({
         flexDirection: 'column',
         ...shorthands.gap(tokens.spacingVerticalSNudge),
     },
+    slidersContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        ...shorthands.gap(tokens.spacingVerticalSNudge),
+        ...shorthands.marginInline('10px'),
+    },
+    slider: {
+        display: 'flex',
+        ...shorthands.gap(tokens.spacingVerticalSNudge),
+        alignItems: 'center',
+    },
 });
 
 const Rows = 8;
@@ -87,6 +111,9 @@ export const SpecializationManager: React.FC = () => {
     const [membershipId, setMembershipId] = useState<string[]>([]);
     const [imageFile, setImageFile] = useState<ISpecializationFile>({ file: null, src: null });
     const [iconFile, setIconFile] = useState<ISpecializationFile>({ file: null, src: null });
+    const [restrictResultScope, setRestrictResultScope] = useState(false);
+    const [strictness, setStrictness] = useState(0);
+    const [documentCount, setDocumentCount] = useState(0);
 
     const [isValid, setIsValid] = useState(false);
     const dropdownId = useId();
@@ -113,6 +140,9 @@ export const SpecializationManager: React.FC = () => {
                 deleteIcon: !iconFile.src, // Set the delete flag if the src is null,
                 deployment,
                 groupMemberships: membershipId,
+                restrictResultScope,
+                strictness,
+                documentCount,
             });
             resetSpecialization();
         } else {
@@ -126,6 +156,9 @@ export const SpecializationManager: React.FC = () => {
                 iconFile: iconFile.file,
                 deployment,
                 groupMemberships: membershipId,
+                restrictResultScope,
+                strictness,
+                documentCount,
             });
             resetSpecialization();
         }
@@ -142,6 +175,9 @@ export const SpecializationManager: React.FC = () => {
         setIconFile({ file: null, src: null });
         setIndexName('');
         setDeployment('');
+        setRestrictResultScope(false);
+        setStrictness(3);
+        setDocumentCount(5);
     };
 
     useEffect(() => {
@@ -156,6 +192,7 @@ export const SpecializationManager: React.FC = () => {
                 setRoleInformation(specializationObj.roleInformation);
                 setMembershipId(specializationObj.groupMemberships);
                 setDeployment(specializationObj.deployment);
+                setRestrictResultScope(specializationObj.restrictResultScope);
                 /**
                  * Set the image and icon file paths
                  * Note: The file is set to null because we only retrieve the file path from the server
@@ -173,6 +210,27 @@ export const SpecializationManager: React.FC = () => {
     const onDeleteChat = () => {
         void specialization.deleteSpecialization(id);
         resetSpecialization();
+    };
+
+    /**
+     * Callback function for handling changes to the "Limit responses to you data content" checkbox.
+     */
+    const onChangeRestrictResultScope = (_event?: React.ChangeEvent<HTMLInputElement>, data?: CheckboxOnChangeData) => {
+        setRestrictResultScope(!!data?.checked);
+    };
+
+    /**
+     * Callback function for handling changes to the "Strictness" slider.
+     */
+    const onChangeStrictness = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
+        setStrictness(data?.value ?? 0);
+    };
+
+    /**
+     * Callback function for handling changes to the "Retrieved Documents" slider.
+     */
+    const onChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
+        setDocumentCount(data?.value ?? 0);
     };
 
     useEffect(() => {
@@ -236,6 +294,35 @@ export const SpecializationManager: React.FC = () => {
                         </Option>
                     ))}
                 </Dropdown>
+                <Checkbox
+                    label="Limit responses to your data content"
+                    checked={restrictResultScope}
+                    onChange={onChangeRestrictResultScope}
+                />
+                <div className={classes.slidersContainer}>
+                    <label htmlFor="strictness">Strictness (1-5)</label>
+                    <div id="strictness" className={classes.slider}>
+                        <Slider
+                            min={1}
+                            max={5}
+                            value={strictness}
+                            disabled={!restrictResultScope}
+                            onChange={onChangeStrictness}
+                        />
+                        <span>{strictness}</span>
+                    </div>
+                    <label htmlFor="documentCount">Retrieved Documents (3-20)</label>
+                    <div id="documentCount" className={classes.slider}>
+                        <Slider
+                            min={3}
+                            max={20}
+                            value={documentCount}
+                            disabled={!restrictResultScope}
+                            onChange={onChangeDocumentCount}
+                        />
+                        <span>{documentCount}</span>
+                    </div>
+                </div>
                 <label htmlFor="description">
                     Short Description<span className={classes.required}>*</span>
                 </label>

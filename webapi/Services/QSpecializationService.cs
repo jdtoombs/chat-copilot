@@ -156,6 +156,22 @@ public class QSpecializationService : IQSpecializationService
                     ? qSpecializationMutate.Deployment
                     : specializationToUpdate!.Deployment;
 
+            specializationToUpdate!.RestrictResultScope =
+                qSpecializationMutate.RestrictResultScope != null
+                    ? qSpecializationMutate.RestrictResultScope
+                    : specializationToUpdate!.RestrictResultScope;
+
+            specializationToUpdate!.Strictness =
+                qSpecializationMutate.Strictness != null
+                    ? qSpecializationMutate.Strictness
+                    : specializationToUpdate!.Strictness;
+
+            specializationToUpdate!.DocumentCount =
+                qSpecializationMutate.DocumentCount != null
+                    ? qSpecializationMutate.DocumentCount
+                    : specializationToUpdate!.DocumentCount;
+
+
             await this._specializationSourceRepository.UpsertAsync(specializationToUpdate);
 
             return specializationToUpdate;
