@@ -12,7 +12,7 @@ interface DeleteChatHistoryProps {
 /**
  * A React functional component for deleting chat history.
  *
- * @param {object} props - The properties passed to the component.
+ * @param {DeleteChatHistoryProps} props - The properties passed to the component.
  * @param {string} props.chatId - The unique identifier for the chat to be deleted.
  *
  * @component
