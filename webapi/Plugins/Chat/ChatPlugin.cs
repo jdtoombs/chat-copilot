@@ -292,9 +292,6 @@ public class ChatPlugin
         // Set the system description in the prompt options
         await this.SetSystemDescriptionAsync(chatId, cancellationToken);
 
-        // Save this new message to memory such that subsequent chat responses can use it
-        await this.UpdateBotResponseStatusOnClientAsync(chatId, "Generating bot response", cancellationToken);
-
         var newUserMessage = new CopilotChatMessage(
             userId,
             userName,
