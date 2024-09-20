@@ -236,7 +236,7 @@ export class ChatService extends BaseService {
 
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: `chats/${chatId}/messages/silent`,
+                commandPath: `chats/${chatId}/messages?silent=true`,
                 method: 'POST',
                 body: ask,
             },
