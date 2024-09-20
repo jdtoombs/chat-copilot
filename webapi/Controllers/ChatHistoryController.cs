@@ -434,10 +434,13 @@ public class ChatHistoryController : ControllerBase
         {
             // Create and store the tasks for deleting chat messages.
             var messages = await this._messageRepository.FindByChatIdAsync(chatIdString);
+
+            var deleteTasks = new List<Task>();
             foreach (var message in messages)
             {
-                await this._messageRepository.DeleteAsync(message);
+                deleteTasks.Add(this._messageRepository.DeleteAsync(message));
             }
+            await Task.WhenAll(deleteTasks.ToArray());
 
             // Create deleted chat history bot message
             var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
