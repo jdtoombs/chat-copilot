@@ -196,6 +196,16 @@ export const conversationsSlice = createSlice({
             frontLoadChat(state, id);
             return;
         },
+        deleteConversationHistory: (
+            state: ConversationsState,
+            action: PayloadAction<{ message: IChatMessage; chatId: string }>,
+        ) => {
+            const { message, chatId } = action.payload;
+            // Remove all messages in the conversation
+            state.conversations[chatId].messages = [];
+            // Insert "Chat History deleted" message into the conversation
+            updateConversation(state, chatId, message);
+        },
         updatePluginState: (state: ConversationsState, action: PayloadAction<UpdatePluginStatePayload>) => {
             const { id, pluginName, newState } = action.payload;
             const isPluginEnabled = state.conversations[id].enabledHostedPlugins.find((p) => p === pluginName);
@@ -303,6 +313,7 @@ export const {
     updatePluginState,
     editConversationSpecialization,
     updateSuggestions,
+    deleteConversationHistory,
 } = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;
