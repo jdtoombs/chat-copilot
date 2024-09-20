@@ -259,7 +259,7 @@ const extractJsonArray = (str: string) => {
     } catch (e) {
         return [];
     }
-}
+};
 
 const setConversationSuggestions = (state: ConversationsState, chatId: string, chatMessage: IAskResult) => {
     const conversation = state.conversations[chatId];
@@ -272,7 +272,7 @@ const setConversationSuggestions = (state: ConversationsState, chatId: string, c
     if (!arraySuggestions.length) {
         //Sometimes the bot will reply with other text and json wrapped in ```json ... ```
         //so we can try that if the first attempt didn't give us anything.
-        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g; 
+        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
         const match = regex.exec(response.value);
         if (match) {
             arraySuggestions = extractJsonArray(match[1]);
