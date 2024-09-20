@@ -248,47 +248,37 @@ const updateUserTypingState = (state: ConversationsState, userId: string, chatId
     }
 };
 
+const extractJsonArray = (str: string) => {
+    try {
+        const parsed = JSON.parse(str) as unknown;
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
+            return parsed;
+        } else {
+            return [];
+        }
+    } catch (e) {
+        return [];
+    }
+}
+
 const setConversationSuggestions = (state: ConversationsState, chatId: string, chatMessage: IAskResult) => {
     const conversation = state.conversations[chatId];
     let arraySuggestions: string[] = [];
-    try {
-        const response = chatMessage.variables.find((a) => a.key === 'input');
-        if (!response) {
-            throw Error(`No response key.`);
-        }
-        const parsed: any = JSON.parse(response.value) as unknown;
-        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
-            arraySuggestions = parsed;
-        } else {
-            console.log(`Parsed content is not a valid array of strings.`);
-        }
-    } catch (e) {
-        console.log(`Failed to parse valid JSON array from chat response. ${JSON.stringify(chatMessage, null, 2)}`);
+    const response = chatMessage.variables.find((a) => a.key === 'input');
+    if (!response) {
+        return;
     }
-    try {
-        const response = chatMessage.variables.find((a) => a.key === 'input');
-        if (!response) {
-            throw Error(`No response key.`);
-        }
-        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
+    arraySuggestions = extractJsonArray(response.value); //First try to convert from the raw string.
+    if (!arraySuggestions.length) {
+        //Sometimes the bot will reply with other text and json wrapped in ```json ... ```
+        //so we can try that if the first attempt didn't give us anything.
+        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g; 
         const match = regex.exec(response.value);
-        if (!match) {
-            throw Error(`No regex match.`);
+        if (match) {
+            arraySuggestions = extractJsonArray(match[1]);
         }
-        const parsed: any = JSON.parse(match[1]) as unknown;
-        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
-            arraySuggestions = parsed;
-        } else {
-            console.log(`Parsed content is not a valid array of strings.`);
-        }
-    } catch (e) {
-        console.log(`Failed to parse valid JSON array from chat response. ${JSON.stringify(chatMessage, null, 2)}`);
     }
-    conversation.suggestions = {
-        current: arraySuggestions,
-        ids: [], //chatMessage.id != null ? conversation.suggestions.ids.concat(chatMessage.id) : conversation.suggestions.ids
-    };
-    conversation.messages = conversation.messages.filter((message) => message.content !== chatMessage.value);
+    conversation.suggestions = arraySuggestions;
 };
 
 export const {

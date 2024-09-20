@@ -25,7 +25,7 @@ export const ChatSuggestionList: React.FC<ChatSuggestionListProps> = ({
     const classes = useClasses();
     return (
         <div className={classes.root}>
-            {conversation.conversations[conversation.selectedId].suggestions.current.map((suggestion, idx) => (
+            {conversation.conversations[conversation.selectedId].suggestions.map((suggestion, idx) => (
                 <ChatSuggestion
                     onClick={onClickSuggestion}
                     key={`suggestions-${idx}`}

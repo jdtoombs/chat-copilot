@@ -95,7 +95,7 @@ export const useChat = () => {
                         disabled: false,
                         hidden: false,
                         specializationId,
-                        suggestions: { ids: [], current: [] },
+                        suggestions: [],
                     };
 
                     dispatch(addConversation(newChat));
@@ -265,7 +265,7 @@ export const useChat = () => {
                         disabled: false,
                         hidden: !features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
                         specializationId: chatSession.specializationId,
-                        suggestions: { ids: [], current: [] },
+                        suggestions: [],
                     };
                 }
 
@@ -324,7 +324,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: chatSession.specializationId,
-                    suggestions: { ids: [], current: [] },
+                    suggestions: [],
                 };
 
                 dispatch(addConversation(newChat));
@@ -444,7 +444,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: result.specializationId,
-                    suggestions: { ids: [], current: [] },
+                    suggestions: [],
                 };
 
                 dispatch(addConversation(newChat));
