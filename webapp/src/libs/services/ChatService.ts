@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-import { ActionResult } from '../../components/shared/ActionResult';
 import { Plugin } from '../../redux/features/plugins/PluginsState';
 import { ChatMemorySource } from '../models/ChatMemorySource';
 import { IChatMessage } from '../models/ChatMessage';
@@ -144,19 +143,17 @@ export class ChatService extends BaseService {
      *
      * @param {string} chatId - The unique identifier of the chat whose history is to be deleted.
      * @param {string} accessToken - The authentication token required for making the API request.
-     * @returns {Promise<ActionResult>} A promise that resolves to an ActionResult indicating the success or failure of the deletion operation.
+     * @returns {Promise<void>} A promise that resolves to void, indicating the completion of the operation.
      * @throws {Error} If there's an error during the fetch or API response, an error will be thrown.
      */
-    public deleteChatHistoryAsync = async (chatId: string, accessToken: string): Promise<ActionResult> => {
-        const result = await this.getResponseAsync<ActionResult>(
+    public deleteChatHistoryAsync = async (chatId: string, accessToken: string): Promise<void> => {
+        await this.getResponseAsync(
             {
                 commandPath: `chats/${chatId}/history`,
                 method: 'DELETE',
             },
             accessToken,
         );
-
-        return result;
     };
 
     public rateMessageAync = async (
