@@ -18,6 +18,11 @@ interface ChatSuggestionListProps {
     onClickSuggestion: (message: string) => void;
 }
 
+/**
+ * ChatSuggestionList - enumerate a list of suggestions loaded from the current conversation state.
+ * 
+ * @param onClickSuggestion function that should be passed to each element so they may invoke it on click
+ */
 export const ChatSuggestionList: React.FC<ChatSuggestionListProps> = ({
     onClickSuggestion,
 }: ChatSuggestionListProps) => {

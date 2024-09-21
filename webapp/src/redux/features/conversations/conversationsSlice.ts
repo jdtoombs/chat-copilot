@@ -248,6 +248,12 @@ const updateUserTypingState = (state: ConversationsState, userId: string, chatId
     }
 };
 
+/**
+ * Small helper function for attempting to convert a JSON formatted string to a JS string array.
+ * Returns an empty array instead of throwing if anything fails.
+ * @param str JSON string
+ * @returns {string[]}
+ */
 const extractJsonArray = (str: string) => {
     try {
         const parsed = JSON.parse(str) as unknown;
@@ -261,6 +267,15 @@ const extractJsonArray = (str: string) => {
     }
 };
 
+/**
+ * setConversationSuggestions - After asking the bot for some suggested chat topics, this function
+ * will attempt to parse the answer as a JSON array and convert it to a valid JS string array object
+ * which will be stored in the conversation state.
+ * 
+ * @param state current conversation state 
+ * @param chatId current chatId guid
+ * @param chatMessage the chat message we got in response from the chatbot
+ */
 const setConversationSuggestions = (state: ConversationsState, chatId: string, chatMessage: IAskResult) => {
     const conversation = state.conversations[chatId];
     let arraySuggestions: string[] = [];

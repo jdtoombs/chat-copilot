@@ -49,20 +49,23 @@ interface ChatSuggestionProps {
     suggestionMainText: string;
 }
 
+/**
+ * Chat suggestion card. Simple element that invokes a function when clicked.
+ * 
+ * @param suggestionMainText Text to be rendered by the suggestion card
+ * @param onClick function to invoke when clicking the card
+ */
 export const ChatSuggestion: React.FC<ChatSuggestionProps> = ({ suggestionMainText, onClick }) => {
     const styles = useStyles();
-    const suggestionDivID = React.useId();
-    const cardId = React.useId();
-
     return (
-        <div className={styles.root} key={suggestionDivID}>
+        <div className={styles.root} key={'suggestionDivId'}>
             <Card
                 className={styles.card}
                 data-testid="chatSuggestionItem"
                 onClick={() => {
                     onClick(suggestionMainText);
                 }}
-                key={cardId}
+                key={'suggestionCardId'}
             >
                 <CardHeader header={<Text weight="semibold">{suggestionMainText}</Text>} />
             </Card>

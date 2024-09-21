@@ -247,6 +247,13 @@ export class ChatService extends BaseService {
         return result;
     };
 
+    /**
+     * getBotResponseSilentAsync - Calling this with a valid ask object will query the chatbot through a POST request,
+     * but will not show elements such as new chat bubbles or typing indicators.
+     * @param ask query for the chat bot
+     * @param accessToken valid access token
+     * @param enabledPlugins plugins, if any
+     */
     public getBotResponseSilentAsync = async (
         ask: IAsk,
         accessToken: string,
