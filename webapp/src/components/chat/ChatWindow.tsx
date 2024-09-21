@@ -24,6 +24,7 @@ import { RootState } from '../../redux/app/store';
 import { FeatureKeys } from '../../redux/features/app/AppState';
 import { Alerts } from '../shared/Alerts';
 import { ChatRoom } from './ChatRoom';
+import { DeleteChatHistory } from './controls/DeleteChatHistory';
 import { ParticipantsList } from './controls/ParticipantsList';
 import { ShareBotMenu } from './controls/ShareBotMenu';
 import { DocumentsTab } from './tabs/DocumentsTab';
@@ -214,6 +215,9 @@ export const ChatWindow: React.FC = () => {
                     />
                 </div>
                 <div className={classes.controls}>
+                    <div>
+                        <DeleteChatHistory chatId={selectedId} />
+                    </div>
                     {!features[FeatureKeys.SimplifiedExperience].enabled && (
                         <div data-testid="chatParticipantsView">
                             <ParticipantsList participants={conversations[selectedId].users} />
