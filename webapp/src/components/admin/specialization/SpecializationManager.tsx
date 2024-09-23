@@ -13,7 +13,9 @@ import {
     SliderOnChangeData,
     Textarea,
     tokens,
+    Tooltip,
 } from '@fluentui/react-components';
+import { Info20Regular } from '@fluentui/react-icons';
 import { useSpecialization } from '../../../libs/hooks';
 import { useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
@@ -296,11 +298,19 @@ export const SpecializationManager: React.FC = () => {
                         </Option>
                     ))}
                 </Dropdown>
-                <Checkbox
-                    label="Limit responses to your data content"
-                    checked={restrictResultScope}
-                    onChange={onChangeRestrictResultScope}
-                />
+                <div>
+                    <Checkbox
+                        label="Limit responses to your data content"
+                        checked={restrictResultScope}
+                        onChange={onChangeRestrictResultScope}
+                    />
+                    <Tooltip
+                        content={'Enabling this will limit responses specific to your data content'}
+                        relationship="label"
+                    >
+                        <Button icon={<Info20Regular />} appearance="transparent" />
+                    </Tooltip>
+                </div>
                 <div className={classes.slidersContainer}>
                     <label htmlFor="strictness">Strictness (1-5)</label>
                     <div id="strictness" className={classes.slider}>
@@ -312,6 +322,14 @@ export const SpecializationManager: React.FC = () => {
                             onChange={onChangeStrictness}
                         />
                         <span>{strictness}</span>
+                        <Tooltip
+                            content={
+                                'Strictness sets the threshold to categorize documents as relevant to your queries. Raising strictness means a higher threshold for relevance and filtering out more documents that are less relevant for responses. Very high strictness could cause failure to generate responses due to limited available documents. The default strictness is 3.'
+                            }
+                            relationship="label"
+                        >
+                            <Button icon={<Info20Regular />} appearance="transparent" />
+                        </Tooltip>
                     </div>
                     <label htmlFor="documentCount">Retrieved Documents (3-20)</label>
                     <div id="documentCount" className={classes.slider}>
@@ -323,6 +341,14 @@ export const SpecializationManager: React.FC = () => {
                             onChange={onChangeDocumentCount}
                         />
                         <span>{documentCount}</span>
+                        <Tooltip
+                            content={
+                                'This specifies the number of top-scoring documents from your data index used to generate responses. You want to increase the value when you have short documents or want to provide more context. The default value is 5. Note: if you set the value to 20 but only have 10 documents in your index, only 10 will be used.'
+                            }
+                            relationship="label"
+                        >
+                            <Button icon={<Info20Regular />} appearance="transparent" />
+                        </Tooltip>
                     </div>
                 </div>
                 <label htmlFor="description">
