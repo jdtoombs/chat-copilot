@@ -127,12 +127,11 @@ export const useChat = () => {
                 },
             ],
         };
-        return chatService
-            .getBotResponseSilentAsync(
-                ask,
-                await AuthHelper.getSKaaSAccessToken(instance, inProgress),
-                getEnabledPlugins(),
-            )
+        return chatService.getBotResponseSilentAsync(
+            ask,
+            await AuthHelper.getSKaaSAccessToken(instance, inProgress),
+            getEnabledPlugins(),
+        );
     };
 
     const getResponse = async ({ messageType, value, chatId, kernelArguments, processPlan }: GetResponseOptions) => {

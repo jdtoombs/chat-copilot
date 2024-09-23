@@ -51,7 +51,7 @@ interface ChatSuggestionProps {
 
 /**
  * Chat suggestion card. Simple element that invokes a function when clicked.
- * 
+ *
  * @param suggestionMainText Text to be rendered by the suggestion card
  * @param onClick function to invoke when clicking the card
  */

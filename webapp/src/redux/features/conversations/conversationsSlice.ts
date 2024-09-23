@@ -271,8 +271,8 @@ const extractJsonArray = (str: string) => {
  * setConversationSuggestions - After asking the bot for some suggested chat topics, this function
  * will attempt to parse the answer as a JSON array and convert it to a valid JS string array object
  * which will be stored in the conversation state.
- * 
- * @param state current conversation state 
+ *
+ * @param state current conversation state
  * @param chatId current chatId guid
  * @param chatMessage the chat message we got in response from the chatbot
  */
