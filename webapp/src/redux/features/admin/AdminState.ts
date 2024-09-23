@@ -26,6 +26,7 @@ export const Specializations = [
         groupMemberships: [],
         strictness: 3,
         documentCount: 20,
+        initialChatMessage: '',
     },
 ];
 export const initialState: AdminState = {

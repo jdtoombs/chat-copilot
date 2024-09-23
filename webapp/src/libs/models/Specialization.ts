@@ -12,6 +12,7 @@ export interface ISpecialization {
     groupMemberships: string[];
     strictness: number;
     documentCount: number;
+    initialChatMessage: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export interface ISpecializationRequest {
     deleteImage?: boolean; // Flag to delete the image
     deleteIcon?: boolean; // Flag to delete the icon
     groupMemberships: string[];
+    initialChatMessage: string;
 }
 
 export interface ISpecializationToggleRequest {

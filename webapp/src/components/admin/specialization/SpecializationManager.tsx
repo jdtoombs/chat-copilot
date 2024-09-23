@@ -82,6 +82,7 @@ export const SpecializationManager: React.FC = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [roleInformation, setRoleInformation] = useState('');
+    const [initialChatMessage, setInitialChatMessage] = useState('');
     const [indexName, setIndexName] = useState('');
     const [deployment, setDeployment] = useState('');
     const [membershipId, setMembershipId] = useState<string[]>([]);
@@ -113,6 +114,7 @@ export const SpecializationManager: React.FC = () => {
                 deleteIcon: !iconFile.src, // Set the delete flag if the src is null,
                 deployment,
                 groupMemberships: membershipId,
+                initialChatMessage,
             });
             resetSpecialization();
         } else {
@@ -126,6 +128,7 @@ export const SpecializationManager: React.FC = () => {
                 iconFile: iconFile.file,
                 deployment,
                 groupMemberships: membershipId,
+                initialChatMessage
             });
             resetSpecialization();
         }
@@ -142,6 +145,7 @@ export const SpecializationManager: React.FC = () => {
         setIconFile({ file: null, src: null });
         setIndexName('');
         setDeployment('');
+        setInitialChatMessage('');
     };
 
     useEffect(() => {
@@ -156,6 +160,7 @@ export const SpecializationManager: React.FC = () => {
                 setRoleInformation(specializationObj.roleInformation);
                 setMembershipId(specializationObj.groupMemberships);
                 setDeployment(specializationObj.deployment);
+                setInitialChatMessage(specializationObj.initialChatMessage);
                 /**
                  * Set the image and icon file paths
                  * Note: The file is set to null because we only retrieve the file path from the server
@@ -260,6 +265,19 @@ export const SpecializationManager: React.FC = () => {
                     rows={Rows}
                     onChange={(_event, data) => {
                         setRoleInformation(data.value);
+                    }}
+                />
+                <label htmlFor="initialMessage">
+                    Initial Chat Message<span className={classes.required}>*</span>
+                </label>
+                <Textarea
+                    id="initialMessage"
+                    required
+                    resize="vertical"
+                    value={initialChatMessage}
+                    rows={2}
+                    onChange={(_event, data) => {
+                        setInitialChatMessage(data.value);
                     }}
                 />
                 <label htmlFor="membership">
