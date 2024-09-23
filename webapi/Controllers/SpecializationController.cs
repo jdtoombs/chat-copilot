@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Models.Request;
@@ -234,6 +235,10 @@ public class SpecializationController : ControllerBase
         defaultProps.Add("imageFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationImage);
         defaultProps.Add("iconFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationIcon);
         defaultProps.Add("deployment", "gpt-4o");
+        defaultProps.Add("restrictResultScope", this._qAzureOpenAIChatOptions.DefaultRestrictResultScope.ToString());
+        defaultProps.Add("strictness", this._qAzureOpenAIChatOptions.DefaultStrictness.ToString(CultureInfo.InvariantCulture));
+        defaultProps.Add("documentCount", this._qAzureOpenAIChatOptions.DefaultDocumentCount.ToString(CultureInfo.InvariantCulture));
+
         return defaultProps;
     }
 }

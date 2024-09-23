@@ -171,7 +171,6 @@ public class QSpecializationService : IQSpecializationService
                     ? qSpecializationMutate.DocumentCount
                     : specializationToUpdate!.DocumentCount;
 
-
             await this._specializationSourceRepository.UpsertAsync(specializationToUpdate);
 
             return specializationToUpdate;

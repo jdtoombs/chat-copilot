@@ -193,6 +193,8 @@ export const SpecializationManager: React.FC = () => {
                 setMembershipId(specializationObj.groupMemberships);
                 setDeployment(specializationObj.deployment);
                 setRestrictResultScope(specializationObj.restrictResultScope);
+                setStrictness(specializationObj.strictness);
+                setDocumentCount(specializationObj.documentCount);
                 /**
                  * Set the image and icon file paths
                  * Note: The file is set to null because we only retrieve the file path from the server
