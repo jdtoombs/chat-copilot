@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace CopilotChat.WebApi.Models.Request;
@@ -59,20 +60,22 @@ public class QSpecializationBase
     public string? Deployment { get; set; } = string.Empty;
 
     /// <summary>
-    /// Restrict Result Scope of specialization
+    /// Restrict Result Scope of the specialization
     /// </summary>
     [JsonPropertyName("restrictResultScope")]
     public bool? RestrictResultScope { get; set; }
 
     /// <summary>
-    /// Strictness of specialization
+    /// Strictness of the specialization
     /// </summary>>
     [JsonPropertyName("strictness")]
+    [Range(1, 5, ErrorMessage = "Strictness must be between 1 and 5.")]
     public int? Strictness { get; set; }
 
     /// <summary>
-    /// Document Count of specialization
+    /// Document Count of the specialization
     /// </summary>>
     [JsonPropertyName("documentCount")]
+    [Range(3, 20, ErrorMessage = "Document count must be between 3 and 20.")]
     public int? DocumentCount { get; set; }
 }
