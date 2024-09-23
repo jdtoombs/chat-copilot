@@ -56,6 +56,7 @@ export class SpecializationService extends BaseService {
         formData.append('name', body.name);
         formData.append('description', body.description);
         formData.append('roleInformation', body.roleInformation);
+        formData.append('indexName', body.indexName);
         formData.append('deployment', body.deployment);
         formData.append('initialChatMessage', body.initialChatMessage);
         // This will need to be parsed on the backend
@@ -102,6 +103,7 @@ export class SpecializationService extends BaseService {
         formData.append('label', body.label);
         formData.append('name', body.name);
         formData.append('description', body.description);
+        formData.append('indexName', body.indexName);
         formData.append('roleInformation', body.roleInformation);
         formData.append('deployment', body.deployment);
         formData.append('initialChatMessage', body.initialChatMessage);
