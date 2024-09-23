@@ -117,13 +117,16 @@ public class QSpecializationService : IQSpecializationService
                 this._qAzureOpenAIChatOptions.DefaultSpecializationImage
             );
 
-            // Update the icon file and set the file path
-            specializationToUpdate.IconFilePath = await this.UpsertSpecializationBlobAsync(
-                qSpecializationMutate.IconFile,
-                new Uri(specializationToUpdate.IconFilePath),
-                Convert.ToBoolean(qSpecializationMutate.DeleteIconFile),
-                this._qAzureOpenAIChatOptions.DefaultSpecializationIcon
-            );
+            if (!string.IsNullOrEmpty(specializationToUpdate.IconFilePath)) //This should be handled better probably.
+            {
+                // Update the icon file and set the file path
+                specializationToUpdate.IconFilePath = await this.UpsertSpecializationBlobAsync(
+                    qSpecializationMutate.IconFile,
+                    new Uri(specializationToUpdate.IconFilePath),
+                    Convert.ToBoolean(qSpecializationMutate.DeleteIconFile),
+                    this._qAzureOpenAIChatOptions.DefaultSpecializationIcon
+                );
+            }
 
             specializationToUpdate!.IsActive = Convert.ToBoolean(qSpecializationMutate.isActive);
 

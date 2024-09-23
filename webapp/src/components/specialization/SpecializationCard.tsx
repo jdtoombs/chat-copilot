@@ -15,11 +15,11 @@ import { useChat } from '../../libs/hooks';
 import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
+import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
 } from '../../redux/features/conversations/conversationsSlice';
-import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 
 const useStyles = makeStyles({
     main: {

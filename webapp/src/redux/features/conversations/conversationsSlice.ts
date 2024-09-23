@@ -204,6 +204,14 @@ export const conversationsSlice = createSlice({
             // Insert "Chat History deleted" message into the conversation
             updateConversation(state, chatId, message);
         },
+        updateConversationHistory: (
+            state: ConversationsState,
+            action: PayloadAction<{ messages: IChatMessage[]; chatId: string }>,
+        ) => {
+            //This allows you to fully replace the current chat history.
+            const { messages, chatId } = action.payload;
+            state.conversations[chatId].messages = messages;
+        },
         updatePluginState: (state: ConversationsState, action: PayloadAction<UpdatePluginStatePayload>) => {
             const { id, pluginName, newState } = action.payload;
             const isPluginEnabled = state.conversations[id].enabledHostedPlugins.find((p) => p === pluginName);
@@ -265,6 +273,7 @@ export const {
     updatePluginState,
     editConversationSpecialization,
     deleteConversationHistory,
+    updateConversationHistory,
 } = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

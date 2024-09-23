@@ -321,6 +321,18 @@ public class ChatHistoryController : ControllerBase
             await this._sessionRepository.UpsertAsync(chat);
             await messageRelayHubContext.Clients.Group(chatId.ToString()).SendAsync(ChatEditedClientCall, chat);
 
+            // Here we want to retrieve the earliest message in the chat history...
+            var messages = await this._messageRepository.FindByChatIdAsync(chatId.ToString());
+            var specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.SpecializationId);
+            messages.ToList().Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
+            var earliest = messages.FirstOrDefault();
+            if (earliest != null && !string.IsNullOrEmpty(specialization.InitialChatMessage))
+            {
+                // And if one exists, override it with the specialization's custom chat message.
+                earliest.Content = specialization.InitialChatMessage;
+                await this._messageRepository.UpsertAsync(earliest);
+            }
+
             return this.Ok(chat);
         }
 
