@@ -236,8 +236,14 @@ public class SpecializationController : ControllerBase
         defaultProps.Add("iconFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationIcon);
         defaultProps.Add("deployment", "gpt-4o");
         defaultProps.Add("restrictResultScope", this._qAzureOpenAIChatOptions.DefaultRestrictResultScope.ToString());
-        defaultProps.Add("strictness", this._qAzureOpenAIChatOptions.DefaultStrictness.ToString(CultureInfo.InvariantCulture));
-        defaultProps.Add("documentCount", this._qAzureOpenAIChatOptions.DefaultDocumentCount.ToString(CultureInfo.InvariantCulture));
+        defaultProps.Add(
+            "strictness",
+            this._qAzureOpenAIChatOptions.DefaultStrictness.ToString(CultureInfo.InvariantCulture)
+        );
+        defaultProps.Add(
+            "documentCount",
+            this._qAzureOpenAIChatOptions.DefaultDocumentCount.ToString(CultureInfo.InvariantCulture)
+        );
 
         return defaultProps;
     }
