@@ -24,7 +24,6 @@ import { RootState } from '../../redux/app/store';
 import { FeatureKeys } from '../../redux/features/app/AppState';
 import { Alerts } from '../shared/Alerts';
 import { ChatRoom } from './ChatRoom';
-import { DeleteChatHistory } from './controls/DeleteChatHistory';
 import { ParticipantsList } from './controls/ParticipantsList';
 import { ShareBotMenu } from './controls/ShareBotMenu';
 import { DocumentsTab } from './tabs/DocumentsTab';
@@ -104,6 +103,7 @@ export const ChatWindow: React.FC = () => {
     const classes = useClasses();
     const { features } = useAppSelector((state: RootState) => state.app);
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
+    const botResponseStatus = conversations[selectedId].botResponseStatus;
     const [selectedTab, setSelectedTab] = React.useState<TabValue>(ChatWindowTabEnum.CHAT);
     const showShareBotMenu = features[FeatureKeys.BotAsDocs].enabled || features[FeatureKeys.MultiUserChat].enabled;
     const chatName = conversations[selectedId].title;
@@ -113,23 +113,35 @@ export const ChatWindow: React.FC = () => {
     const onTabSelect: SelectTabEventHandler = (_event, data) => {
         setSelectedTab(data.value);
     };
-    const onNewChatClick = () => {
-        void chat.createChat(chatSpecialization?.id);
+    const onNewChatClick = async () => {
+        const newChatId = await chat.createChat() ?? undefined;
         if (chatSpecialization) {
-            void chat.editChatSpecialization(selectedId, chatSpecialization.id).finally(() => {
-                const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
-                if (specializationMatch) {
-                    dispatch(setChatSpecialization(specializationMatch));
-                }
-                dispatch(editConversationSpecialization({ id: selectedId, specializationId: chatSpecialization.id }));
-                dispatch(
-                    editConversationSystemDescription({
-                        id: selectedId,
-                        newSystemDescription: chatSpecialization.roleInformation,
-                    }),
-                );
-            });
+            if (newChatId) {
+                void chat.editChatSpecialization(newChatId, chatSpecialization.id).finally(() => {
+                    const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
+                    if (specializationMatch) {
+                        dispatch(setChatSpecialization(specializationMatch));
+                    }
+                    dispatch(editConversationSpecialization({ id: newChatId, specializationId: chatSpecialization.id }));
+                    dispatch(
+                        editConversationSystemDescription({
+                            id: newChatId,
+                            newSystemDescription: chatSpecialization.roleInformation,
+                        }),
+                    );
+                });
+            }
         }
+    };
+
+    const handleNewChatClick = () => {
+        onNewChatClick().catch((error) => {
+            console.error('Error creating new chat:', error);
+        });
+    };
+
+    const onDeleteChatHistory = () => {
+        void chat.deleteChatHistory(selectedId);
     };
 
     return (
@@ -195,8 +207,15 @@ export const ChatWindow: React.FC = () => {
                         </MenuTrigger>
                         <MenuPopover>
                             <MenuList>
-                                <MenuItem onClick={onNewChatClick} key="newChat">
+                                <MenuItem onClick={handleNewChatClick} key="newChat">
                                     New Chat
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={onDeleteChatHistory}
+                                    key="deleteChatHistory"
+                                    disabled={botResponseStatus != null}
+                                >
+                                    Clear Chat History
                                 </MenuItem>
                             </MenuList>
                         </MenuPopover>
@@ -215,9 +234,6 @@ export const ChatWindow: React.FC = () => {
                     />
                 </div>
                 <div className={classes.controls}>
-                    <div>
-                        <DeleteChatHistory chatId={selectedId} />
-                    </div>
                     {!features[FeatureKeys.SimplifiedExperience].enabled && (
                         <div data-testid="chatParticipantsView">
                             <ParticipantsList participants={conversations[selectedId].users} />

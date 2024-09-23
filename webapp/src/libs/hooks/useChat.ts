@@ -77,32 +77,32 @@ export const useChat = () => {
     const createChat = async (specializationId = defaultSpecializationId) => {
         const chatTitle = `Q-Pilot @ ${new Date().toLocaleString()}`;
         try {
-            await chatService
-                .createChatAsync(chatTitle, await AuthHelper.getSKaaSAccessToken(instance, inProgress))
-                .then((result: ICreateChatSessionResponse) => {
-                    const newChat: ChatState = {
-                        id: result.chatSession.id,
-                        title: result.chatSession.title,
-                        systemDescription: result.chatSession.systemDescription,
-                        memoryBalance: result.chatSession.memoryBalance,
-                        messages: [result.initialBotMessage],
-                        enabledHostedPlugins: result.chatSession.enabledPlugins,
-                        users: [loggedInUser],
-                        botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
-                        input: '',
-                        botResponseStatus: undefined,
-                        userDataLoaded: false,
-                        disabled: false,
-                        hidden: false,
-                        specializationId,
-                    };
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            const result: ICreateChatSessionResponse = await chatService.createChatAsync(chatTitle, accessToken);
 
-                    dispatch(addConversation(newChat));
-                    return newChat.id;
-                });
+            const newChat: ChatState = {
+                id: result.chatSession.id,
+                title: result.chatSession.title,
+                systemDescription: result.chatSession.systemDescription,
+                memoryBalance: result.chatSession.memoryBalance,
+                messages: [result.initialBotMessage],
+                enabledHostedPlugins: result.chatSession.enabledPlugins,
+                users: [loggedInUser],
+                botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
+                input: '',
+                botResponseStatus: undefined,
+                userDataLoaded: false,
+                disabled: false,
+                hidden: false,
+                specializationId,
+            };
+
+            dispatch(addConversation(newChat));
+            return newChat.id;
         } catch (e: any) {
             const errorMessage = `Unable to create new chat. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+            return undefined;
         }
     };
 
