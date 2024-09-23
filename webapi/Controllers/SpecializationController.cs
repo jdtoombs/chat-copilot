@@ -124,6 +124,7 @@ public class SpecializationController : ControllerBase
         [FromForm] QSpecializationMutate qSpecializationMutate
     )
     {
+        Console.WriteLine($"This is the object we received: {qSpecializationMutate.InitialChatMessage}");
         try
         {
             var _specializationsource = await this._qspecializationService.SaveSpecialization(qSpecializationMutate);

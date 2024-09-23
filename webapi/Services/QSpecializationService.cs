@@ -79,6 +79,7 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationMutate.Name,
                 qSpecializationMutate.Description,
                 qSpecializationMutate.RoleInformation,
+                qSpecializationMutate.InitialChatMessage,
                 qSpecializationMutate.IndexName,
                 qSpecializationMutate.Deployment,
                 imageFilePath,
@@ -152,6 +153,11 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationMutate.Deployment != null
                     ? qSpecializationMutate.Deployment
                     : specializationToUpdate!.Deployment;
+
+            specializationToUpdate!.InitialChatMessage =
+                qSpecializationMutate.InitialChatMessage != null
+                    ? qSpecializationMutate.InitialChatMessage
+                    : specializationToUpdate!.InitialChatMessage;
 
             await this._specializationSourceRepository.UpsertAsync(specializationToUpdate);
 
