@@ -139,7 +139,7 @@ export const ChatWindow: React.FC = () => {
         } else {
             console.error('Error creating new chat:', newChatId);
         }
-};
+    };
 
     const onDeleteChatHistory = () => {
         void chat.deleteChatHistory(selectedId);
@@ -209,7 +209,11 @@ export const ChatWindow: React.FC = () => {
                         <MenuPopover>
                             <MenuList>
                                 <MenuItem
-                                    onClick={() => {void onNewChatClick();}} key="newChat">
+                                    onClick={() => {
+                                        void onNewChatClick();
+                                    }}
+                                    key="newChat"
+                                >
                                     New Chat
                                 </MenuItem>
                                 <MenuItem
