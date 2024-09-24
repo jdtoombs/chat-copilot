@@ -312,7 +312,9 @@ public class ChatHistoryController : ControllerBase
                     chatParameters.SpecializationId
                 );
                 chat!.SystemDescription = specializationSource.RoleInformation;
-                var specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.SpecializationId);
+                var specialization = await this._qSpecializationService.GetSpecializationAsync(
+                    chatParameters.SpecializationId
+                );
                 // Here we want to retrieve the earliest message in the chat history...
                 var messages = await this._messageRepository.FindByChatIdAsync(chatId.ToString());
 

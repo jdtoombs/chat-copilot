@@ -128,7 +128,7 @@ export const SpecializationManager: React.FC = () => {
                 iconFile: iconFile.file,
                 deployment,
                 groupMemberships: membershipId,
-                initialChatMessage
+                initialChatMessage,
             });
             resetSpecialization();
         }
