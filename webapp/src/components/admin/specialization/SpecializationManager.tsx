@@ -314,13 +314,7 @@ export const SpecializationManager: React.FC = () => {
                 <div className={classes.slidersContainer}>
                     <label htmlFor="strictness">Strictness (1-5)</label>
                     <div id="strictness" className={classes.slider}>
-                        <Slider
-                            min={1}
-                            max={5}
-                            value={strictness}
-                            disabled={!restrictResultScope}
-                            onChange={onChangeStrictness}
-                        />
+                        <Slider min={1} max={5} value={strictness} onChange={onChangeStrictness} />
                         <span>{strictness}</span>
                         <Tooltip
                             content={
@@ -333,13 +327,7 @@ export const SpecializationManager: React.FC = () => {
                     </div>
                     <label htmlFor="documentCount">Retrieved Documents (3-20)</label>
                     <div id="documentCount" className={classes.slider}>
-                        <Slider
-                            min={3}
-                            max={20}
-                            value={documentCount}
-                            disabled={!restrictResultScope}
-                            onChange={onChangeDocumentCount}
-                        />
+                        <Slider min={3} max={20} value={documentCount} onChange={onChangeDocumentCount} />
                         <span>{documentCount}</span>
                         <Tooltip
                             content={
