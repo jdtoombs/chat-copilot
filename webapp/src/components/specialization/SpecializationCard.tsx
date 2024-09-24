@@ -15,11 +15,11 @@ import { useChat } from '../../libs/hooks';
 import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
+import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
 } from '../../redux/features/conversations/conversationsSlice';
-import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 
 const useStyles = makeStyles({
     main: {
@@ -86,7 +86,8 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
     const { specializations } = useAppSelector((state: RootState) => state.admin);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const onAddChat = () => {
-        void chat.editChatSpecialization(selectedId, specialization.id).finally(() => {
+        console.log(`SpecializationCard thinks this is the current id: ${selectedId}`);
+        void chat.selectSpecializationAndBeginChat(specialization.id, selectedId).finally(() => {
             const specializationMatch = specializations.find((spec) => spec.id === specialization.id);
             if (specializationMatch) {
                 dispatch(setChatSpecialization(specializationMatch));

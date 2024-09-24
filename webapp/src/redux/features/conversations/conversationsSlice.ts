@@ -72,6 +72,7 @@ export const conversationsSlice = createSlice({
             const newId = action.payload.id;
             state.conversations = { [newId]: action.payload, ...state.conversations };
             state.selectedId = newId;
+            console.log(JSON.stringify(state.conversations, null, 2));
         },
         addUserToConversation: (
             state: ConversationsState,

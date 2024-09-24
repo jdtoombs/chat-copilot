@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 import { useMsal } from '@azure/msal-react';
+import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../Constants';
 import botIcon1 from '../../assets/bot-icons/bot-icon-1.png';
 import { getErrorDetails } from '../../components/utils/TextUtils';
@@ -74,36 +74,64 @@ export const useChat = () => {
         return users.find((user) => user.id === id);
     };
     const defaultSpecializationId = specializationsState.find((a) => a.id === 'general')?.id ?? '';
-    const createChat = async (specializationId = defaultSpecializationId) => {
+    const createChat = (specializationId = defaultSpecializationId) => {
         const chatTitle = `Q-Pilot @ ${new Date().toLocaleString()}`;
         try {
-            await chatService
-                .createChatAsync(chatTitle, await AuthHelper.getSKaaSAccessToken(instance, inProgress))
-                .then((result: ICreateChatSessionResponse) => {
-                    const newChat: ChatState = {
-                        id: result.chatSession.id,
-                        title: result.chatSession.title,
-                        systemDescription: result.chatSession.systemDescription,
-                        memoryBalance: result.chatSession.memoryBalance,
-                        messages: [result.initialBotMessage],
-                        enabledHostedPlugins: result.chatSession.enabledPlugins,
-                        users: [loggedInUser],
-                        botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
-                        input: '',
-                        botResponseStatus: undefined,
-                        userDataLoaded: false,
-                        disabled: false,
-                        hidden: false,
-                        specializationId,
-                    };
-
-                    dispatch(addConversation(newChat));
-                    return newChat.id;
-                });
+            const newChat: ChatState = {
+                id: uuidv4(),
+                title: chatTitle,
+                systemDescription: '',
+                memoryBalance: -1,
+                messages: [],
+                enabledHostedPlugins: [],
+                users: [loggedInUser],
+                botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
+                input: '',
+                botResponseStatus: undefined,
+                userDataLoaded: false,
+                disabled: false,
+                hidden: false,
+                specializationId,
+            };
+            dispatch(addConversation(newChat));
+            return newChat.id;
         } catch (e: any) {
             const errorMessage = `Unable to create new chat. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+            return '';
         }
+    };
+
+    const selectSpecializationAndBeginChat = async (specializationId: string, chatId: string) => {
+        const conversation = conversations[chatId];
+        await chatService
+            .createChatAsync(
+                conversation.title,
+                specializationId,
+                await AuthHelper.getSKaaSAccessToken(instance, inProgress),
+                chatId,
+            )
+            .then((result: ICreateChatSessionResponse) => {
+                const newChat: ChatState = {
+                    id: result.chatSession.id,
+                    title: result.chatSession.title,
+                    systemDescription: result.chatSession.systemDescription,
+                    memoryBalance: result.chatSession.memoryBalance,
+                    messages: [result.initialBotMessage],
+                    enabledHostedPlugins: result.chatSession.enabledPlugins,
+                    users: [loggedInUser],
+                    botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
+                    input: '',
+                    botResponseStatus: undefined,
+                    userDataLoaded: false,
+                    disabled: false,
+                    hidden: false,
+                    specializationId,
+                };
+                dispatch(addConversation(newChat));
+                dispatch(addMessageToConversationFromUser({ message: result.initialBotMessage, chatId }));
+                return newChat.id;
+            });
     };
 
     const getResponse = async ({ messageType, value, chatId, kernelArguments, processPlan }: GetResponseOptions) => {
@@ -241,13 +269,13 @@ export const useChat = () => {
                 // If there are no non-hidden chats, create a new chat
                 const nonHiddenChats = Object.values(loadedConversations).filter((c) => !c.hidden);
                 if (nonHiddenChats.length === 0) {
-                    await createChat();
+                    createChat();
                 } else {
                     dispatch(setSelectedConversation(nonHiddenChats[0].id));
                 }
             } else {
                 // No chats exist, create first chat window
-                await createChat();
+                createChat();
             }
 
             return true;
@@ -558,6 +586,7 @@ export const useChat = () => {
         deleteChat,
         deleteChatHistory,
         processPlan,
+        selectSpecializationAndBeginChat,
     };
 };
 
