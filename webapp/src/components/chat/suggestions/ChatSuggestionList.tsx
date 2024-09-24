@@ -9,7 +9,6 @@ const useClasses = makeStyles({
         display: 'flex',
         flexDirection: 'row',
         width: '100%',
-        maxWidth: '105em',
         justifyContent: 'center',
     },
 });

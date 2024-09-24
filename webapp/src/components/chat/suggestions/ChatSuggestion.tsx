@@ -9,7 +9,7 @@ const useStyles = makeStyles({
 
     card: {
         maxWidth: '250px',
-        height: '100px',
+        height: '200px',
     },
 
     root: {
@@ -22,25 +22,9 @@ const useStyles = makeStyles({
         textOverflow: 'ellipsis',
     },
 
-    smallRadius: { borderRadius: tokens.borderRadiusSmall },
-
-    grayBackground: {
-        backgroundColor: tokens.colorNeutralBackground3,
-    },
-
-    logoBadge: {
-        padding: '5px',
-        borderRadius: tokens.borderRadiusSmall,
-        backgroundColor: '#FFF',
-        boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 2px rgba(0, 0, 0, 0.12)',
-    },
-
-    showTooltip: {
-        display: 'show',
-    },
-
-    hideTooltip: {
-        display: 'none',
+    textContainer: {
+        display: 'flex',
+        flexDirection: 'column',
     },
 });
 
@@ -67,7 +51,16 @@ export const ChatSuggestion: React.FC<ChatSuggestionProps> = ({ suggestionMainTe
                 }}
                 key={'suggestionCardId'}
             >
-                <CardHeader header={<Text weight="semibold">{suggestionMainText}</Text>} />
+                <CardHeader
+                    header={
+                        <div className={styles.textContainer}>
+                            <Text size={500} weight="bold">
+                                Q:
+                            </Text>
+                            <Text weight="semibold">{suggestionMainText}</Text>
+                        </div>
+                    }
+                />
             </Card>
         </div>
     );
