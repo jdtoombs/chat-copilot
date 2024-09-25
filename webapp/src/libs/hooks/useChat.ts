@@ -92,6 +92,7 @@ export const useChat = () => {
                 disabled: false,
                 hidden: false,
                 specializationId,
+                createdOnServer: false,
             };
             dispatch(addConversation(newChat));
             return newChat.id;
@@ -127,9 +128,9 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId,
+                    createdOnServer: true,
                 };
                 dispatch(addConversation(newChat));
-                dispatch(addMessageToConversationFromUser({ message: result.initialBotMessage, chatId }));
                 return newChat.id;
             });
     };
@@ -261,6 +262,7 @@ export const useChat = () => {
                         disabled: false,
                         hidden: !features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
                         specializationId: chatSession.specializationId,
+                        createdOnServer: true,
                     };
                 }
 
@@ -319,6 +321,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: chatSession.specializationId,
+                    createdOnServer: true,
                 };
 
                 dispatch(addConversation(newChat));
@@ -438,6 +441,7 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId: result.specializationId,
+                    createdOnServer: true,
                 };
 
                 dispatch(addConversation(newChat));
@@ -450,12 +454,12 @@ export const useChat = () => {
         return { success: true, message: '' };
     };
 
-    const editChat = async (chatId: string, title: string, syetemDescription: string, memoryBalance: number) => {
+    const editChat = async (chatId: string, title: string, systemDescription: string, memoryBalance: number) => {
         try {
             await chatService.editChatAsync(
                 chatId,
                 title,
-                syetemDescription,
+                systemDescription,
                 memoryBalance,
                 await AuthHelper.getSKaaSAccessToken(instance, inProgress),
             );
@@ -491,30 +495,33 @@ export const useChat = () => {
 
     const deleteChat = async (chatId: string) => {
         const friendlyChatName = getFriendlyChatName(conversations[chatId]);
-        await chatService
-            .deleteChatAsync(chatId, await AuthHelper.getSKaaSAccessToken(instance, inProgress))
-            .then(() => {
-                dispatch(deleteConversation(chatId));
+        if (conversations[chatId].createdOnServer) {
+            await chatService
+                .deleteChatAsync(chatId, await AuthHelper.getSKaaSAccessToken(instance, inProgress))
+                .then(() => {
+                    dispatch(deleteConversation(chatId));
 
-                if (Object.values(conversations).filter((c) => !c.hidden && c.id !== chatId).length === 0) {
-                    // If there are no non-hidden chats, create a new chat
-                    //void createChat();
-                }
-            })
-            .catch((e: any) => {
-                const errorDetails = (e as Error).message.includes('Failed to delete resources for chat id')
-                    ? "Some or all resources associated with this chat couldn't be deleted. Please try again."
-                    : `Details: ${(e as Error).message}`;
-                dispatch(
-                    addAlert({
-                        message: `Unable to delete chat {${friendlyChatName}}. ${errorDetails}`,
-                        type: AlertType.Error,
-                        onRetry: () => void deleteChat(chatId),
-                    }),
-                );
-            });
+                    if (Object.values(conversations).filter((c) => !c.hidden && c.id !== chatId).length === 0) {
+                        // If there are no non-hidden chats, create a new chat
+                        //void createChat();
+                    }
+                })
+                .catch((e: any) => {
+                    const errorDetails = (e as Error).message.includes('Failed to delete resources for chat id')
+                        ? "Some or all resources associated with this chat couldn't be deleted. Please try again."
+                        : `Details: ${(e as Error).message}`;
+                    dispatch(
+                        addAlert({
+                            message: `Unable to delete chat {${friendlyChatName}}. ${errorDetails}`,
+                            type: AlertType.Error,
+                            onRetry: () => void deleteChat(chatId),
+                        }),
+                    );
+                });
+        } else {
+            dispatch(deleteConversation(chatId));
+        }
     };
-    ``;
 
     /**
      * Asynchronously deletes the chat history for a given chat ID.

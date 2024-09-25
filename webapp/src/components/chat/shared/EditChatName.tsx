@@ -47,12 +47,16 @@ export const EditChatName: React.FC<IEditChatNameProps> = ({ name, chatId, exitE
         if (selectedId !== chatId) exitEdits();
     }, [chatId, exitEdits, selectedId]);
 
-    const onSaveTitleChange = async () => {
+    const onSaveTitleChange = () => {
         if (name !== title) {
             const chatState = conversations[selectedId];
-            await chat.editChat(chatId, title, chatState.systemDescription, chatState.memoryBalance).then(() => {
+            if (chatState.createdOnServer) {
+                void chat.editChat(chatId, title, chatState.systemDescription, chatState.memoryBalance).then(() => {
+                    dispatch(editConversationTitle({ id: chatId, newTitle: title }));
+                });
+            } else {
                 dispatch(editConversationTitle({ id: chatId, newTitle: title }));
-            });
+            }
         }
         exitEdits();
     };
@@ -67,10 +71,12 @@ export const EditChatName: React.FC<IEditChatNameProps> = ({ name, chatId, exitE
     };
 
     const handleSave = () => {
-        onSaveTitleChange().catch((e: any) => {
+        try {
+            onSaveTitleChange();
+        } catch (e: any) {
             const errorMessage = `Unable to retrieve chat to change title. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
-        });
+        }
     };
 
     const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (event) => {
