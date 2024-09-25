@@ -87,23 +87,26 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
     const { specializations } = useAppSelector((state: RootState) => state.admin);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const onAddChat = () => {
-        console.log(`SpecializationCard thinks this is the current id: ${selectedId}`);
-        void chat.selectSpecializationAndBeginChat(specialization.id, selectedId).finally(() => {
-            const specializationMatch = specializations.find((spec) => spec.id === specialization.id);
-            if (specializationMatch) {
-                dispatch(setChatSpecialization(specializationMatch));
-            }
-            dispatch(editConversationSpecialization({ id: selectedId, specializationId: specialization.id }));
-            dispatch(
-                editConversationSystemDescription({
-                    id: selectedId,
-                    newSystemDescription: specialization.roleInformation,
+        void chat
+            .selectSpecializationAndBeginChat(specialization.id, selectedId)
+            .finally(() => {
+                const specializationMatch = specializations.find((spec) => spec.id === specialization.id);
+                if (specializationMatch) {
+                    dispatch(setChatSpecialization(specializationMatch));
+                }
+                dispatch(editConversationSpecialization({ id: selectedId, specializationId: specialization.id }));
+                dispatch(
+                    editConversationSystemDescription({
+                        id: selectedId,
+                        newSystemDescription: specialization.roleInformation,
+                    }),
+                );
+            })
+            .then(() =>
+                chat.getSuggestions({ chatId: selectedId }).then((response) => {
+                    dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
                 }),
             );
-        });
-        void chat.getSuggestions({ chatId: selectedId }).then((response) => {
-            dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
-        });
     };
 
     const truncate = (str: string) => {

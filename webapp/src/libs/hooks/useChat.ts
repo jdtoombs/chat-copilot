@@ -177,8 +177,6 @@ export const useChat = () => {
             authorRole: AuthorRoles.User,
         };
 
-        dispatch(addMessageToConversationFromUser({ message: chatInput, chatId: chatId }));
-
         const ask = {
             input: value,
             variables: [
@@ -205,16 +203,13 @@ export const useChat = () => {
 
         try {
             const conversation = conversations[currentConversationId];
-            if (!conversation.specializationId) {
-                await chatService.editChatSepcializationAsync(
-                    conversation.id,
-                    defaultSpecializationId,
-                    await AuthHelper.getSKaaSAccessToken(instance, inProgress),
-                );
+            if (!conversation.createdOnServer) {
+                await selectSpecializationAndBeginChat(defaultSpecializationId, conversation.id);
                 dispatch(
                     editConversationSpecialization({ id: conversation.id, specializationId: defaultSpecializationId }),
                 );
             }
+            dispatch(addMessageToConversationFromUser({ message: chatInput, chatId: chatId }));
             const askResult = await chatService
                 .getBotResponseAsync(
                     ask,
