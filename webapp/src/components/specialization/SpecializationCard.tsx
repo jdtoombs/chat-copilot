@@ -19,6 +19,7 @@ import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
+    updateSuggestions,
 } from '../../redux/features/conversations/conversationsSlice';
 
 const useStyles = makeStyles({
@@ -99,6 +100,9 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                     newSystemDescription: specialization.roleInformation,
                 }),
             );
+        });
+        void chat.getSuggestions({ chatId: selectedId }).then((response) => {
+            dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
         });
     };
 

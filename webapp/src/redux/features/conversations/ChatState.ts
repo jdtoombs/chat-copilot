@@ -23,4 +23,5 @@ export interface ChatState {
     hidden: boolean; // For hiding a chat from the list
     specializationId?: string;
     createdOnServer: boolean; //Flag used to check whether this piece of state has been persisted to the server store yet or not
+    suggestions: string[];
 }

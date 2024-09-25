@@ -92,6 +92,7 @@ export const useChat = () => {
                 disabled: false,
                 hidden: false,
                 specializationId,
+                suggestions: [],
                 createdOnServer: false,
             };
             dispatch(addConversation(newChat));
@@ -128,11 +129,38 @@ export const useChat = () => {
                     disabled: false,
                     hidden: false,
                     specializationId,
+                    suggestions: [],
                     createdOnServer: true,
                 };
                 dispatch(addConversation(newChat));
                 return newChat.id;
             });
+    };
+    const getSuggestions = async ({ chatId }: { chatId: string }) => {
+        const ask = {
+            input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Format them as a JSON array of strings.`,
+            variables: [
+                {
+                    key: 'chatId',
+                    value: chatId,
+                },
+                {
+                    key: 'messageType',
+                    value: ChatMessageType.Message.toString(),
+                },
+                {
+                    key: 'specialization',
+                    value: conversations[chatId].specializationId
+                        ? conversations[chatId].specializationId
+                        : defaultSpecializationId,
+                },
+            ],
+        };
+        return chatService.getBotResponseSilentAsync(
+            ask,
+            await AuthHelper.getSKaaSAccessToken(instance, inProgress),
+            getEnabledPlugins(),
+        );
     };
 
     const getResponse = async ({ messageType, value, chatId, kernelArguments, processPlan }: GetResponseOptions) => {
@@ -263,6 +291,7 @@ export const useChat = () => {
                         hidden: !features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
                         specializationId: chatSession.specializationId,
                         createdOnServer: true,
+                        suggestions: [],
                     };
                 }
 
@@ -322,6 +351,7 @@ export const useChat = () => {
                     hidden: false,
                     specializationId: chatSession.specializationId,
                     createdOnServer: true,
+                    suggestions: [],
                 };
 
                 dispatch(addConversation(newChat));
@@ -442,6 +472,7 @@ export const useChat = () => {
                     hidden: false,
                     specializationId: result.specializationId,
                     createdOnServer: true,
+                    suggestions: [],
                 };
 
                 dispatch(addConversation(newChat));
@@ -581,6 +612,7 @@ export const useChat = () => {
         createChat,
         loadChats,
         getResponse,
+        getSuggestions,
         downloadBot,
         uploadBot,
         getChatMemorySources,
