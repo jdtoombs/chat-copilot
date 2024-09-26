@@ -232,7 +232,7 @@ public class SpecializationController : ControllerBase
             RoleInformation = this._promptOptions.SystemDescription,
             ImageFilePath = ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage),
             IconFilePath = ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon),
-            Deployment = this._qAzureOpenAIChatOptions.DefaultModel,
+            Deployment = "gpt-4o",
             RestrictResultScope = this._qAzureOpenAIChatOptions.DefaultRestrictResultScope,
             Strictness = this._qAzureOpenAIChatOptions.DefaultStrictness,
             DocumentCount = this._qAzureOpenAIChatOptions.DefaultDocumentCount,
