@@ -524,7 +524,12 @@ public class ChatPlugin
             - TokenUtils.GetContextMessageTokenCount(AuthorRole.User, userMessage.ToFormattedString());
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
-        var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(chatId, chatMemoryTokenBudget, chatContext, promptConfig);
+        var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(
+            chatId,
+            chatMemoryTokenBudget,
+            chatContext,
+            promptConfig
+        );
         var botPrompt = await this.GetBotResponsePromptAsync(
             userId,
             chatId,
@@ -572,7 +577,12 @@ public class ChatPlugin
             - TokenUtils.GetContextMessageTokenCount(AuthorRole.User, userMessage.ToFormattedString());
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
-        var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(chatId, chatMemoryTokenBudget, chatContext, promptConfig);
+        var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(
+            chatId,
+            chatMemoryTokenBudget,
+            chatContext,
+            promptConfig
+        );
         var botPrompt = await this.GetBotResponsePromptAsync(
             userId,
             chatId,
