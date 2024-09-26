@@ -2,6 +2,7 @@ import React, { useEffect, useId, useState } from 'react';
 
 import { Button, Dropdown, Input, makeStyles, Option, shorthands, Textarea, tokens } from '@fluentui/react-components';
 import { useSpecialization } from '../../../libs/hooks';
+import { useToast } from '../../../libs/hooks/useToast';
 import { useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
 import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
@@ -69,6 +70,7 @@ const Rows = 8;
  */
 export const SpecializationManager: React.FC = () => {
     const specialization = useSpecialization();
+    const toast = useToast();
     const classes = useClasses();
 
     const { specializations, specializationIndexes, chatCompletionDeployments, selectedId } = useAppSelector(
@@ -129,6 +131,7 @@ export const SpecializationManager: React.FC = () => {
             });
             resetSpecialization();
         }
+        toast.showToast({ title: 'Specialization Saved', intent: 'success' });
     };
 
     const resetSpecialization = () => {

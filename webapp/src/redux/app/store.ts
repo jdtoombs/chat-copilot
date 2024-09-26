@@ -9,14 +9,15 @@ import {
     UnknownAction,
     configureStore,
 } from '@reduxjs/toolkit';
+import { AdminState } from '../features/admin/AdminState';
 import { AppState } from '../features/app/AppState';
 import { ConversationsState } from '../features/conversations/ConversationsState';
 import { signalRMiddleware } from '../features/message-relay/signalRMiddleware';
 import { PluginsState } from '../features/plugins/PluginsState';
+import { SearchState } from '../features/search/SearchState';
+import { ToastState } from '../features/toast/ToastState';
 import { UsersState } from '../features/users/UsersState';
 import resetStateReducer, { resetApp } from './rootReducer';
-import { SearchState } from '../features/search/SearchState';
-import { AdminState } from '../features/admin/AdminState';
 
 export type StoreMiddlewareAPI = MiddlewareAPI<Dispatch, RootState>;
 export type Store = typeof store;
@@ -32,6 +33,7 @@ export interface RootState {
     users: UsersState;
     search: SearchState;
     admin: AdminState;
+    toast: ToastState;
 }
 
 export const getSelectedChatID = (): string => {
