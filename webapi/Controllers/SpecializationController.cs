@@ -74,8 +74,8 @@ public class SpecializationController : ControllerBase
             QSpecializationResponse qSpecializationResponse = new(specialization);
             specializationResponses.Add(qSpecializationResponse);
         }
-        var defaultSpecializationProps = this.GetDefaultSpecializationDict();
-        specializationResponses.Add(new QSpecializationResponse(defaultSpecializationProps));
+        var defaultSpecialization = this.GetDefaultSpecialization();
+        specializationResponses.Add(new QSpecializationResponse(defaultSpecialization));
         return this.Ok(specializationResponses);
     }
 
@@ -217,41 +217,28 @@ public class SpecializationController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the default specialization properties
+    /// Gets the default specialization
     /// </summary>
-    /// <returns>The dictionary containing default specialization properties</returns>
-    private Dictionary<string, string> GetDefaultSpecializationDict()
+    /// <returns>An instance of <see cref="Specialization"/></returns>
+    private Specialization GetDefaultSpecialization()
     {
-        var defaultProps = new Dictionary<string, string>();
-        defaultProps.Add("id", "general");
-        defaultProps.Add("label", "general");
-        defaultProps.Add("name", "General");
-        defaultProps.Add(
-            "description",
-            string.IsNullOrEmpty(this._qAzureOpenAIChatOptions.DefaultSpecializationDescription)
+        var defaultSpecialization = new Specialization()
+        {
+            Id = "general",
+            Label = "general",
+            Name = "General",
+            Description = string.IsNullOrEmpty(this._qAzureOpenAIChatOptions.DefaultSpecializationDescription)
                 ? "This is a chat between an intelligent AI bot named Copilot and one or more participants. SK stands for Semantic Kernel, the AI platform used to build the bot."
-                : this._qAzureOpenAIChatOptions.DefaultSpecializationDescription
-        );
-        defaultProps.Add("roleInformation", this._promptOptions.SystemDescription);
-        defaultProps.Add(
-            "imageFilePath",
-            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage)
-        );
-        defaultProps.Add(
-            "iconFilePath",
-            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon)
-        );
-        defaultProps.Add("deployment", "gpt-4o");
-        defaultProps.Add("restrictResultScope", this._qAzureOpenAIChatOptions.DefaultRestrictResultScope.ToString());
-        defaultProps.Add(
-            "strictness",
-            this._qAzureOpenAIChatOptions.DefaultStrictness.ToString(CultureInfo.InvariantCulture)
-        );
-        defaultProps.Add(
-            "documentCount",
-            this._qAzureOpenAIChatOptions.DefaultDocumentCount.ToString(CultureInfo.InvariantCulture)
-        );
+                : this._qAzureOpenAIChatOptions.DefaultSpecializationDescription,
+            RoleInformation = this._promptOptions.SystemDescription,
+            ImageFilePath = ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage),
+            IconFilePath = ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon),
+            Deployment = this._qAzureOpenAIChatOptions.DefaultModel,
+            RestrictResultScope = this._qAzureOpenAIChatOptions.DefaultRestrictResultScope,
+            Strictness = this._qAzureOpenAIChatOptions.DefaultStrictness,
+            DocumentCount = this._qAzureOpenAIChatOptions.DefaultDocumentCount,
+        };
 
-        return defaultProps;
+        return defaultSpecialization;
     }
 }

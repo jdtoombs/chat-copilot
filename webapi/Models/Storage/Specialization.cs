@@ -108,6 +108,8 @@ public class Specialization : IStorageEntity
     /// </summary>>
     public int? DocumentCount { get; set; }
 
+    public Specialization() { }
+
     public Specialization(
         string Label,
         string Name,

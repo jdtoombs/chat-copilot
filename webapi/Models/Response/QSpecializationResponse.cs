@@ -121,27 +121,4 @@ public class QSpecializationResponse
             this.Deployment = specializationSource.Deployment;
         }
     }
-
-    /// <summary>
-    /// Creates new instance from default specialization dictionary.
-    /// </summary>
-    public QSpecializationResponse(Dictionary<string, string> specializationProps)
-    {
-        this.Id = specializationProps["id"];
-        this.Label = specializationProps["label"];
-        this.Name = specializationProps["name"];
-        this.Description = specializationProps["description"];
-        this.RoleInformation = specializationProps["roleInformation"];
-        this.ImageFilePath = specializationProps["imageFilePath"];
-        this.IconFilePath = specializationProps["iconFilePath"];
-        this.Deployment = specializationProps["deployment"];
-        this.RestrictResultScope = bool.Parse(specializationProps["restrictResultScope"]);
-        this.Strictness = int.Parse(specializationProps["strictness"], CultureInfo.InvariantCulture);
-        this.DocumentCount = int.Parse(specializationProps["documentCount"], CultureInfo.InvariantCulture);
-        if (specializationProps.TryGetValue("indexName", out string? value))
-        {
-            this.IndexName = value;
-        }
-        this.isActive = true;
-    }
 }
