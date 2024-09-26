@@ -12,6 +12,7 @@ using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
+using CopilotChat.WebApi.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -232,8 +233,14 @@ public class SpecializationController : ControllerBase
                 : this._qAzureOpenAIChatOptions.DefaultSpecializationDescription
         );
         defaultProps.Add("roleInformation", this._promptOptions.SystemDescription);
-        defaultProps.Add("imageFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationImage);
-        defaultProps.Add("iconFilePath", this._qAzureOpenAIChatOptions.DefaultSpecializationIcon);
+        defaultProps.Add(
+            "imageFilePath",
+            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage)
+        );
+        defaultProps.Add(
+            "iconFilePath",
+            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon)
+        );
         defaultProps.Add("deployment", "gpt-4o");
         defaultProps.Add("restrictResultScope", this._qAzureOpenAIChatOptions.DefaultRestrictResultScope.ToString());
         defaultProps.Add(
