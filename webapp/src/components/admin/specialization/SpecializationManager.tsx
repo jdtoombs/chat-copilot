@@ -146,7 +146,6 @@ export const SpecializationManager: React.FC = () => {
                 strictness,
                 documentCount,
             });
-            resetSpecialization();
         } else {
             void specialization.createSpecialization({
                 label,
@@ -162,7 +161,6 @@ export const SpecializationManager: React.FC = () => {
                 strictness,
                 documentCount,
             });
-            resetSpecialization();
         }
     };
 

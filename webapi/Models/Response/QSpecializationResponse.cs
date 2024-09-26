@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.Json.Serialization;
 using CopilotChat.WebApi.Models.Storage;
 
