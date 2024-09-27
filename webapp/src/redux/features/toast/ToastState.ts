@@ -1,8 +1,14 @@
 export interface ToastData {
-    id: string;
     title?: string;
     body?: string;
-    intent?: string;
+    intent?: AppToastIntent;
+}
+
+export enum AppToastIntent {
+    Success = 'success',
+    Error = 'error',
+    Warning = 'warning',
+    Info = 'info',
 }
 
 export interface ToastState {

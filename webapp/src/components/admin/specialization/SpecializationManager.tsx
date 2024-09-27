@@ -5,6 +5,7 @@ import { useSpecialization } from '../../../libs/hooks';
 import { useToast } from '../../../libs/hooks/useToast';
 import { useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
+import { AppToastIntent } from '../../../redux/features/toast/ToastState';
 import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
 
 interface ISpecializationFile {
@@ -131,7 +132,10 @@ export const SpecializationManager: React.FC = () => {
             });
             resetSpecialization();
         }
-        toast.showToast({ title: 'Specialization Saved', intent: 'success' });
+        toast.showToast({
+            title: 'Specialization Saved',
+            intent: AppToastIntent.Success,
+        });
     };
 
     const resetSpecialization = () => {

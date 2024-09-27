@@ -1,15 +1,18 @@
 import {
+    Link,
     Toast,
     ToastBody,
     Toaster,
     ToastIntent,
     ToastTitle,
+    ToastTrigger,
     useId,
     useToastController,
 } from '@fluentui/react-components';
 import { useEffect } from 'react';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
+import { Dismiss16 } from '../shared/BundledIcons';
 
 const ToastContainer = () => {
     const toasterId = useId('toaster');
@@ -19,16 +22,24 @@ const ToastContainer = () => {
 
     useEffect(() => {
         if (currentToast) {
-            const { title, body, intent, id } = currentToast;
-            if (title ?? body) {
-                dispatchToast(
-                    <Toast key={id}>
-                        {title && <ToastTitle>{title}</ToastTitle>}
-                        {body && <ToastBody>{body}</ToastBody>}
-                    </Toast>,
-                    { intent: intent as ToastIntent },
-                );
-            }
+            const { title, body, intent } = currentToast;
+            dispatchToast(
+                <Toast>
+                    <ToastTitle
+                        action={
+                            <ToastTrigger>
+                                <Link>
+                                    <Dismiss16 />
+                                </Link>
+                            </ToastTrigger>
+                        }
+                    >
+                        {title}
+                    </ToastTitle>
+                    <ToastBody>{body}</ToastBody>
+                </Toast>,
+                { position: 'top-end', intent: intent as ToastIntent },
+            );
         }
     }, [currentToast, dispatchToast]);
 
