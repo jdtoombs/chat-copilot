@@ -95,6 +95,7 @@ export const useChat = () => {
                 disabled: false,
                 hidden: false,
                 specializationId,
+                suggestions: [],
             };
             dispatch(addConversation(newChat));
             return newChat.id;

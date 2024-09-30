@@ -9,14 +9,8 @@ import {
     TabList,
     TabValue,
     tokens,
-    Button,
-    Menu,
-    MenuItem,
-    MenuTrigger,
-    MenuList,
-    MenuPopover,
 } from '@fluentui/react-components';
-import { Map16Regular, ChevronDown16Regular } from '@fluentui/react-icons';
+import { Map16Regular } from '@fluentui/react-icons';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { useChat } from '../../libs/hooks';
@@ -34,6 +28,7 @@ import {
     editConversationSpecialization,
     editConversationSystemDescription,
 } from '../../redux/features/conversations/conversationsSlice';
+import { ChatMenu } from './controls/ChatMenu';
 
 // Enum for chat window tabs
 enum ChatWindowTabEnum {
@@ -195,37 +190,14 @@ export const ChatWindow: React.FC = () => {
                     </TabList>
                 </div>
                 <div className={classes.rightSection}>
-                    <Menu>
-                        <MenuTrigger>
-                            <Button
-                                appearance="transparent"
-                                className={classes.menu}
-                                icon={<ChevronDown16Regular />}
-                                iconPosition="after"
-                            >
-                                {chatSpecialization?.name}
-                            </Button>
-                        </MenuTrigger>
-                        <MenuPopover>
-                            <MenuList>
-                                <MenuItem
-                                    onClick={() => {
-                                        void onNewChatClick();
-                                    }}
-                                    key="newChat"
-                                >
-                                    New Chat
-                                </MenuItem>
-                                <MenuItem
-                                    onClick={onDeleteChatHistory}
-                                    key="deleteChatHistory"
-                                    disabled={botResponseStatus != null}
-                                >
-                                    Clear Chat History
-                                </MenuItem>
-                            </MenuList>
-                        </MenuPopover>
-                    </Menu>
+                    <ChatMenu
+                        onNewChatClick={() => {
+                            void onNewChatClick();
+                        }}
+                        onDeleteChatHistory={onDeleteChatHistory}
+                        botResponseStatus={botResponseStatus}
+                        chatSpecialization={chatSpecialization}
+                    />
                     <Persona
                         key={'Semantic Kernel Bot'}
                         size="medium"
