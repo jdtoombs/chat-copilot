@@ -77,24 +77,7 @@ const useClasses = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         ...shorthands.margin(0, '72px'),
-    },
-    menu: {
-        backgroundColor: 'transparent',
-        border: 'none',
-        boxShadow: 'none',
-        padding: '4px',
-        width: 'auto',
-        ':hover': {
-            border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
-            color: 'black',
-        },
-        ':focus': {
-            border: `0.5px solid ${tokens.colorNeutralStroke1Hover}`,
-        },
-        ':active': {
-            border: `0.5px solid ${tokens.colorNeutralStroke1Pressed}`,
-        },
-    },
+    }
 });
 
 export const ChatWindow: React.FC = () => {
