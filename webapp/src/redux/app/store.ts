@@ -15,7 +15,6 @@ import { ConversationsState } from '../features/conversations/ConversationsState
 import { signalRMiddleware } from '../features/message-relay/signalRMiddleware';
 import { PluginsState } from '../features/plugins/PluginsState';
 import { SearchState } from '../features/search/SearchState';
-import { ToastState } from '../features/toast/ToastState';
 import { UsersState } from '../features/users/UsersState';
 import resetStateReducer, { resetApp } from './rootReducer';
 
@@ -33,7 +32,6 @@ export interface RootState {
     users: UsersState;
     search: SearchState;
     admin: AdminState;
-    toast: ToastState;
 }
 
 export const getSelectedChatID = (): string => {

@@ -1,11 +1,12 @@
 import React, { useEffect, useId, useState } from 'react';
 
 import { Button, Dropdown, Input, makeStyles, Option, shorthands, Textarea, tokens } from '@fluentui/react-components';
+import { useDispatch } from 'react-redux';
 import { useSpecialization } from '../../../libs/hooks';
-import { useToast } from '../../../libs/hooks/useToast';
+import { AlertType } from '../../../libs/models/AlertType';
 import { useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
-import { AppToastIntent } from '../../../redux/features/toast/ToastState';
+import { addAlert } from '../../../redux/features/app/appSlice';
 import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
 
 interface ISpecializationFile {
@@ -70,9 +71,9 @@ const Rows = 8;
  * @returns {*}
  */
 export const SpecializationManager: React.FC = () => {
-    const specialization = useSpecialization();
-    const toast = useToast();
     const classes = useClasses();
+    const dispatch = useDispatch();
+    const specialization = useSpecialization();
 
     const { specializations, specializationIndexes, chatCompletionDeployments, selectedId } = useAppSelector(
         (state: RootState) => state.admin,
@@ -132,10 +133,13 @@ export const SpecializationManager: React.FC = () => {
             });
             resetSpecialization();
         }
-        toast.showToast({
-            title: 'Specialization Saved',
-            intent: AppToastIntent.Success,
-        });
+        const message = `Specialization {${name}} saved successfully.`;
+        dispatch(
+            addAlert({
+                type: AlertType.Success,
+                message,
+            }),
+        );
     };
 
     const resetSpecialization = () => {

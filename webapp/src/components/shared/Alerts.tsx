@@ -1,64 +1,60 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
-import { Alert } from '@fluentui/react-components/unstable';
-import React from 'react';
+import {
+    Link,
+    Toast,
+    Toaster,
+    ToastIntent,
+    ToastTitle,
+    ToastTrigger,
+    useId,
+    useToastController,
+} from '@fluentui/react-components';
+import { Dismiss12Regular } from '@fluentui/react-icons';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { removeAlert } from '../../redux/features/app/appSlice';
-import { Dismiss16 } from './BundledIcons';
 
-const useClasses = makeStyles({
-    alert: {
-        fontWeight: tokens.fontWeightRegular,
-        color: tokens.colorNeutralForeground1,
-        backgroundColor: tokens.colorNeutralBackground6,
-        fontSize: tokens.fontSizeBase200,
-        lineHeight: tokens.lineHeightBase200,
-    },
-    actionItems: {
-        display: 'flex',
-        flexDirection: 'row',
-        ...shorthands.gap(tokens.spacingHorizontalMNudge),
-    },
-    button: {
-        alignSelf: 'center',
-    },
-});
-
-export const Alerts: React.FC = () => {
-    const classes = useClasses();
+const Alerts = () => {
     const dispatch = useAppDispatch();
+
+    const toasterId = useId('toaster');
+    const { dispatchToast } = useToastController(toasterId);
+
     const { alerts } = useAppSelector((state: RootState) => state.app);
 
-    return (
-        <div>
-            {alerts.map(({ type, message, onRetry }, index) => {
-                return (
-                    <Alert
-                        intent={type}
-                        action={{
-                            children: (
-                                <div className={classes.actionItems}>
-                                    {onRetry && <div onClick={onRetry}>Retry</div>}
-                                    <Dismiss16
-                                        aria-label="dismiss message"
-                                        onClick={() => {
-                                            dispatch(removeAlert(index));
-                                        }}
-                                        color="black"
-                                        className={classes.button}
-                                    />
-                                </div>
-                            ),
-                        }}
-                        key={`${index}-${type}`}
-                        className={classes.alert}
+    useEffect(() => {
+        alerts.forEach((alert, index) => {
+            console.log(alert.type);
+            dispatchToast(
+                <Toast>
+                    <ToastTitle
+                        action={
+                            <ToastTrigger>
+                                <Link>
+                                    <Dismiss12Regular />
+                                </Link>
+                            </ToastTrigger>
+                        }
                     >
-                        {message.slice(0, 1000) + (message.length > 1000 ? '...' : '')}
-                    </Alert>
-                );
-            })}
-        </div>
-    );
+                        {alert.message}
+                    </ToastTitle>
+                </Toast>,
+                {
+                    position: 'top-end',
+                    intent: alert.type as ToastIntent,
+                    onStatusChange: (_e, { status: toastStatus }) => {
+                        if (toastStatus === 'dismissed') {
+                            dispatch(removeAlert(index));
+                        }
+                    },
+                },
+            );
+        });
+    }, [alerts, dispatch, dispatchToast]);
+
+    return <Toaster toasterId={toasterId} />;
 };
+
+export default Alerts;

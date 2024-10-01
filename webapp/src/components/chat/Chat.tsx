@@ -2,7 +2,7 @@ import React from 'react';
 import { AuthHelper } from '../..//libs/auth/AuthHelper';
 import { AppState, useClasses } from '../../App';
 import Header from '../header/Header';
-import ToastContainer from '../toast/ToastContainer';
+import Alerts from '../shared/Alerts';
 import { BackendProbe, ChatView, Error, Loading } from '../views';
 
 const Chat = ({
@@ -25,7 +25,7 @@ const Chat = ({
     }, [setAppState]);
     return (
         <div className={classes.container}>
-            <ToastContainer />
+            <Alerts />
             <Header appState={appState} setAppState={setAppState} showPluginsAndSettings={true} />
             {appState === AppState.ProbeForBackend && <BackendProbe onBackendFound={onBackendFound} />}
             {appState === AppState.SettingUserInfo && (
