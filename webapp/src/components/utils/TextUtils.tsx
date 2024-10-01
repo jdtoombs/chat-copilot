@@ -99,3 +99,19 @@ export function replaceCitationLinksWithIndices(formattedMessageContent: string,
 export function getErrorDetails(error: unknown) {
     return error instanceof Error ? error.message : String(error);
 }
+
+/**
+ * Generates a unique ID based on a timestamp with an optional prefix.
+ * @param prefix - A string to prepend to the generated ID for categorization or identification.
+ * @returns A unique string ID.
+ */
+export function generateTimestampId(prefix = ''): string {
+    // Generate the timestamp part in base 36 to reduce length
+    const timestamp = Date.now().toString(36);
+
+    // Add a random component for further uniqueness
+    const random = Math.random().toString(36).substr(2, 3);
+
+    // Combine prefix with timestamp and random parts
+    return `${prefix}${timestamp}${random}`;
+}
