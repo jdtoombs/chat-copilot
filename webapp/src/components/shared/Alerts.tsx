@@ -26,7 +26,6 @@ const Alerts = () => {
 
     useEffect(() => {
         alerts.forEach((alert, index) => {
-            console.log(alert.type);
             dispatchToast(
                 <Toast>
                     <ToastTitle
