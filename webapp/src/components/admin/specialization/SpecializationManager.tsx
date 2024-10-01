@@ -181,9 +181,16 @@ export const SpecializationManager: React.FC = () => {
         }
     }, [editMode, selectedId, specializations]);
 
-    const onDeleteChat = () => {
+    const onDeleteSpecialization = () => {
         void specialization.deleteSpecialization(id);
         resetSpecialization();
+        const message = `Specialization {${name}} deleted successfully.`;
+        dispatch(
+            addAlert({
+                type: AlertType.Warning,
+                message,
+            }),
+        );
     };
 
     useEffect(() => {
@@ -312,7 +319,7 @@ export const SpecializationManager: React.FC = () => {
                     </div>
                 </div>
                 <div className={classes.controls}>
-                    <Button appearance="secondary" disabled={!id} onClick={onDeleteChat}>
+                    <Button appearance="secondary" disabled={!id} onClick={onDeleteSpecialization}>
                         Delete
                     </Button>
 
