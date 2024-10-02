@@ -164,7 +164,7 @@ public class QSpecializationService : IQSpecializationService
         specializationToUpdate.Strictness = qSpecializationMutate.Strictness ?? specializationToUpdate.Strictness;
         specializationToUpdate.DocumentCount =
             qSpecializationMutate.DocumentCount ?? specializationToUpdate.DocumentCount;
-        specializationToUpdate.MaxResponseTokenLimit = 
+        specializationToUpdate.MaxResponseTokenLimit =
             qSpecializationMutate.MaxResponseTokenLimit ?? specializationToUpdate.MaxResponseTokenLimit;
 
         await this._specializationSourceRepository.UpsertAsync(specializationToUpdate);
