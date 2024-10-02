@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -69,7 +70,15 @@ public class ChatPlugin
     /// </summary>
     private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
 
+    /// <summary>
+    /// The QSpecializationService used for managing specializations.
+    /// </summary>
     private readonly QSpecializationService _qSpecializationService;
+
+    /// <summary>
+    /// The current specialization in use, may be null if not yet set or if no specialization applies.
+    /// </summary>
+    private Specialization? _qSpecialization = null;
 
     /// <summary>
     /// Settings containing prompt texts.
@@ -254,6 +263,16 @@ public class ChatPlugin
         KernelArguments chatContext = new(context);
         chatContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
 
+        // Retrieve the specialization key or default to the predefined default specialization key
+        var specializationKey =
+            context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString()
+            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
+        // Fetch specialization only if the context key differs from the default
+        if (specializationKey != this._qAzureOpenAIChatExtension.DefaultSpecialization)
+        {
+            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+        }
+
         this._logger.LogInformation("Getting chat response");
         // Directly get the chat response without extracting user intent
         CopilotChatMessage chatMessage = await this.GetChatResponseAsync(
@@ -317,6 +336,16 @@ public class ChatPlugin
         // Clone the context to avoid modifying the original context variables.
         KernelArguments chatContext = new(context);
         chatContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
+
+        // Retrieve the specialization key or default to the predefined default specialization key
+        var specializationKey =
+            context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString()
+            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
+        // Fetch specialization only if the context key differs from the default
+        if (specializationKey != this._qAzureOpenAIChatExtension.DefaultSpecialization)
+        {
+            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+        }
 
         this._logger.LogInformation("Getting chat response! Silent version.");
         // Directly get the chat response without extracting user intent
@@ -621,7 +650,6 @@ public class ChatPlugin
         CancellationToken cancellationToken
     )
     {
-        string speckey = (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!;
         string serializedContext = JsonSerializer.Serialize(chatContext);
 
         // Combine the context with the main prompt
@@ -632,7 +660,7 @@ public class ChatPlugin
         var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
         var stream = await chatCompletion.GetChatMessageContentAsync(
             chatHistory,
-            await this.CreateChatRequestSettingsAsync(speckey),
+            this.CreateChatRequestSettings(),
             this._kernel,
             cancellationToken
         );
@@ -689,15 +717,7 @@ public class ChatPlugin
     {
         CopilotChatMessage chatMessage = await AsyncUtils.SafeInvokeAsync(
             () =>
-                this.StreamResponseToClientAsync(
-                    chatId,
-                    userId,
-                    (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!,
-                    promptView,
-                    chatContext,
-                    cancellationToken,
-                    citations
-                ),
+                this.StreamResponseToClientAsync(chatId, userId, promptView, chatContext, cancellationToken, citations),
             nameof(StreamResponseToClientAsync)
         );
 
@@ -753,12 +773,9 @@ public class ChatPlugin
             );
 
         audienceContext["tokenLimit"] = historyTokenBudget.ToString(new NumberFormatInfo());
-        var specializationKey =
-            context[this._qAzureOpenAIChatExtension.ContextKey]
-            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
         var completionFunction = this._kernel.CreateFunctionFromPrompt(
             this._promptOptions.SystemAudienceExtraction,
-            await this.CreateIntentCompletionSettingsAsync((string)specializationKey),
+            this.CreateIntentCompletionSettings(),
             functionName: "SystemAudienceExtraction",
             description: "Extract audience"
         );
@@ -807,12 +824,9 @@ public class ChatPlugin
 
         intentContext["tokenLimit"] = tokenBudget.ToString(new NumberFormatInfo());
         intentContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
-        var specializationKey =
-            context[this._qAzureOpenAIChatExtension.ContextKey]
-            ?? this._qAzureOpenAIChatExtension.DefaultSpecialization;
         var completionFunction = this._kernel.CreateFunctionFromPrompt(
             this._promptOptions.SystemIntentExtraction,
-            await this.CreateIntentCompletionSettingsAsync((string)specializationKey),
+            this.CreateIntentCompletionSettings(),
             functionName: "UserIntentExtraction",
             description: "Extract user intent"
         );
@@ -945,7 +959,7 @@ public class ChatPlugin
     /// <summary>
     /// Create `OpenAIPromptExecutionSettings` for chat response. Parameters are read from the PromptSettings class.
     /// </summary>
-    private async Task<OpenAIPromptExecutionSettings> CreateChatRequestSettingsAsync(string specializationId)
+    private OpenAIPromptExecutionSettings CreateChatRequestSettings()
     {
 #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         return new OpenAIPromptExecutionSettings
@@ -956,10 +970,9 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.ResponseFrequencyPenalty,
             PresencePenalty = this._promptOptions.ResponsePresencePenalty,
             ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            AzureChatExtensionsOptions =
-                this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true
-                    ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId)
-                    : null,
+            AzureChatExtensionsOptions = this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(
+                this._qSpecialization
+            ),
         };
 #pragma warning restore SKEXP0010 //Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     }
@@ -967,7 +980,7 @@ public class ChatPlugin
     /// <summary>
     /// Create `OpenAIPromptExecutionSettings` for intent response. Parameters are read from the PromptSettings class.
     /// </summary>
-    private async Task<OpenAIPromptExecutionSettings> CreateIntentCompletionSettingsAsync(string specializationId)
+    private OpenAIPromptExecutionSettings CreateIntentCompletionSettings()
     {
 #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         return new OpenAIPromptExecutionSettings
@@ -978,10 +991,9 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.IntentFrequencyPenalty,
             PresencePenalty = this._promptOptions.IntentPresencePenalty,
             StopSequences = new string[] { "] bot:" },
-            AzureChatExtensionsOptions =
-                this._qAzureOpenAIChatExtension.isEnabled(specializationId) == true
-                    ? await this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(specializationId)
-                    : null,
+            AzureChatExtensionsOptions = this._qAzureOpenAIChatExtension.GetAzureChatExtensionsOptions(
+                this._qSpecialization
+            ),
         };
 #pragma warning restore SKEXP0010 //Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     }
@@ -1045,7 +1057,6 @@ public class ChatPlugin
     private async Task<CopilotChatMessage> StreamResponseToClientAsync(
         string chatId,
         string userId,
-        string specializationkey,
         BotResponsePrompt prompt,
         KernelArguments chatContext,
         CancellationToken cancellationToken,
@@ -1062,14 +1073,10 @@ public class ChatPlugin
         chatHistory.AddUserMessage(combinedPrompt);
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
-        var specialization =
-            specializationkey == "general"
-                ? null
-                : await this._qSpecializationService.GetSpecializationAsync(specializationkey);
         var serviceId =
-            (specialization == null || specialization.Deployment == defaultModel)
+            (this._qSpecialization == null || this._qSpecialization.Deployment == defaultModel)
                 ? "default"
-                : specialization.Deployment;
+                : this._qSpecialization.Deployment;
         var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
         if (chatCompletion == null)
         {
@@ -1077,7 +1084,7 @@ public class ChatPlugin
         }
         var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
             chatHistory,
-            await this.CreateChatRequestSettingsAsync(specializationkey),
+            this.CreateChatRequestSettings(),
             this._kernel,
             cancellationToken
         );
@@ -1088,30 +1095,21 @@ public class ChatPlugin
         var citationPattern = new Regex(@"\[(doc\d+)\](,)?");
         var accumulatedContent = new StringBuilder();
 
-        // Create message on client
-        CopilotChatMessage chatMessage;
-        if (specializationkey == "general")
-        {
-            chatMessage = await this.CreateBotMessageOnClient(
-                chatId,
-                userId,
-                JsonSerializer.Serialize(prompt),
-                string.Empty,
-                cancellationToken,
-                citations
-            );
-        }
-        else
-        {
-            chatMessage = await this.CreateBotMessageOnClient(
-                chatId,
-                userId,
-                JsonSerializer.Serialize(prompt),
-                string.Empty,
-                cancellationToken,
-                new List<CitationSource>()
-            );
-        }
+        // Determine the citations based on whether the current specialization matches the default
+        var citationsToUse =
+            this._qSpecialization?.Id == this._qAzureOpenAIChatExtension.DefaultSpecialization
+                ? citations
+                : new List<CitationSource>();
+
+        // Create message on client with determined citations
+        var chatMessage = await this.CreateBotMessageOnClient(
+            chatId,
+            userId,
+            JsonSerializer.Serialize(prompt),
+            string.Empty,
+            cancellationToken,
+            citationsToUse
+        );
 
         // Stream the message to the client
         await foreach (var contentPiece in stream)
@@ -1180,8 +1178,7 @@ public class ChatPlugin
             {
                 if (match.Groups.Count > 1)
                 {
-                    var referenceIndex =
-                        int.Parse(match.Groups[1].Value.Substring(3), CultureInfo.InvariantCulture) - 1; // Extract the index from "docX"
+                    var referenceIndex = int.Parse(match.Groups[1].Value.AsSpan(3), CultureInfo.InvariantCulture) - 1; // Extract the index from "docX"
                     if (referenceIndex >= 0 && referenceIndex < responseCitations.Count)
                     {
                         referencedCitations.Add(responseCitations[referenceIndex].SourceName);
@@ -1199,21 +1196,25 @@ public class ChatPlugin
                 match =>
                 {
                     var citationKey = match.Groups[1].Value;
-                    if (!citationIndexMap.ContainsKey(citationKey))
+                    if (!citationIndexMap.TryGetValue(citationKey, out int value))
                     {
-                        citationIndexMap[citationKey] = citationIndexMap.Count + 1;
+                        value = citationIndexMap.Count + 1;
+                        citationIndexMap[citationKey] = value;
                     }
-                    return $"^{citationIndexMap[citationKey]}^";
+                    return $"^{value}^";
                 }
             );
 
             // Update the message content and citations on the client
             chatMessage.Content += processedContentPiece;
-            // Conditionally update citations based on specialization key
-            if (specializationkey != "general")
+
+            // Determine citations based on specialization
+            if (this._qSpecialization?.Id != this._qAzureOpenAIChatExtension.DefaultSpecialization)
             {
                 chatMessage.Citations = filteredCitations;
             }
+
+            // Update the message on the client with the new content and possibly updated citations
             await this.UpdateMessageOnClient(chatMessage, cancellationToken);
         }
 
