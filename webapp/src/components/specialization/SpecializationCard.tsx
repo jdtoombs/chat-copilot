@@ -100,7 +100,7 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                 }),
             );
         });
-        void chat.getSuggestions({ chatId: selectedId }).then((response) => {
+        void chat.getSuggestions({ chatId: selectedId, specializationId: specialization.id }).then((response) => {
             dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
         });
     };

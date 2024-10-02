@@ -106,7 +106,7 @@ export const useChat = () => {
         }
     };
 
-    const getSuggestions = async ({ chatId }: { chatId: string }) => {
+    const getSuggestions = async ({ chatId, specializationId }: { chatId: string; specializationId: string }) => {
         const ask = {
             input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Format them as a JSON array of strings.`,
             variables: [
@@ -120,9 +120,7 @@ export const useChat = () => {
                 },
                 {
                     key: 'specialization',
-                    value: conversations[chatId].specializationId
-                        ? conversations[chatId].specializationId
-                        : defaultSpecializationId,
+                    value: specializationId ? specializationId : defaultSpecializationId,
                 },
             ],
         };

@@ -27,6 +27,7 @@ import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
+    updateSuggestions,
 } from '../../redux/features/conversations/conversationsSlice';
 import { ChatMenu } from './controls/ChatMenu';
 
@@ -77,7 +78,7 @@ const useClasses = makeStyles({
         display: 'flex',
         flexDirection: 'column',
         ...shorthands.margin(0, '72px'),
-    }
+    },
 });
 
 export const ChatWindow: React.FC = () => {
@@ -113,6 +114,11 @@ export const ChatWindow: React.FC = () => {
                         }),
                     );
                 });
+                void chat
+                    .getSuggestions({ chatId: newChatId, specializationId: chatSpecialization.id })
+                    .then((response) => {
+                        dispatch(updateSuggestions({ id: newChatId, chatSuggestionMessage: response }));
+                    });
             }
         } else {
             console.error('Error creating new chat:', newChatId);
