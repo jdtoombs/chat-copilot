@@ -27,6 +27,7 @@ export const Specializations = [
         restrictResultScope: false,
         strictness: 3,
         documentCount: 20,
+        maxResponseTokenLimit: 1024,
     },
 ];
 export const initialState: AdminState = {

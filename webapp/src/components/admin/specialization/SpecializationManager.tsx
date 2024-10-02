@@ -116,6 +116,7 @@ export const SpecializationManager: React.FC = () => {
     const [restrictResultScope, setRestrictResultScope] = useState(false);
     const [strictness, setStrictness] = useState(0);
     const [documentCount, setDocumentCount] = useState(0);
+    const [maxResponseTokenLimit, setMaxResponseTokenLimit] = useState(0);
 
     const [isValid, setIsValid] = useState(false);
     const dropdownId = useId();
@@ -145,6 +146,7 @@ export const SpecializationManager: React.FC = () => {
                 restrictResultScope,
                 strictness,
                 documentCount,
+                maxResponseTokenLimit,
             });
         } else {
             void specialization.createSpecialization({
@@ -160,6 +162,7 @@ export const SpecializationManager: React.FC = () => {
                 restrictResultScope,
                 strictness,
                 documentCount,
+                maxResponseTokenLimit,
             });
         }
     };
@@ -178,6 +181,7 @@ export const SpecializationManager: React.FC = () => {
         setRestrictResultScope(false);
         setStrictness(3);
         setDocumentCount(5);
+        setMaxResponseTokenLimit(1024);
     };
 
     useEffect(() => {
@@ -195,6 +199,7 @@ export const SpecializationManager: React.FC = () => {
                 setRestrictResultScope(specializationObj.restrictResultScope);
                 setStrictness(specializationObj.strictness);
                 setDocumentCount(specializationObj.documentCount);
+                setMaxResponseTokenLimit(specializationObj.maxResponseTokenLimit);
                 /**
                  * Set the image and icon file paths
                  * Note: The file is set to null because we only retrieve the file path from the server
@@ -233,6 +238,13 @@ export const SpecializationManager: React.FC = () => {
      */
     const onChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
         setDocumentCount(data?.value ?? 0);
+    };
+
+    /**
+     * Callback function for handling changes to the "Max Response" slider.
+     */
+    const onChangeMaxResponseTokenLimit = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
+        setMaxResponseTokenLimit(data?.value ?? 0);
     };
 
     useEffect(() => {
@@ -330,6 +342,24 @@ export const SpecializationManager: React.FC = () => {
                         <Tooltip
                             content={
                                 'This specifies the number of top-scoring documents from your data index used to generate responses. You want to increase the value when you have short documents or want to provide more context. The default value is 5. Note: if you set the value to 20 but only have 10 documents in your index, only 10 will be used.'
+                            }
+                            relationship="label"
+                        >
+                            <Button icon={<Info20Regular />} appearance="transparent" />
+                        </Tooltip>
+                    </div>
+                    <label htmlFor="maxResponse">Max Response (1-4096)</label>
+                    <div id="maxResponse" className={classes.slider}>
+                        <Slider
+                            min={1}
+                            max={4096}
+                            value={maxResponseTokenLimit}
+                            onChange={onChangeMaxResponseTokenLimit}
+                        />
+                        <span>{maxResponseTokenLimit}</span>
+                        <Tooltip
+                            content={
+                                "Set a limit on the number of tokens per model response. The supported number of tokens are shared between the prompt (including system message, examples, message history, and user query) and the model's response. One token is roughly 4 characters for typical English text."
                             }
                             relationship="label"
                         >

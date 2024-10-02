@@ -72,22 +72,28 @@ public class QSpecializationResponse
     public bool isActive { get; set; } = true;
 
     /// <summary>
-    /// List of group memberships for the user.
+    /// Restrict result scope flag of the specialization.
     /// </summary>
     [JsonPropertyName("restrictResultScope")]
     public bool? RestrictResultScope { get; set; } = false;
 
     /// <summary>
-    /// List of group memberships for the user.
+    /// Strictness of the specialization.
     /// </summary>
     [JsonPropertyName("strictness")]
     public int? Strictness { get; set; } = 0;
 
     /// <summary>
-    /// List of group memberships for the user.
+    /// Document count of the specialization.
     /// </summary>
     [JsonPropertyName("documentCount")]
     public int? DocumentCount { get; set; } = 0;
+
+    /// <summary>
+    /// Max response token limit of the specialization.
+    /// </summary>
+    [JsonPropertyName("maxResponseTokenLimit")]
+    public int? MaxResponseTokenLimit { get; set; } = 0;
 
     /// <summary>
     /// List of group memberships for the user.
@@ -110,6 +116,7 @@ public class QSpecializationResponse
         this.RestrictResultScope = specializationSource.RestrictResultScope;
         this.Strictness = specializationSource.Strictness;
         this.DocumentCount = specializationSource.DocumentCount;
+        this.MaxResponseTokenLimit = specializationSource.MaxResponseTokenLimit;
         this.GroupMemberships = specializationSource.GroupMemberships;
         if (specializationSource.IndexName != null)
         {
