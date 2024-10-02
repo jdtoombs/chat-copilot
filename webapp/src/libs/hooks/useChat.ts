@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
 import { useMsal } from '@azure/msal-react';
-import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../Constants';
 import botIcon1 from '../../assets/bot-icons/bot-icon-1.png';
 import { getErrorDetails } from '../../components/utils/TextUtils';
@@ -34,6 +33,7 @@ import { ContextVariable } from '../semantic-kernel/model/AskResult';
 import { ChatArchiveService } from '../services/ChatArchiveService';
 import { ChatService } from '../services/ChatService';
 import { DocumentImportService } from '../services/DocumentImportService';
+import { getUUID } from '../utils/HelperMethods';
 
 export interface GetResponseOptions {
     messageType: ChatMessageType;
@@ -73,12 +73,19 @@ export const useChat = () => {
         if (id === `${chatId}-bot` || id.toLocaleLowerCase() === 'bot') return Constants.bot.profile;
         return users.find((user) => user.id === id);
     };
+
     const defaultSpecializationId = specializationsState.find((a) => a.id === 'general')?.id ?? '';
+    /**
+     * Create chat - This function will create an entry in the redux conversation state with default values.
+     * It does not send any information to the server.
+     * @param specializationId specify the desired specializationId, otherwise default to general
+     * @returns
+     */
     const createChat = (specializationId = defaultSpecializationId) => {
         const chatTitle = `Q-Pilot @ ${new Date().toLocaleString()}`;
         try {
             const newChat: ChatState = {
-                id: uuidv4(),
+                id: getUUID(),
                 title: chatTitle,
                 systemDescription: '',
                 memoryBalance: -1,
@@ -104,6 +111,13 @@ export const useChat = () => {
         }
     };
 
+    /**
+     * selectSpecializationAndBeginChat - To be used against a chat initialized in the the local redux state that has not been
+     * persisted to the API yet. This will create an entry in the data store for this conversation, set the specialization, and
+     * start the chat with whatever the default message is for this specialization.
+     * @param specializationId
+     * @param chatId
+     */
     const selectSpecializationAndBeginChat = async (specializationId: string, chatId: string) => {
         const conversation = conversations[chatId];
         await chatService

@@ -12,10 +12,12 @@ import {
 import { MoreHorizontal20Regular } from '@fluentui/react-icons';
 import * as React from 'react';
 import { useChat } from '../../libs/hooks';
+import { AlertType } from '../../libs/models/AlertType';
 import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
+import { addAlert } from '../../redux/features/app/appSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
@@ -89,7 +91,7 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
     const onAddChat = () => {
         void chat
             .selectSpecializationAndBeginChat(specialization.id, selectedId)
-            .finally(() => {
+            .then(() => {
                 const specializationMatch = specializations.find((spec) => spec.id === specialization.id);
                 if (specializationMatch) {
                     dispatch(setChatSpecialization(specializationMatch));
@@ -100,6 +102,11 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                         id: selectedId,
                         newSystemDescription: specialization.roleInformation,
                     }),
+                );
+            })
+            .catch(() => {
+                dispatch(
+                    addAlert({ message: 'Unable to select the specified specialization.', type: AlertType.Error }),
                 );
             })
             .then(() =>
