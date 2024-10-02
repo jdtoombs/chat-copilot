@@ -81,7 +81,7 @@ public class QSpecializationService : IQSpecializationService
 
         Specialization specializationSource =
             new(
-                qSpecializationMutate.label,
+                qSpecializationMutate.Label,
                 qSpecializationMutate.Name,
                 qSpecializationMutate.Description,
                 qSpecializationMutate.RoleInformation,
@@ -141,6 +141,9 @@ public class QSpecializationService : IQSpecializationService
         specializationToUpdate.Name = !string.IsNullOrEmpty(qSpecializationMutate.Name)
             ? qSpecializationMutate.Name
             : specializationToUpdate.Name;
+        specializationToUpdate.Label = !string.IsNullOrEmpty(qSpecializationMutate.Label)
+            ? qSpecializationMutate.Label
+            : specializationToUpdate.Label;
         specializationToUpdate.Description = !string.IsNullOrEmpty(qSpecializationMutate.Description)
             ? qSpecializationMutate.Description
             : specializationToUpdate.Description;

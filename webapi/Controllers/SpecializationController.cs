@@ -136,7 +136,7 @@ public class SpecializationController : ControllerBase
         {
             this._logger.LogError(ex, "Specialization create threw an exception");
 
-            return this.StatusCode(500, $"Failed to create specialization for label '{qSpecializationMutate.label}'.");
+            return this.StatusCode(500, $"Failed to create specialization for label '{qSpecializationMutate.Label}'.");
         }
     }
 

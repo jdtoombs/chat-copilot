@@ -15,7 +15,7 @@ public class QSpecializationBase
     /// Key of the specialization
     /// </summary>
     [JsonPropertyName("label")]
-    public string label { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
 
     /// <summary>
     /// Name of the specialization
