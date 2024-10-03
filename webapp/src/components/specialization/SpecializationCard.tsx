@@ -100,9 +100,14 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                 }),
             );
         });
-        void chat.getSuggestions({ chatId: selectedId, specializationId: specialization.id }).then((response) => {
-            dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
-        });
+        void chat
+            .getSuggestions({ chatId: selectedId, specializationId: specialization.id })
+            .then((response) => {
+                dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
+            })
+            .catch((reason) => {
+                console.error(`Failed to retrieve suggestions: ${reason}`);
+            });
     };
 
     const truncate = (str: string) => {
