@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -731,6 +730,7 @@ public class ChatPlugin
             () =>
                 SemanticChatMemoryExtractor.ExtractSemanticChatMemoryAsync(
                     chatId,
+                    this.GetResponseTokenLimit(),
                     this._memoryClient,
                     this._kernel,
                     chatContext,
@@ -764,7 +764,7 @@ public class ChatPlugin
         KernelArguments audienceContext = new(context);
         int historyTokenBudget =
             this._promptOptions.CompletionTokenLimit
-            - this._promptOptions.ResponseTokenLimit
+            - this.GetResponseTokenLimit()
             - TokenUtils.TokenCount(
                 string.Join(
                     "\n\n",
@@ -809,7 +809,7 @@ public class ChatPlugin
 
         int tokenBudget =
             this._promptOptions.CompletionTokenLimit
-            - this._promptOptions.ResponseTokenLimit
+            - this.GetResponseTokenLimit()
             - TokenUtils.TokenCount(
                 string.Join(
                     "\n",
@@ -964,7 +964,7 @@ public class ChatPlugin
 #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         return new OpenAIPromptExecutionSettings
         {
-            MaxTokens = this._promptOptions.ResponseTokenLimit,
+            MaxTokens = this.GetResponseTokenLimit(),
             Temperature = this._promptOptions.ResponseTemperature,
             TopP = this._promptOptions.ResponseTopP,
             FrequencyPenalty = this._promptOptions.ResponseFrequencyPenalty,
@@ -985,7 +985,7 @@ public class ChatPlugin
 #pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         return new OpenAIPromptExecutionSettings
         {
-            MaxTokens = this._promptOptions.ResponseTokenLimit,
+            MaxTokens = this.GetResponseTokenLimit(),
             Temperature = this._promptOptions.IntentTemperature,
             TopP = this._promptOptions.IntentTopP,
             FrequencyPenalty = this._promptOptions.IntentFrequencyPenalty,
@@ -1010,9 +1010,20 @@ public class ChatPlugin
         return this._promptOptions.CompletionTokenLimit // Total token limit
             - ExtraOpenAiMessageTokens
             // Token count reserved for model to generate a response
-            - this._promptOptions.ResponseTokenLimit
+            - this.GetResponseTokenLimit()
             // Buffer for Tool Calls
             - this._promptOptions.FunctionCallingTokenLimit;
+    }
+
+    /// <summary>
+    /// Retrieves the token limit for responses.
+    /// This method first checks if a specialization exists and has a maximum response token limit set.
+    /// If so, it returns that limit; otherwise, it falls back to the default response token limit specified in the prompt options.
+    /// </summary>
+    /// <returns>The applicable response token limit as an integer.</returns>
+    private int GetResponseTokenLimit()
+    {
+        return this._qSpecialization?.MaxResponseTokenLimit ?? this._promptOptions.ResponseTokenLimit;
     }
 
     /// <summary>
