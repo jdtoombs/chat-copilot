@@ -42,12 +42,15 @@ public class AzureVisionOcrEngine : IOcrEngine
 
             var result = await this._engine.AnalyzeAsync(new System.BinaryData(img), VisualFeatures.DenseCaptions | VisualFeatures.Read);
             var sb = new StringBuilder();
-            var firstCaption = result.Value.DenseCaptions.Values.First();
-            sb.AppendLine($"The summary of this image's conent is the following: {firstCaption.Text}");
-            sb.AppendLine($"This image contains the following details, when asked to describe you may omit details that duplicate the summary: ");
-            foreach (var caption in result.Value.DenseCaptions.Values.Skip(1))
+            if (result.Value.DenseCaptions.Values.Count > 0)
             {
-                sb.AppendLine(caption.Text);
+                var firstCaption = result.Value.DenseCaptions.Values.First();
+                sb.AppendLine($"The summary of this image's content is the following: {firstCaption.Text}");
+                sb.AppendLine($"These details are present in the image. If they are also present in the summary, do not describe them: ");
+                foreach (var caption in result.Value.DenseCaptions.Values.Skip(1))
+                {
+                    sb.AppendLine(caption.Text);
+                }
             }
             if (result.Value.Read.Blocks.Count > 0)
             {
