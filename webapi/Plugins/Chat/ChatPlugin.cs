@@ -632,9 +632,7 @@ public class ChatPlugin
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
         var specialization =
-            speckey == "general"
-                ? null
-                : await this._qSpecializationService.GetSpecializationAsync(speckey);
+            speckey == "general" ? null : await this._qSpecializationService.GetSpecializationAsync(speckey);
         var serviceId =
             (specialization == null || specialization.Deployment == defaultModel)
                 ? "default"
