@@ -14,7 +14,9 @@ public class QAzureOpenAIChatOptions
     public const string PropertyName = "QAzureOpenAIChatConfig";
     public bool Enabled { get; set; } = false;
     public string DefaultModel { get; set; } = "";
-
+    public string DefaultEmbeddingModel { get; set; } = "";
+    public Uri? DefaultEndpoint { get; set; } = null;
+    public string APIKey { get; set; } = string.Empty;
     public string DefaultSpecializationDescription { get; set; } = "";
     public string DefaultSpecializationImage { get; set; } = "";
     public string DefaultSpecializationIcon { get; set; } = "";

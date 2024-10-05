@@ -19,7 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
+using CopilotChat.Shared;
 namespace CopilotChat.WebApi;
 
 /// <summary>
@@ -50,14 +50,20 @@ public sealed class Program
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization();
 
-        // Configure and add semantic services
-        builder.AddBotConfig().AddSemanticKernelServices().AddSemanticMemoryServices();
-
         // Add SignalR as the real time relay service
         builder.Services.AddSignalR();
         var qAzureOpenAIChatOptions =
             builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>()
             ?? new QAzureOpenAIChatOptions { Enabled = false };
+        var defaultConfig = new DefaultConfiguration();
+        defaultConfig.DefaultModel = qAzureOpenAIChatOptions.DefaultModel;
+        defaultConfig.DefaultEmbeddingModel = qAzureOpenAIChatOptions.DefaultEmbeddingModel;
+        defaultConfig.DefaultEndpoint = qAzureOpenAIChatOptions.DefaultEndpoint;
+        defaultConfig.APIKey = qAzureOpenAIChatOptions.APIKey;
+
+        // Configure and add semantic services
+        builder.AddBotConfig().AddSemanticKernelServices().AddSemanticMemoryServices(defaultConfig);
+
         // Add AppInsights telemetry
         builder
             .Services.AddHttpContextAccessor()
