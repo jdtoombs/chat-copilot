@@ -5,5 +5,6 @@ public class DefaultConfiguration
 {
   public string DefaultModel { get; set; } = "";
   public string DefaultEmbeddingModel { get; set; } = "";
-  public Uri? Endpoint { get; set; } = null;
+  public string APIKey { get; set; } = string.Empty;
+  public Uri? DefaultEndpoint { get; set; } = null;
 }
