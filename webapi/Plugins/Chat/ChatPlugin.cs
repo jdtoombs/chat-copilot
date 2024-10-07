@@ -466,6 +466,17 @@ public class ChatPlugin
         );
         var (memoryText, citationMap) = await memoryQueryTask;
         chatContext["knowledgeBase"] = memoryText;
+
+        // Create the stream
+        // Serialize the chatContext to JSON
+        string serializedContext = JsonSerializer.Serialize(chatContext);
+
+        // Combine the context with the main prompt
+        string combinedPrompt = $"Context: {serializedContext}";
+
+        ChatHistory chatHistory = promptConfig.MetaPrompt;
+        chatHistory.AddUserMessage(combinedPrompt);
+
         // Store token usage of prompt template
         chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils
             .GetContextMessagesTokenCount(promptConfig.MetaPrompt)
@@ -1082,6 +1093,7 @@ public class ChatPlugin
         string combinedPrompt = $"Context: {serializedContext}";
         ChatHistory chatHistory = prompt.MetaPromptTemplate;
         chatHistory.AddUserMessage(combinedPrompt);
+
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
         var serviceId =
@@ -1094,7 +1106,7 @@ public class ChatPlugin
             throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
         }
         var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
-            chatHistory,
+            prompt.MetaPromptTemplate,
             this.CreateChatRequestSettings(),
             this._kernel,
             cancellationToken

@@ -80,6 +80,13 @@ public class QSpecializationBase
     public int? DocumentCount { get; set; }
 
     /// <summary>
+    /// Past Messages Included Count of the specialization
+    /// </summary>>
+    [JsonPropertyName("pastMessagesIncludedCount")]
+    [Range(1, 20, ErrorMessage = "Past messages included count must be between 1 and 20.")]
+    public int? PastMessagesIncludedCount { get; set; }
+
+    /// <summary>
     /// Max Response Token Limit of the specialization
     /// </summary>>
     [JsonPropertyName("maxResponseTokenLimit")]

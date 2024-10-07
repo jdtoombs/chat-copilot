@@ -90,6 +90,12 @@ public class QSpecializationResponse
     public int? DocumentCount { get; set; } = 0;
 
     /// <summary>
+    /// Document count of the specialization.
+    /// </summary>
+    [JsonPropertyName("pastMessagesIncludedCount")]
+    public int? PastMessagesIncludedCount { get; set; } = 0;
+
+    /// <summary>
     /// Max response token limit of the specialization.
     /// </summary>
     [JsonPropertyName("maxResponseTokenLimit")]
@@ -116,6 +122,7 @@ public class QSpecializationResponse
         this.RestrictResultScope = specializationSource.RestrictResultScope;
         this.Strictness = specializationSource.Strictness;
         this.DocumentCount = specializationSource.DocumentCount;
+        this.PastMessagesIncludedCount = specializationSource.PastMessagesIncludedCount;
         this.MaxResponseTokenLimit = specializationSource.MaxResponseTokenLimit;
         this.GroupMemberships = specializationSource.GroupMemberships;
         if (specializationSource.IndexName != null)

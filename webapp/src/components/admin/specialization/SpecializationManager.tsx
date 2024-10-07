@@ -116,6 +116,7 @@ export const SpecializationManager: React.FC = () => {
     const [restrictResultScope, setRestrictResultScope] = useState(false);
     const [strictness, setStrictness] = useState(0);
     const [documentCount, setDocumentCount] = useState(0);
+    const [pastMessagesIncludedCount, setPastMessagesIncludedCount] = useState(0);
     const [maxResponseTokenLimit, setMaxResponseTokenLimit] = useState(0);
 
     const [isValid, setIsValid] = useState(false);
@@ -146,6 +147,7 @@ export const SpecializationManager: React.FC = () => {
                 restrictResultScope,
                 strictness,
                 documentCount,
+                pastMessagesIncludedCount,
                 maxResponseTokenLimit,
             });
         } else {
@@ -162,6 +164,7 @@ export const SpecializationManager: React.FC = () => {
                 restrictResultScope,
                 strictness,
                 documentCount,
+                pastMessagesIncludedCount,
                 maxResponseTokenLimit,
             });
         }
@@ -181,6 +184,7 @@ export const SpecializationManager: React.FC = () => {
         setRestrictResultScope(false);
         setStrictness(3);
         setDocumentCount(5);
+        setPastMessagesIncludedCount(10);
         setMaxResponseTokenLimit(1024);
     };
 
@@ -199,6 +203,7 @@ export const SpecializationManager: React.FC = () => {
                 setRestrictResultScope(specializationObj.restrictResultScope);
                 setStrictness(specializationObj.strictness);
                 setDocumentCount(specializationObj.documentCount);
+                setPastMessagesIncludedCount(specializationObj.pastMessagesIncludedCount);
                 setMaxResponseTokenLimit(specializationObj.maxResponseTokenLimit);
                 /**
                  * Set the image and icon file paths
@@ -238,6 +243,16 @@ export const SpecializationManager: React.FC = () => {
      */
     const onChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
         setDocumentCount(data?.value ?? 0);
+    };
+
+    /**
+     * Callback function for handling changes to the "Past messages included" slider.
+     */
+    const onChangePastMessagesIncludedCount = (
+        _event?: React.ChangeEvent<HTMLInputElement>,
+        data?: SliderOnChangeData,
+    ) => {
+        setPastMessagesIncludedCount(data?.value ?? 0);
     };
 
     /**
@@ -342,6 +357,24 @@ export const SpecializationManager: React.FC = () => {
                         <Tooltip
                             content={
                                 'This specifies the number of top-scoring documents from your data index used to generate responses. You want to increase the value when you have short documents or want to provide more context. The default value is 5. Note: if you set the value to 20 but only have 10 documents in your index, only 10 will be used.'
+                            }
+                            relationship="label"
+                        >
+                            <Button icon={<Info20Regular />} appearance="transparent" />
+                        </Tooltip>
+                    </div>
+                    <label htmlFor="maxResponse">Past messages included (1-20)</label>
+                    <div id="maxResponse" className={classes.slider}>
+                        <Slider
+                            min={1}
+                            max={20}
+                            value={pastMessagesIncludedCount}
+                            onChange={onChangePastMessagesIncludedCount}
+                        />
+                        <span>{pastMessagesIncludedCount}</span>
+                        <Tooltip
+                            content={
+                                'Select the number of past messages to include in each new API request. This helps give the model context for new user queries. Setting this number to 10 will include 5 user queries and 5 system responses.'
                             }
                             relationship="label"
                         >
