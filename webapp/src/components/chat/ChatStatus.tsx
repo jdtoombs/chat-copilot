@@ -5,8 +5,8 @@ import React, { useMemo } from 'react';
 import { IChatUser } from '../../libs/models/ChatUser';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
-import { TypingIndicator } from './typing-indicator/TypingIndicator';
 import { ChatState } from '../../redux/features/conversations/ChatState';
+import { TypingIndicator } from './typing-indicator/TypingIndicator';
 
 const useClasses = makeStyles({
     root: {
@@ -28,13 +28,14 @@ export const ChatStatus: React.FC<ChatStatusProps> = (props: ChatStatusProps) =>
     const { activeUserInfo } = useAppSelector((state: RootState) => state.app);
 
     // The last message either from the user or the bot
-    const lastMessage = props.chatState.messages[props.chatState.messages.length - 1];
+    // const lastMessage = props.chatState.messages[props.chatState.messages.length - 1];
 
     // Get the bot response status if the last message is not from the bot
-    const botResponseStatus =
-        (lastMessage.userId === 'Bot' || lastMessage.userName === 'Bot') && Boolean(lastMessage.content.length)
-            ? undefined
-            : props.chatState.botResponseStatus;
+    // const botResponseStatus =
+    //     (lastMessage.userId === 'Bot' || lastMessage.userName === 'Bot') && Boolean(lastMessage.content.length)
+    //         ? undefined
+    //         : props.chatState.botResponseStatus;
+    const botResponseStatus = props.chatState.botResponseStatus;
 
     // The number of users typing in the chat
     const numUsersTyping = useMemo(() => {
