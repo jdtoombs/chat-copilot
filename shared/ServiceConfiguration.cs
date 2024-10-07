@@ -225,7 +225,7 @@ internal sealed class ServiceConfiguration
                     var azureOpenAIEmbeddingConfig = new AzureOpenAIConfig();
                     this.ConfigureAzureOpenAIEmbedding(azureOpenAIEmbeddingConfig);
                     var instance = this.GetServiceInstance<ITextEmbeddingGenerator>(builder,
-                        s => s.AddAzureOpenAIEmbeddingGeneration(this.GetServiceConfig<AzureOpenAIConfig>("AzureOpenAIEmbedding")));
+                        s => s.AddAzureOpenAIEmbeddingGeneration(azureOpenAIEmbeddingConfig));
                     builder.AddIngestionEmbeddingGenerator(instance);
                     break;
                 }
