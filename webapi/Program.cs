@@ -55,11 +55,18 @@ public sealed class Program
         var qAzureOpenAIChatOptions =
             builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>()
             ?? new QAzureOpenAIChatOptions { Enabled = false };
+
+        var defaultConnection = qAzureOpenAIChatOptions.OpenAIDeploymentConnections
+            .FirstOrDefault(conn => conn.Name.Equals(qAzureOpenAIChatOptions.DefaultConnection, StringComparison.OrdinalIgnoreCase));
+        if (defaultConnection == null)
+        {
+            throw new InvalidOperationException("Default connection not found. Please check the configuration.");
+        }
         var defaultConfig = new DefaultConfiguration(
             qAzureOpenAIChatOptions.DefaultModel,
             qAzureOpenAIChatOptions.DefaultEmbeddingModel,
-            qAzureOpenAIChatOptions.APIKey,
-            qAzureOpenAIChatOptions.DefaultEndpoint
+            defaultConnection.APIKey,
+            defaultConnection.Endpoint
         );
         // Configure and add semantic services
         builder.AddBotConfig().AddSemanticKernelServices().AddSemanticMemoryServices(defaultConfig);
