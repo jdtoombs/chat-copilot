@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 namespace CopilotChat.WebApi;
 
 /// <summary>
@@ -56,8 +57,9 @@ public sealed class Program
             builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>()
             ?? new QAzureOpenAIChatOptions { Enabled = false };
 
-        var defaultConnection = qAzureOpenAIChatOptions.OpenAIDeploymentConnections
-            .FirstOrDefault(conn => conn.Name.Equals(qAzureOpenAIChatOptions.DefaultConnection, StringComparison.OrdinalIgnoreCase));
+        var defaultConnection = qAzureOpenAIChatOptions.OpenAIDeploymentConnections.FirstOrDefault(conn =>
+            conn.Name.Equals(qAzureOpenAIChatOptions.DefaultConnection, StringComparison.OrdinalIgnoreCase)
+        );
         if (defaultConnection == null)
         {
             throw new InvalidOperationException("Default connection not found. Please check the configuration.");
