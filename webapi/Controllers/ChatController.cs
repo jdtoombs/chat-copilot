@@ -106,7 +106,6 @@ public class ChatController : ControllerBase, IDisposable
         [FromRoute] Guid chatId,
         CancellationToken requestAbortedToken,
         [FromQuery] bool silent = false
-
     )
     {
         this._logger.LogDebug("Chat message received.");
@@ -153,7 +152,12 @@ public class ChatController : ControllerBase, IDisposable
         }
         catch (Exception ex)
         {
-            if (ex is OperationCanceledException || ex.InnerException is OperationCanceledException || ex is TaskCanceledException || ex.InnerException is TaskCanceledException)
+            if (
+                ex is OperationCanceledException
+                || ex.InnerException is OperationCanceledException
+                || ex is TaskCanceledException
+                || ex.InnerException is TaskCanceledException
+            )
             {
                 // Log the timeout and return a 504 response
                 this._logger.LogError("The {FunctionName} operation was cancelled.", ChatFunction);
