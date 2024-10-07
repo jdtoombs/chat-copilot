@@ -83,32 +83,28 @@ export const useChat = () => {
      */
     const createChat = (specializationId = defaultSpecializationId) => {
         const chatTitle = `Q-Pilot @ ${new Date().toLocaleString()}`;
-        try {
-            const newChat: ChatState = {
-                id: getUUID(),
-                title: chatTitle,
-                systemDescription: '',
-                memoryBalance: -1,
-                messages: [],
-                enabledHostedPlugins: [],
-                users: [loggedInUser],
-                botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
-                input: '',
-                botResponseStatus: undefined,
-                userDataLoaded: false,
-                disabled: false,
-                hidden: false,
-                specializationId,
-                suggestions: [],
-                createdOnServer: false,
-            };
-            dispatch(addConversation(newChat));
-            return newChat.id;
-        } catch (e: any) {
-            const errorMessage = `Unable to create new chat. Details: ${getErrorDetails(e)}`;
-            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
-            return '';
-        }
+
+        const newChat: ChatState = {
+            id: getUUID(),
+            title: chatTitle,
+            systemDescription: '',
+            memoryBalance: -1,
+            messages: [],
+            enabledHostedPlugins: [],
+            users: [loggedInUser],
+            botProfilePicture: getBotProfilePicture(specializationsState, specializationId),
+            input: '',
+            botResponseStatus: undefined,
+            userDataLoaded: false,
+            disabled: false,
+            hidden: false,
+            specializationId,
+            suggestions: [],
+            createdOnServer: false,
+        };
+
+        dispatch(addConversation(newChat));
+        return newChat.id;
     };
 
     /**
