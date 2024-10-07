@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Elastic.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.DocumentStorage.DevTools;
@@ -125,7 +124,8 @@ internal sealed class ServiceConfiguration
         return builder.Build();
     }
 
-    private void ConfigureAzureOpenAIText(AzureOpenAIConfig config){
+    private void ConfigureAzureOpenAIText(AzureOpenAIConfig config)
+    {
 
         config.APIKey = this._defaultConfig.APIKey;
         config.Deployment = this._defaultConfig.DefaultModel;
@@ -133,7 +133,8 @@ internal sealed class ServiceConfiguration
         config.Auth = AzureOpenAIConfig.AuthTypes.APIKey;
     }
 
-    private void ConfigureAzureOpenAIEmbedding(AzureOpenAIConfig config){
+    private void ConfigureAzureOpenAIEmbedding(AzureOpenAIConfig config)
+    {
 
         config.APIKey = this._defaultConfig.APIKey;
         config.Deployment = this._defaultConfig.DefaultEmbeddingModel;
