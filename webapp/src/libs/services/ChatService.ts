@@ -16,9 +16,16 @@ import { BaseService } from './BaseService';
  * Changes to take specialization key in chat creation.
  */
 export class ChatService extends BaseService {
-    public createChatAsync = async (title: string, accessToken: string): Promise<ICreateChatSessionResponse> => {
+    public createChatAsync = async (
+        title: string,
+        specializationId: string,
+        accessToken: string,
+        id = '',
+    ): Promise<ICreateChatSessionResponse> => {
         const body = {
             title,
+            specializationId,
+            id,
         };
 
         const result = await this.getResponseAsync<ICreateChatSessionResponse>(
@@ -237,6 +244,34 @@ export class ChatService extends BaseService {
         const result = await this.getResponseAsync<IAskResult>(
             {
                 commandPath: `chats/${chatId}/${processPlan ? 'plan' : 'messages'}`,
+                method: 'POST',
+                body: ask,
+            },
+            accessToken,
+            enabledPlugins,
+        );
+
+        return result;
+    };
+
+    /**
+     * getBotResponseSilentAsync - Calling this with a valid ask object will query the chatbot through a POST request,
+     * but will not show elements such as new chat bubbles or typing indicators.
+     * @param ask query for the chat bot
+     * @param accessToken valid access token
+     * @param enabledPlugins plugins, if any
+     */
+    public getBotResponseSilentAsync = async (
+        ask: IAsk,
+        accessToken: string,
+        enabledPlugins?: Plugin[],
+    ): Promise<IAskResult> => {
+        // If function requires any additional api properties, append to context
+        const chatId = ask.variables?.find((variable) => variable.key === 'chatId')?.value as string;
+
+        const result = await this.getResponseAsync<IAskResult>(
+            {
+                commandPath: `chats/${chatId}/messages?silent=true`,
                 method: 'POST',
                 body: ask,
             },

@@ -10,6 +10,7 @@ export interface ISpecialization {
     iconFilePath: string;
     isActive: boolean;
     groupMemberships: string[];
+    restrictResultScope: boolean;
     strictness: number;
     documentCount: number;
     initialChatMessage: string;
@@ -32,6 +33,9 @@ export interface ISpecializationRequest {
     deleteIcon?: boolean; // Flag to delete the icon
     groupMemberships: string[];
     initialChatMessage: string;
+    restrictResultScope: boolean;
+    strictness: number;
+    documentCount: number;
 }
 
 export interface ISpecializationToggleRequest {
