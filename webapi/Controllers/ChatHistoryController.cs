@@ -120,10 +120,18 @@ public class ChatHistoryController : ControllerBase
             await this._sessionRepository.UpsertAsync(chat);
         }
         //Save prompt - End
+
+        Specialization? specialization = null;
+        if (chatParameters.specializationId != "general")
+        {
+            specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
+        }
+        var initialMessage = specialization != null ? specialization.InitialChatMessage : this._promptOptions.InitialBotMessage;
+
         // Create initial bot message
         var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
             newChat.Id,
-            this._promptOptions.InitialBotMessage,
+            initialMessage,
             string.Empty, // The initial bot message doesn't need a prompt.
             null,
             TokenUtils.EmptyTokenUsages()
@@ -317,20 +325,6 @@ public class ChatHistoryController : ControllerBase
                     chatParameters.SpecializationId
                 );
                 chat!.SystemDescription = specializationSource.RoleInformation;
-                var specialization = await this._qSpecializationService.GetSpecializationAsync(
-                    chatParameters.SpecializationId
-                );
-                // Here we want to retrieve the earliest message in the chat history...
-                var messages = await this._messageRepository.FindByChatIdAsync(chatId.ToString());
-
-                messages.ToList().Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
-                var earliest = messages.FirstOrDefault();
-                if (earliest != null && !string.IsNullOrEmpty(specialization.InitialChatMessage))
-                {
-                    // And if one exists, override it with the specialization's custom chat message.
-                    earliest.Content = specialization.InitialChatMessage;
-                    await this._messageRepository.UpsertAsync(earliest);
-                }
             }
             else
             {

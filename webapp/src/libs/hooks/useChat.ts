@@ -17,7 +17,6 @@ import {
     setConversations,
     setSelectedConversation,
     updateBotResponseStatus,
-    updateConversationHistory,
 } from '../../redux/features/conversations/conversationsSlice';
 import { Plugin } from '../../redux/features/plugins/PluginsState';
 import { AuthHelper } from '../auth/AuthHelper';
@@ -510,13 +509,6 @@ export const useChat = () => {
         try {
             const token = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
             await chatService.editChatSepcializationAsync(chatId, specializationId, token);
-
-            // We reload the chat history, since modifying the specialization may prompt the backend
-            // to load a different initial message.
-            const messages = await chatService.getChatMessagesAsync(chatId, 0, 100, token);
-            if (messages.length) {
-                dispatch(updateConversationHistory({ chatId, messages }));
-            }
         } catch (e: any) {
             const errorMessage = `Error editing chat ${chatId}. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
