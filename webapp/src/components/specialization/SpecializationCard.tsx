@@ -110,21 +110,14 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                 );
             })
             .then(() =>
-                chat.getSuggestions({ chatId: selectedId }).then((response) => {
+                chat.getSuggestions({ chatId: selectedId, specializationId: specialization.id })
+                .then((response) => {
                     dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
+                })
+                .catch((reason) => {
+                    console.error(`Failed to retrieve suggestions: ${reason}`);
                 }),
             );
-
-        });
-        void chat
-            .getSuggestions({ chatId: selectedId, specializationId: specialization.id })
-            .then((response) => {
-                dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
-            })
-            .catch((reason) => {
-                console.error(`Failed to retrieve suggestions: ${reason}`);
-            });
-
     };
 
     const truncate = (str: string) => {

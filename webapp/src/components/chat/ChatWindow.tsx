@@ -95,35 +95,33 @@ export const ChatWindow: React.FC = () => {
     const onTabSelect: SelectTabEventHandler = (_event, data) => {
         setSelectedTab(data.value);
     };
-    const onNewChatClick = async () => {
-        const newChatId = await chat.createChat();
-        if (newChatId) {
-            if (chatSpecialization) {
-                void chat.editChatSpecialization(newChatId, chatSpecialization.id).finally(() => {
-                    const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
-                    if (specializationMatch) {
-                        dispatch(setChatSpecialization(specializationMatch));
-                    }
-                    dispatch(
-                        editConversationSpecialization({ id: newChatId, specializationId: chatSpecialization.id }),
-                    );
-                    dispatch(
-                        editConversationSystemDescription({
-                            id: newChatId,
-                            newSystemDescription: chatSpecialization.roleInformation,
-                        }),
-                    );
+    const onNewChatClick = () => {
+        void chat.createChat(chatSpecialization?.id);
+        if (chatSpecialization) {
+            void chat.selectSpecializationAndBeginChat(chatSpecialization.id, selectedId).then(() => {
+                const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
+                if (specializationMatch) {
+                    dispatch(setChatSpecialization(specializationMatch));
+                }
+                dispatch(editConversationSpecialization({ id: selectedId, specializationId: chatSpecialization.id }));
+                dispatch(
+                    editConversationSystemDescription({
+                        id: selectedId,
+                        newSystemDescription: chatSpecialization.roleInformation,
+                    }),
+                );
+            });
+            void chat
+                .getSuggestions({ chatId: selectedId, specializationId: chatSpecialization.id })
+                .then((response) => {
+                    dispatch(updateSuggestions({ id: selectedId, chatSuggestionMessage: response }));
+                })
+                .catch((reason) => {
+                    console.error(`Failed to retrieve suggestions: ${reason}`);
                 });
-                void chat
-                    .getSuggestions({ chatId: newChatId, specializationId: chatSpecialization.id })
-                    .then((response) => {
-                        dispatch(updateSuggestions({ id: newChatId, chatSuggestionMessage: response }));
-                    });
-            }
-        } else {
-            console.error('Error creating new chat:', newChatId);
         }
     };
+
 
     const onDeleteChatHistory = () => {
         void chat.deleteChatHistory(selectedId);
@@ -180,9 +178,7 @@ export const ChatWindow: React.FC = () => {
                 </div>
                 <div className={classes.rightSection}>
                     <ChatMenu
-                        onNewChatClick={() => {
-                            void onNewChatClick();
-                        }}
+                        onNewChatClick={onNewChatClick}
                         onDeleteChatHistory={onDeleteChatHistory}
                         botResponseStatus={botResponseStatus}
                         chatSpecialization={chatSpecialization}

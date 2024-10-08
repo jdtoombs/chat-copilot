@@ -83,11 +83,8 @@ export const useChat = () => {
      */
     const createChat = (specializationId = defaultSpecializationId) => {
         const chatTitle = `Q-Pilot @ ${new Date().toLocaleString()}`;
-        try {
-            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
-            const result: ICreateChatSessionResponse = await chatService.createChatAsync(chatTitle, accessToken);
 
-            const newChat: ChatState = {
+        const newChat: ChatState = {
             id: getUUID(),
             title: chatTitle,
             systemDescription: '',
@@ -108,11 +105,6 @@ export const useChat = () => {
 
         dispatch(addConversation(newChat));
         return newChat.id;
-        } catch (e: any) {
-            const errorMessage = `Unable to create new chat. Details: ${getErrorDetails(e)}`;
-            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
-            return null;
-        }
     };
 
     /**
