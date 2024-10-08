@@ -11,7 +11,7 @@ import {
     useToastController,
 } from '@fluentui/react-components';
 import { Dismiss12Regular } from '@fluentui/react-icons';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertType } from '../../libs/models/AlertType';
 import { Environment } from '../../libs/services/BaseService';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
@@ -30,6 +30,8 @@ const Alerts = () => {
     const dispatch = useAppDispatch();
     const toasterId = useId('toaster');
     const { dispatchToast } = useToastController(toasterId);
+    const [horizontal] = React.useState(20);
+    const [vertical] = React.useState(48);
 
     const { alerts } = useAppSelector((state: RootState) => state.app);
     const [activeToasts, setActiveToasts] = useState(new Set<string | undefined>());
@@ -78,7 +80,7 @@ const Alerts = () => {
         });
     }, [alerts, dispatch, dispatchToast, activeToasts]);
 
-    return <Toaster toasterId={toasterId} />;
+    return <Toaster toasterId={toasterId} offset={{ horizontal, vertical }} />;
 };
 
 export default Alerts;

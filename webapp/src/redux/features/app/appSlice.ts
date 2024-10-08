@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved.
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { generateTimestampId } from '../../../components/utils/TextUtils';
 import { Constants } from '../../../Constants';
 import { ServiceInfo } from '../../../libs/models/ServiceInfo';
 import { TokenUsage, TokenUsageFunctionNameMap } from '../../../libs/models/TokenUsage';
+import { getUUID } from '../../../libs/utils/HelperMethods';
 import { ActiveUserInfo, Alert, AppState, FeatureKeys, initialState } from './AppState';
 /**
  * Modified to support specialization.
@@ -29,7 +29,7 @@ export const appSlice = createSlice({
             } else {
                 const alert = {
                     ...action.payload,
-                    id: generateTimestampId('alert_'),
+                    id: getUUID(),
                 };
                 addNewAlert(state.alerts, alert);
             }
