@@ -122,7 +122,6 @@ export const ChatWindow: React.FC = () => {
         }
     };
 
-
     const onDeleteChatHistory = () => {
         void chat.deleteChatHistory(selectedId);
     };

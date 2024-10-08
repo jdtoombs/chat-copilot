@@ -147,7 +147,6 @@ export const useChat = () => {
             });
     };
     const getSuggestions = async ({ chatId, specializationId }: { chatId: string; specializationId: string }) => {
-      
         const ask = {
             input: `Make 4 suggestions for topics we could talk about and phrase them as one sentence long questions. Make them specific to the current chat's specialization and/or documents. Make sure they are formatted as a JSON array.`,
             variables: [
