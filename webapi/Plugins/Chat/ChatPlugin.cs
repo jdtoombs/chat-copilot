@@ -178,7 +178,8 @@ public class ChatPlugin
         CancellationToken cancellationToken = default
     )
     {
-        var sortedMessages = await this._chatMessageRepository.FindByChatIdAsync(chatId, 0, 100);
+        int count = this._qSpecialization?.PastMessagesIncludedCount ?? 100;
+        var sortedMessages = await this._chatMessageRepository.FindByChatIdAsync(chatId, 0, count);
 
         ChatHistory allottedChatHistory = new();
         var remainingToken = tokenLimit;
@@ -552,37 +553,71 @@ public class ChatPlugin
         CancellationToken cancellationToken
     )
     {
-        var promptConfig = await this.GetPromptConfig(chatId, chatContext, cancellationToken);
+        //var promptConfig = await this.GetPromptConfig(chatId, chatContext, cancellationToken);
+        // Render system instruction components and create the meta-prompt template
+        var systemInstructions = await AsyncUtils.SafeInvokeAsync(
+            () => this.RenderSystemInstructions(chatId, chatContext, cancellationToken), nameof(RenderSystemInstructions));
+        ChatHistory metaPrompt = new(systemInstructions);
 
+        // Get the audience
+        await this.UpdateBotResponseStatusOnClientAsync(chatId, "Extracting audience", cancellationToken);
+        var audience = await AsyncUtils.SafeInvokeAsync(
+            () => this.GetAudienceAsync(chatContext, cancellationToken), nameof(GetAudienceAsync));
+        metaPrompt.AddSystemMessage(audience);
+
+        var userIntent = string.Empty;
+        if (this._isUserIntentExtractionEnabled)
+        {
+            // Extract user intent from the conversation history.
+            await this.UpdateBotResponseStatusOnClientAsync(chatId, "Extracting user intent", cancellationToken);
+            userIntent = await AsyncUtils.SafeInvokeAsync(
+                () => this.GetUserIntentAsync(chatContext, cancellationToken), nameof(GetUserIntentAsync));
+            metaPrompt.AddSystemMessage(userIntent);
+        }
+
+        // Calculate tokens used for memories
         int maxRequestTokenBudget = this.GetMaxRequestTokenBudget();
-        int tokensUsed = TokenUtils.GetContextMessagesTokenCount(promptConfig.MetaPrompt);
-
+        // Calculate tokens used so far: system instructions, audience extraction and user intent
+        int tokensUsed = TokenUtils.GetContextMessagesTokenCount(metaPrompt);
         int chatMemoryTokenBudget =
             maxRequestTokenBudget
             - tokensUsed
             - TokenUtils.GetContextMessageTokenCount(AuthorRole.User, userMessage.ToFormattedString());
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
-        var (memoryText, citationMap) = await this.GetAndInjectSemanticMemories(
-            chatId,
-            chatMemoryTokenBudget,
-            chatContext,
-            promptConfig
-        );
-        var botPrompt = await this.GetBotResponsePromptAsync(
-            userId,
-            chatId,
-            memoryText,
-            promptConfig,
-            userMessage,
-            cancellationToken
-        );
+        // Query relevant semantic and document memories
+        await this.UpdateBotResponseStatusOnClientAsync(chatId, "Extracting semantic and document memories", cancellationToken);
+        (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(userIntent, chatId, chatMemoryTokenBudget);
+        if (!string.IsNullOrWhiteSpace(memoryText))
+        {
+            metaPrompt.AddSystemMessage(memoryText);
+            tokensUsed += TokenUtils.GetContextMessageTokenCount(AuthorRole.System, memoryText);
+        }
+
+        // Add as many chat history messages to meta-prompt as the token budget will allow, or based on the count of messages to add specified in the specialization
+        await this.UpdateBotResponseStatusOnClientAsync(chatId, "Extracting chat history", cancellationToken);
+        string allowedChatHistory = await this.GetAllowedChatHistoryAsync(chatId, maxRequestTokenBudget - tokensUsed, metaPrompt, cancellationToken);
+
+        // Store token usage of prompt template
+        chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils.GetContextMessagesTokenCount(metaPrompt).ToString(CultureInfo.CurrentCulture);
+
+        // Stream the response to the client
+        var promptView = new BotResponsePrompt(systemInstructions, audience, userIntent, memoryText, allowedChatHistory, metaPrompt);
+
+        //var botPrompt = await this.GetBotResponsePromptAsync(
+        //    userId,
+        //    chatId,
+        //    memoryText,
+        //    promptConfig,
+        //    userMessage,
+        //    cancellationToken
+        //);
 
         return await this.StreamBotResponseAsync(
             chatId,
             userId,
             chatContext,
-            botPrompt,
+            promptView,
             citationMap.Values.AsEnumerable(),
             cancellationToken
         );
@@ -1085,31 +1120,50 @@ public class ChatPlugin
         IEnumerable<CitationSource>? citations = null
     )
     {
+        //// Create the stream
+        //// Serialize the chatContext to JSON
+        //string serializedContext = JsonSerializer.Serialize(chatContext);
+
+        //// Combine the context with the main prompt
+        //string combinedPrompt = $"Context: {serializedContext}";
+        //ChatHistory chatHistory = prompt.MetaPromptTemplate;
+        //chatHistory.AddUserMessage(combinedPrompt);
+
+        //var provider = this._kernel.GetRequiredService<IServiceProvider>();
+        //var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
+        //var serviceId =
+        //    (this._qSpecialization == null || this._qSpecialization.Deployment == defaultModel)
+        //        ? "default"
+        //        : this._qSpecialization.Deployment;
+        //var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
+        //if (chatCompletion == null)
+        //{
+        //    throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
+        //}
+        //var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
+        //    prompt.MetaPromptTemplate,
+        //    this.CreateChatRequestSettings(),
+        //    this._kernel,
+        //    cancellationToken
+        //);
+
         // Create the stream
-        // Serialize the chatContext to JSON
-        string serializedContext = JsonSerializer.Serialize(chatContext);
+        var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
+        var stream =
+            chatCompletion.GetStreamingChatMessageContentsAsync(
+                prompt.MetaPromptTemplate,
+                this.CreateChatRequestSettings(),
+                this._kernel,
+                cancellationToken);
 
-        // Combine the context with the main prompt
-        string combinedPrompt = $"Context: {serializedContext}";
-        ChatHistory chatHistory = prompt.MetaPromptTemplate;
-        chatHistory.AddUserMessage(combinedPrompt);
-
-        var provider = this._kernel.GetRequiredService<IServiceProvider>();
-        var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
-        var serviceId =
-            (this._qSpecialization == null || this._qSpecialization.Deployment == defaultModel)
-                ? "default"
-                : this._qSpecialization.Deployment;
-        var chatCompletion = provider.GetKeyedService<IChatCompletionService>(serviceId);
-        if (chatCompletion == null)
-        {
-            throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
-        }
-        var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
-            prompt.MetaPromptTemplate,
-            this.CreateChatRequestSettings(),
-            this._kernel,
-            cancellationToken
+        // Create message on client
+        var chatMessage = await this.CreateBotMessageOnClient(
+            chatId,
+            userId,
+            JsonSerializer.Serialize(prompt),
+            string.Empty,
+            cancellationToken,
+            citations
         );
 
         var responseCitations = new List<CitationSource>();
@@ -1124,15 +1178,15 @@ public class ChatPlugin
                 ? citations
                 : new List<CitationSource>();
 
-        // Create message on client with determined citations
-        var chatMessage = await this.CreateBotMessageOnClient(
-            chatId,
-            userId,
-            JsonSerializer.Serialize(prompt),
-            string.Empty,
-            cancellationToken,
-            citationsToUse
-        );
+        //// Create message on client with determined citations
+        //var chatMessage = await this.CreateBotMessageOnClient(
+        //    chatId,
+        //    userId,
+        //    JsonSerializer.Serialize(prompt),
+        //    string.Empty,
+        //    cancellationToken,
+        //    citationsToUse
+        //);
 
         // Stream the message to the client
         await foreach (var contentPiece in stream)
