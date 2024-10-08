@@ -96,7 +96,7 @@ export const ChatWindow: React.FC = () => {
         setSelectedTab(data.value);
     };
     const onNewChatClick = () => {
-        void chat.createChat(chatSpecialization?.id);
+        chat.createChat(chatSpecialization?.id);
         if (chatSpecialization) {
             void chat.selectSpecializationAndBeginChat(chatSpecialization.id, selectedId).then(() => {
                 const specializationMatch = specializations.find((spec) => spec.id === chatSpecialization.id);
