@@ -120,10 +120,19 @@ public class ChatHistoryController : ControllerBase
             await this._sessionRepository.UpsertAsync(chat);
         }
         //Save prompt - End
+
+        Specialization? specialization = null;
+        if (chatParameters.specializationId != "general")
+        {
+            specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
+        }
+        var initialMessage =
+            specialization != null ? specialization.InitialChatMessage : this._promptOptions.InitialBotMessage;
+
         // Create initial bot message
         var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
             newChat.Id,
-            this._promptOptions.InitialBotMessage,
+            initialMessage,
             string.Empty, // The initial bot message doesn't need a prompt.
             null,
             TokenUtils.EmptyTokenUsages()
