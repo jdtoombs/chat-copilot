@@ -432,7 +432,7 @@ public class ChatPlugin
     )
     {
         var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(
-            promptConfig.SystemInstructions,
+            this._promptOptions.DocumentMemoryName,
             chatId,
             tokenBudget
         );
@@ -479,7 +479,7 @@ public class ChatPlugin
 
         if (!string.IsNullOrWhiteSpace(memoryText))
         {
-            promptConfig.MetaPrompt.AddSystemMessage(memoryText);
+            promptConfig.MetaPrompt.AddUserMessage(memoryText);
             tokensUsed += TokenUtils.GetContextMessageTokenCount(AuthorRole.System, memoryText);
         }
 
@@ -622,12 +622,6 @@ public class ChatPlugin
     )
     {
         string speckey = (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!;
-        string serializedContext = JsonSerializer.Serialize(chatContext);
-
-        // Combine the context with the main prompt
-        string combinedPrompt = $"Context: {serializedContext}";
-        var chatHistory = promptView.MetaPromptTemplate;
-        chatHistory.AddUserMessage(combinedPrompt);
 
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
@@ -643,7 +637,7 @@ public class ChatPlugin
             throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
         }
         var stream = await chatCompletion.GetChatMessageContentAsync(
-            chatHistory,
+            promptView.MetaPromptTemplate,
             await this.CreateChatRequestSettingsAsync(speckey),
             this._kernel,
             cancellationToken
@@ -654,7 +648,7 @@ public class ChatPlugin
             "Bot",
             chatId,
             stream.Content ?? "No message returned",
-            combinedPrompt,
+            promptView.MetaPromptTemplate.ToString(),
             citations
         );
         return chatmessage;
@@ -686,8 +680,8 @@ public class ChatPlugin
     /// </summary>
     /// <param name="chatId">The chat ID</param>
     /// <param name="userId">The user ID</param>
-    /// <param name="chatContext">Chat context.</param>
     /// <param name="promptView">The prompt view.</param>
+    /// <param name="chatContext">Chat context.</param>
     /// <param name="citations">Citation sources.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     private async Task<CopilotChatMessage> StreamBotResponseAsync(
