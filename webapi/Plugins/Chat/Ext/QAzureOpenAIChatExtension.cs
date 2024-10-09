@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Azure.AI.OpenAI;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Services;
