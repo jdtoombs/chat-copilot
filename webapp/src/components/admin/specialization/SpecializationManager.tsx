@@ -6,6 +6,7 @@ import {
     CheckboxOnChangeData,
     Dropdown,
     Input,
+    InputOnChangeData,
     makeStyles,
     Option,
     shorthands,
@@ -83,6 +84,9 @@ const useClasses = makeStyles({
         display: 'flex',
         ...shorthands.gap(tokens.spacingVerticalSNudge),
         alignItems: 'center',
+    },
+    input: {
+        width: '80px',
     },
 });
 
@@ -244,10 +248,28 @@ export const SpecializationManager: React.FC = () => {
     };
 
     /**
+     * Callback function for handling changes to the "Retrieved Documents" input.
+     */
+    const onInputChangeStrictness = (_event?: React.ChangeEvent<HTMLInputElement>, data?: InputOnChangeData) => {
+        const value = data?.value;
+        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
+        setStrictness(intValue);
+    };
+
+    /**
      * Callback function for handling changes to the "Retrieved Documents" slider.
      */
     const onChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
         setDocumentCount(data?.value ?? 0);
+    };
+
+    /**
+     * Callback function for handling changes to the "Retrieved Documents" input.
+     */
+    const onInputChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: InputOnChangeData) => {
+        const value = data?.value;
+        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
+        setDocumentCount(intValue);
     };
 
     /**
@@ -261,10 +283,34 @@ export const SpecializationManager: React.FC = () => {
     };
 
     /**
+     * Callback function for handling changes to the "Past messages included" input.
+     */
+    const onInputChangePastMessagesIncludedCount = (
+        _event?: React.ChangeEvent<HTMLInputElement>,
+        data?: InputOnChangeData,
+    ) => {
+        const value = data?.value;
+        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
+        setPastMessagesIncludedCount(intValue);
+    };
+
+    /**
      * Callback function for handling changes to the "Max Response" slider.
      */
     const onChangeMaxResponseTokenLimit = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
         setMaxResponseTokenLimit(data?.value ?? 0);
+    };
+
+    /**
+     * Callback function for handling changes to the "Max Response" input.
+     */
+    const onInputChangeMaxResponseTokenLimit = (
+        _event?: React.ChangeEvent<HTMLInputElement>,
+        data?: InputOnChangeData,
+    ) => {
+        const value = data?.value;
+        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
+        setMaxResponseTokenLimit(intValue);
     };
 
     useEffect(() => {
@@ -345,7 +391,14 @@ export const SpecializationManager: React.FC = () => {
                     <label htmlFor="strictness">Strictness (1-5)</label>
                     <div id="strictness" className={classes.slider}>
                         <Slider min={1} max={5} value={strictness} onChange={onChangeStrictness} />
-                        <span>{strictness}</span>
+                        <Input
+                            value={strictness.toString()}
+                            onChange={onInputChangeStrictness}
+                            type="number"
+                            min={1}
+                            max={5}
+                            className={classes.input}
+                        ></Input>
                         <Tooltip
                             content={
                                 'Strictness sets the threshold to categorize documents as relevant to your queries. Raising strictness means a higher threshold for relevance and filtering out more documents that are less relevant for responses. Very high strictness could cause failure to generate responses due to limited available documents. The default strictness is 3.'
@@ -358,7 +411,14 @@ export const SpecializationManager: React.FC = () => {
                     <label htmlFor="documentCount">Retrieved Documents (3-20)</label>
                     <div id="documentCount" className={classes.slider}>
                         <Slider min={3} max={20} value={documentCount} onChange={onChangeDocumentCount} />
-                        <span>{documentCount}</span>
+                        <Input
+                            value={documentCount.toString()}
+                            onChange={onInputChangeDocumentCount}
+                            min={3}
+                            max={20}
+                            type="number"
+                            className={classes.input}
+                        ></Input>
                         <Tooltip
                             content={
                                 'This specifies the number of top-scoring documents from your data index used to generate responses. You want to increase the value when you have short documents or want to provide more context. The default value is 5. Note: if you set the value to 20 but only have 10 documents in your index, only 10 will be used.'
@@ -368,15 +428,22 @@ export const SpecializationManager: React.FC = () => {
                             <Button icon={<Info20Regular />} appearance="transparent" />
                         </Tooltip>
                     </div>
-                    <label htmlFor="maxResponse">Past messages included (1-20)</label>
+                    <label htmlFor="maxResponse">Past messages included (1-100)</label>
                     <div id="maxResponse" className={classes.slider}>
                         <Slider
                             min={1}
-                            max={20}
+                            max={100}
                             value={pastMessagesIncludedCount}
                             onChange={onChangePastMessagesIncludedCount}
                         />
-                        <span>{pastMessagesIncludedCount}</span>
+                        <Input
+                            value={pastMessagesIncludedCount.toString()}
+                            onChange={onInputChangePastMessagesIncludedCount}
+                            type="number"
+                            min={1}
+                            max={100}
+                            className={classes.input}
+                        ></Input>
                         <Tooltip
                             content={
                                 'Select the number of past messages to include in each new API request. This helps give the model context for new user queries. Setting this number to 10 will include 5 user queries and 5 system responses.'
@@ -394,7 +461,14 @@ export const SpecializationManager: React.FC = () => {
                             value={maxResponseTokenLimit}
                             onChange={onChangeMaxResponseTokenLimit}
                         />
-                        <span>{maxResponseTokenLimit}</span>
+                        <Input
+                            value={maxResponseTokenLimit.toString()}
+                            onChange={onInputChangeMaxResponseTokenLimit}
+                            type="number"
+                            min={1}
+                            max={4096}
+                            className={classes.input}
+                        ></Input>
                         <Tooltip
                             content={
                                 "Set a limit on the number of tokens per model response. The supported number of tokens are shared between the prompt (including system message, examples, message history, and user query) and the model's response. One token is roughly 4 characters for typical English text."
