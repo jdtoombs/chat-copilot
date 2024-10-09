@@ -432,7 +432,7 @@ public class ChatPlugin
     )
     {
         var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(
-            this._promptOptions.DocumentMemoryName,
+            promptConfig.SystemInstructions,
             chatId,
             tokenBudget
         );
@@ -542,8 +542,8 @@ public class ChatPlugin
         return await this.StreamBotResponseAsync(
             chatId,
             userId,
-            chatContext,
             botPrompt,
+            chatContext,
             citationMap.Values.AsEnumerable(),
             cancellationToken
         );
@@ -693,8 +693,8 @@ public class ChatPlugin
     private async Task<CopilotChatMessage> StreamBotResponseAsync(
         string chatId,
         string userId,
-        KernelArguments chatContext,
         BotResponsePrompt promptView,
+        KernelArguments chatContext,
         IEnumerable<CitationSource>? citations,
         CancellationToken cancellationToken
     )
@@ -706,7 +706,6 @@ public class ChatPlugin
                     userId,
                     (string)chatContext[this._qAzureOpenAIChatExtension.ContextKey]!,
                     promptView,
-                    chatContext,
                     cancellationToken,
                     citations
                 ),
@@ -1059,19 +1058,11 @@ public class ChatPlugin
         string userId,
         string specializationkey,
         BotResponsePrompt prompt,
-        KernelArguments chatContext,
         CancellationToken cancellationToken,
         IEnumerable<CitationSource>? citations = null
     )
     {
         // Create the stream
-        // Serialize the chatContext to JSON
-        string serializedContext = JsonSerializer.Serialize(chatContext);
-
-        // Combine the context with the main prompt
-        string combinedPrompt = $"Context: {serializedContext}";
-        ChatHistory chatHistory = prompt.MetaPromptTemplate;
-        chatHistory.AddUserMessage(combinedPrompt);
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
         var defaultModel = this._qAzureOpenAIChatExtension.GetDefaultChatCompletionDeployment();
         var specialization =
@@ -1088,7 +1079,7 @@ public class ChatPlugin
             throw new InvalidOperationException($"ChatCompletionService for serviceId '{serviceId}' not found.");
         }
         var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
-            chatHistory,
+            prompt.MetaPromptTemplate,
             await this.CreateChatRequestSettingsAsync(specializationkey),
             this._kernel,
             cancellationToken
