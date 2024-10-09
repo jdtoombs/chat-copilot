@@ -152,7 +152,7 @@ public class QSpecializationService : IQSpecializationService
             ? qSpecializationMutate.RoleInformation
             : specializationToUpdate.RoleInformation;
         specializationToUpdate.InitialChatMessage = !string.IsNullOrEmpty(qSpecializationMutate.InitialChatMessage)
-            ? specializationToUpdate.InitialChatMessage
+            ? qSpecializationMutate.InitialChatMessage
             : specializationToUpdate.InitialChatMessage;
         specializationToUpdate.IndexName = qSpecializationMutate.IndexName ?? specializationToUpdate.IndexName;
 
