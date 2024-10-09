@@ -15,6 +15,7 @@ export interface ISpecialization {
     documentCount: number;
     pastMessagesIncludedCount: number;
     maxResponseTokenLimit: number;
+    initialChatMessage: string;
 }
 
 /**
@@ -33,6 +34,7 @@ export interface ISpecializationRequest {
     deleteImage?: boolean; // Flag to delete the image
     deleteIcon?: boolean; // Flag to delete the icon
     groupMemberships: string[];
+    initialChatMessage: string;
     restrictResultScope: boolean;
     strictness: number;
     documentCount: number;

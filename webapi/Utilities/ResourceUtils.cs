@@ -21,15 +21,22 @@ internal static class ResourceUtils
 
         if (!File.Exists(imageFilePath))
         {
-            throw new FileNotFoundException(
-                $"The image '{imageFileName}' was not found in the wwwroot directory.",
-                imageFileName
-            );
+            Console.WriteLine($"The image '{imageFileName}' was not found in the wwwroot directory.");
+            return string.Empty;
         }
 
-        byte[] imageBytes = File.ReadAllBytes(imageFilePath);
-        string base64ImageRepresentation = Convert.ToBase64String(imageBytes);
-
-        return $"data:image/png;base64,{base64ImageRepresentation}";
+        try
+        {
+            byte[] imageBytes = File.ReadAllBytes(imageFilePath);
+            string base64ImageRepresentation = Convert.ToBase64String(imageBytes);
+            return $"data:image/png;base64,{base64ImageRepresentation}";
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"An unexpected error occurred while processing the image '{imageFileName}'",
+                ex
+            );
+        }
     }
 }

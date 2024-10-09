@@ -48,6 +48,12 @@ public class QSpecializationResponse
     public string? IndexName { get; set; } = string.Empty;
 
     /// <summary>
+    /// Initial chat response of the specialization
+    /// </summary>
+    [JsonPropertyName("initialChatMessage")]
+    public string? InitialChatMessage { get; set; } = string.Empty;
+
+    /// <summary>
     /// Deployment of the specialization
     /// </summary>
     [JsonPropertyName("deployment")]
@@ -125,6 +131,7 @@ public class QSpecializationResponse
         this.PastMessagesIncludedCount = specializationSource.PastMessagesIncludedCount;
         this.MaxResponseTokenLimit = specializationSource.MaxResponseTokenLimit;
         this.GroupMemberships = specializationSource.GroupMemberships;
+        this.InitialChatMessage = specializationSource.InitialChatMessage;
         if (specializationSource.IndexName != null)
         {
             this.IndexName = specializationSource.IndexName;
