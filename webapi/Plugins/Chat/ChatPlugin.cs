@@ -237,12 +237,16 @@ public class ChatPlugin
     {
         // Render system instruction components and create the meta-prompt template
         var systemInstructions = await AsyncUtils.SafeInvokeAsync(
-            () => this.RenderSystemInstructions(chatId, chatContext, cancellationToken), nameof(RenderSystemInstructions));
+            () => this.RenderSystemInstructions(chatId, chatContext, cancellationToken),
+            nameof(RenderSystemInstructions)
+        );
         ChatHistory metaPrompt = new(systemInstructions);
 
         // Get the audience
         var audience = await AsyncUtils.SafeInvokeAsync(
-            () => this.GetAudienceAsync(chatContext, cancellationToken), nameof(GetAudienceAsync));
+            () => this.GetAudienceAsync(chatContext, cancellationToken),
+            nameof(GetAudienceAsync)
+        );
         metaPrompt.AddSystemMessage(audience);
 
         var userIntent = string.Empty;
@@ -250,7 +254,9 @@ public class ChatPlugin
         {
             // Extract user intent from the conversation history.
             userIntent = await AsyncUtils.SafeInvokeAsync(
-                () => this.GetUserIntentAsync(chatContext, cancellationToken), nameof(GetUserIntentAsync));
+                () => this.GetUserIntentAsync(chatContext, cancellationToken),
+                nameof(GetUserIntentAsync)
+            );
             metaPrompt.AddSystemMessage(userIntent);
         }
 
@@ -265,7 +271,11 @@ public class ChatPlugin
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
         // Query relevant semantic and document memories
-        (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(userIntent, chatId, chatMemoryTokenBudget);
+        (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(
+            userIntent,
+            chatId,
+            chatMemoryTokenBudget
+        );
         if (!string.IsNullOrWhiteSpace(memoryText))
         {
             metaPrompt.AddSystemMessage(memoryText);
@@ -273,13 +283,27 @@ public class ChatPlugin
         }
 
         // Add as many chat history messages to meta-prompt as the token budget will allow, or based on the count of messages to add specified in the specialization
-        string allowedChatHistory = await this.GetAllowedChatHistoryAsync(chatId, maxRequestTokenBudget - tokensUsed, metaPrompt, cancellationToken);
+        string allowedChatHistory = await this.GetAllowedChatHistoryAsync(
+            chatId,
+            maxRequestTokenBudget - tokensUsed,
+            metaPrompt,
+            cancellationToken
+        );
 
         // Store token usage of prompt template
-        chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils.GetContextMessagesTokenCount(metaPrompt).ToString(CultureInfo.CurrentCulture);
+        chatContext[TokenUtils.GetFunctionKey("SystemMetaPrompt")] = TokenUtils
+            .GetContextMessagesTokenCount(metaPrompt)
+            .ToString(CultureInfo.CurrentCulture);
 
         // Stream the response to the client
-        var botPrompt = new BotResponsePrompt(systemInstructions, audience, userIntent, memoryText, allowedChatHistory, metaPrompt);
+        var botPrompt = new BotResponsePrompt(
+            systemInstructions,
+            audience,
+            userIntent,
+            memoryText,
+            allowedChatHistory,
+            metaPrompt
+        );
 
         return await this.StreamBotResponseAsync(
             chatId,
@@ -1077,12 +1101,12 @@ public class ChatPlugin
     {
         // Create the stream
         var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
-        var stream =
-            chatCompletion.GetStreamingChatMessageContentsAsync(
-                prompt.MetaPromptTemplate,
-                this.CreateChatRequestSettings(),
-                this._kernel,
-                cancellationToken);
+        var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
+            prompt.MetaPromptTemplate,
+            this.CreateChatRequestSettings(),
+            this._kernel,
+            cancellationToken
+        );
 
         // Create message on client
         var chatMessage = await this.CreateBotMessageOnClient(
