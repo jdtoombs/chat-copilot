@@ -85,6 +85,7 @@ public class QSpecializationService : IQSpecializationService
                 qSpecializationMutate.Name,
                 qSpecializationMutate.Description,
                 qSpecializationMutate.RoleInformation,
+                qSpecializationMutate.InitialChatMessage,
                 qSpecializationMutate.IndexName,
                 qSpecializationMutate.Deployment,
                 qSpecializationMutate.RestrictResultScope,
@@ -150,6 +151,9 @@ public class QSpecializationService : IQSpecializationService
         specializationToUpdate.RoleInformation = !string.IsNullOrEmpty(qSpecializationMutate.RoleInformation)
             ? qSpecializationMutate.RoleInformation
             : specializationToUpdate.RoleInformation;
+        specializationToUpdate.InitialChatMessage = !string.IsNullOrEmpty(qSpecializationMutate.InitialChatMessage)
+            ? qSpecializationMutate.InitialChatMessage
+            : specializationToUpdate.InitialChatMessage;
         specializationToUpdate.IndexName = qSpecializationMutate.IndexName ?? specializationToUpdate.IndexName;
 
         // Group memberships (mutate payload) are a comma separated list of UUIDs.

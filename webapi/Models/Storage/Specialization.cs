@@ -33,6 +33,11 @@ public class Specialization : IStorageEntity
     public string Description { get; set; }
 
     /// <summary>
+    /// The initial chat message to display when starting a conversation under this specialization
+    /// </summary>
+    public string InitialChatMessage { get; set; }
+
+    /// <summary>
     /// Role Information
     /// </summary>
     public string RoleInformation { get; set; }
@@ -115,6 +120,7 @@ public class Specialization : IStorageEntity
         string Name,
         string Description,
         string RoleInformation,
+        string InitialChatMessage,
         string? IndexName,
         string? Deployment,
         bool? RestrictResultScope,
@@ -140,5 +146,6 @@ public class Specialization : IStorageEntity
         this.GroupMemberships = GroupMemberships;
         this.CreatedOn = DateTimeOffset.Now;
         this.IsActive = true;
+        this.InitialChatMessage = InitialChatMessage;
     }
 }
