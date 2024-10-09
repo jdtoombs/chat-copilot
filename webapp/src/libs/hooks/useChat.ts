@@ -505,11 +505,8 @@ export const useChat = () => {
 
     const editChatSpecialization = async (chatId: string, specializationId: string) => {
         try {
-            await chatService.editChatSepcializationAsync(
-                chatId,
-                specializationId,
-                await AuthHelper.getSKaaSAccessToken(instance, inProgress),
-            );
+            const token = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            await chatService.editChatSepcializationAsync(chatId, specializationId, token);
         } catch (e: any) {
             const errorMessage = `Error editing chat ${chatId}. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
