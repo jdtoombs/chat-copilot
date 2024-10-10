@@ -1,6 +1,7 @@
 import { makeStyles, mergeClasses, Persona, shorthands, Text, tokens } from '@fluentui/react-components';
 import { ShieldTask16Regular } from '@fluentui/react-icons';
 import { FC, useState } from 'react';
+import { useChat } from '../../../libs/hooks';
 import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
 import { setChatSpecialization } from '../../../redux/features/admin/adminSlice';
@@ -104,6 +105,7 @@ export const ChatListItem: FC<IChatListItemProps> = ({
     specializationLabel,
 }) => {
     const classes = useClasses();
+    const chat = useChat();
     const dispatch = useAppDispatch();
     const { features } = useAppSelector((state: RootState) => state.app);
     const { specializations } = useAppSelector((state: RootState) => state.admin);
@@ -124,7 +126,12 @@ export const ChatListItem: FC<IChatListItemProps> = ({
                 dispatch(setChatSpecialization(foundSpecialization));
             }
         }
-        dispatch(setSelectedConversation(id));
+        chat.loadChatMessagesByChatId(id)
+            .then(() => dispatch(setSelectedConversation(id)))
+            .catch((e: Error) => {
+                console.error(`Could not retrieve chat messages. ${e.message}`);
+            });
+        //dispatch(setSelectedConversation(id));
     };
 
     const time = timestampToDateString(timestamp);

@@ -264,34 +264,33 @@ export const useChat = () => {
             if (chatSessions.length > 0) {
                 const loadedConversations: Conversations = {};
 
-                const participantsMessagesPromises = chatSessions.map((chatSession) =>
-                    Promise.all([
-                        chatService.getAllChatParticipantsAsync(chatSession.id, accessToken),
-                        chatService.getChatMessagesAsync(chatSession.id, 0, 100, accessToken),
-                    ]),
-                );
+                // const participantsMessagesPromises = chatSessions.map((chatSession) =>
+                //     Promise.all([
+                //         chatService.getAllChatParticipantsAsync(chatSession.id, accessToken),
+                //         chatService.getChatMessagesAsync(chatSession.id, 0, 100, accessToken),
+                //     ]),
+                // );
 
                 // Fetch all chat participants and messages at once
-                const allUsersMessages = await Promise.all(participantsMessagesPromises);
+                //const allUsersMessages = await Promise.all(participantsMessagesPromises);
 
-                for (let i = 0; i < chatSessions.length; i++) {
-                    const chatSession = chatSessions[i];
-                    const [chatUsers, chatMessages] = allUsersMessages[i];
+                for (const chatSession of chatSessions) {
+                    //const [chatUsers, chatMessages] = allUsersMessages[i];
 
                     loadedConversations[chatSession.id] = {
                         id: chatSession.id,
                         title: chatSession.title,
                         systemDescription: chatSession.systemDescription,
                         memoryBalance: chatSession.memoryBalance,
-                        users: chatUsers,
-                        messages: chatMessages,
+                        users: [],
+                        messages: [],
                         enabledHostedPlugins: chatSession.enabledPlugins,
                         botProfilePicture: getBotProfilePicture(specializations, chatSession.specializationId),
                         input: '',
                         botResponseStatus: undefined,
                         userDataLoaded: false,
                         disabled: false,
-                        hidden: !features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
+                        hidden: false, //!features[FeatureKeys.MultiUserChat].enabled && chatUsers.length > 1,
                         specializationId: chatSession.specializationId,
                         createdOnServer: true,
                         suggestions: [],
@@ -319,6 +318,19 @@ export const useChat = () => {
 
             return false;
         }
+    };
+
+    const loadChatMessagesByChatId = async (chatId: string) => {
+        const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+        const participantsMessagesPromises = Promise.all([
+            chatService.getAllChatParticipantsAsync(chatId, accessToken),
+            chatService.getChatMessagesAsync(chatId, 0, 100, accessToken),
+        ]);
+        const [chatUsers, chatMessages] = await participantsMessagesPromises;
+        const conversation = Object.assign({}, conversations[chatId]);
+        conversation.users = chatUsers;
+        conversation.messages = chatMessages;
+        dispatch(addConversation(conversation));
     };
 
     const downloadBot = async (chatId: string) => {
@@ -626,6 +638,7 @@ export const useChat = () => {
         deleteChatHistory,
         processPlan,
         selectSpecializationAndBeginChat,
+        loadChatMessagesByChatId,
     };
 };
 
