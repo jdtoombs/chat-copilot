@@ -164,6 +164,15 @@ public class ChatController : ControllerBase, IDisposable
                 return this.StatusCode(StatusCodes.Status504GatewayTimeout, $"The chat {ChatFunction} was cancelled.");
             }
 
+            if (
+                ex is HttpOperationException
+                && ex.Message.Contains("Service request failed.", System.StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                this._logger.LogError("Something went wrong while the AI chat service processed the request.");
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Service request failed.");
+            }
+
             this._telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, false);
 
             throw;

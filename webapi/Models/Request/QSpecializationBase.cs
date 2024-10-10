@@ -60,6 +60,12 @@ public class QSpecializationBase
     public string? Deployment { get; set; } = string.Empty;
 
     /// <summary>
+    /// Initial chat message that should be displayed to the client for this specialization.
+    /// </summary>
+    [JsonPropertyName("initialChatMessage")]
+    public string InitialChatMessage { get; set; } = string.Empty;
+
+    /// <summary>
     /// Restrict Result Scope of the specialization
     /// </summary>
     [JsonPropertyName("restrictResultScope")]
