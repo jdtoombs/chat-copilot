@@ -110,7 +110,7 @@ public class ChatPlugin
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         ILogger logger,
         AzureContentSafety? contentSafety = null,
-        bool isUserIntentExtractionEnabled = false
+        bool isUserIntentExtractionEnabled = true
     ) // Parameter for feature flag
     {
         this._logger = logger;
@@ -432,7 +432,7 @@ public class ChatPlugin
     )
     {
         var memoryQueryTask = this._semanticMemoryRetriever.QueryMemoriesAsync(
-            this._promptOptions.DocumentMemoryName,
+            promptConfig.UserIntent,
             chatId,
             tokenBudget
         );
