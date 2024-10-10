@@ -126,12 +126,13 @@ export const ChatListItem: FC<IChatListItemProps> = ({
                 dispatch(setChatSpecialization(foundSpecialization));
             }
         }
-        chat.loadChatMessagesByChatId(id)
-            .then(() => dispatch(setSelectedConversation(id)))
-            .catch((e: Error) => {
+        if (conversations[id].createdOnServer && conversations[id].messages.length < 1) {
+            chat.loadChatMessagesByChatId(id).catch((e: Error) => {
                 console.error(`Could not retrieve chat messages. ${e.message}`);
             });
-        //dispatch(setSelectedConversation(id));
+        } else {
+            dispatch(setSelectedConversation(id));
+        }
     };
 
     const time = timestampToDateString(timestamp);

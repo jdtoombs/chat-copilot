@@ -15,7 +15,6 @@ import {
     deleteConversation,
     editConversationSpecialization,
     setConversations,
-    setSelectedConversation,
     updateBotResponseStatus,
 } from '../../redux/features/conversations/conversationsSlice';
 import { Plugin } from '../../redux/features/plugins/PluginsState';
@@ -303,8 +302,6 @@ export const useChat = () => {
                 const nonHiddenChats = Object.values(loadedConversations).filter((c) => !c.hidden);
                 if (nonHiddenChats.length === 0) {
                     createChat();
-                } else {
-                    dispatch(setSelectedConversation(nonHiddenChats[0].id));
                 }
             } else {
                 // No chats exist, create first chat window
