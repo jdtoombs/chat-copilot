@@ -8,7 +8,6 @@ RUN dotnet dev-certs https
 # copy everything else and build app
 COPY webapi webapi
 COPY shared shared
-COPY wwwroot wwwroot
 RUN cd webapi && \
   dotnet restore --use-current-runtime && \
   apt update && apt install -y wget && \
@@ -20,7 +19,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 ENV Kestrel__Endpoints__Http__Url=http://0.0.0.0:8080
 WORKDIR /app
 COPY --from=builder /app .
-COPY wwwroot wwwroot
 COPY --from=builder /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 RUN apt update && \
   apt install -y libleptonica-dev libtesseract-dev libc6-dev libjpeg62-turbo-dev libgdiplus && \
