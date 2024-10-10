@@ -236,6 +236,7 @@ public class SpecializationController : ControllerBase
             RestrictResultScope = this._qAzureOpenAIChatOptions.DefaultRestrictResultScope,
             Strictness = this._qAzureOpenAIChatOptions.DefaultStrictness,
             DocumentCount = this._qAzureOpenAIChatOptions.DefaultDocumentCount,
+            PastMessagesIncludedCount = this._qAzureOpenAIChatOptions.DefaultPastMessagesIncludedCount,
             MaxResponseTokenLimit = this._qAzureOpenAIChatOptions.DefaultMaxResponseTokenLimit,
         };
 
