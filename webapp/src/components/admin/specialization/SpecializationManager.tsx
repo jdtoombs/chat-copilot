@@ -316,8 +316,8 @@ export const SpecializationManager: React.FC = () => {
                 </div>
                 <div className={classes.slidersContainer}>
                     <label htmlFor="strictness">Strictness (1-5)</label>
-                    <div id="strictness" className={classes.slider}>
-                        <Slider min={1} max={5} value={strictness} onChange={onChangeStrictness} />
+                    <div className={classes.slider}>
+                        <Slider id="strictness" min={1} max={5} value={strictness} onChange={onChangeStrictness} />
                         <span>{strictness}</span>
                         <Tooltip
                             content={
@@ -329,8 +329,14 @@ export const SpecializationManager: React.FC = () => {
                         </Tooltip>
                     </div>
                     <label htmlFor="documentCount">Retrieved Documents (3-20)</label>
-                    <div id="documentCount" className={classes.slider}>
-                        <Slider min={3} max={20} value={documentCount} onChange={onChangeDocumentCount} />
+                    <div className={classes.slider}>
+                        <Slider
+                            id="documentCount"
+                            min={3}
+                            max={20}
+                            value={documentCount}
+                            onChange={onChangeDocumentCount}
+                        />
                         <span>{documentCount}</span>
                         <Tooltip
                             content={
@@ -398,7 +404,7 @@ export const SpecializationManager: React.FC = () => {
                 />
                 <div className={classes.fileUploadContainer}>
                     <div className={classes.imageContainer}>
-                        <label htmlFor="image-url">Specialization Image</label>
+                        <label>Specialization Image</label>
                         <ImageUploaderPreview
                             buttonLabel="Upload Image"
                             file={imageFile.file ?? imageFile.src}
@@ -408,7 +414,7 @@ export const SpecializationManager: React.FC = () => {
                         />
                     </div>
                     <div className={classes.imageContainer}>
-                        <label htmlFor="image-url">Specialization Icon</label>
+                        <label>Specialization Icon</label>
                         <ImageUploaderPreview
                             buttonLabel="Upload Icon"
                             file={iconFile.file ?? iconFile.src}
