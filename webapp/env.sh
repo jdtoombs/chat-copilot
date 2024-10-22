@@ -31,10 +31,7 @@ do
 
 done < .env
 
-# Debugging: print what's in the .env file for SECURITY_GROUP_ID
-echo "Checking for SECURITY_GROUP_ID in .env file..."
-
-# Optionally add a default security group ID if it's not in .env
+# Add a default security group ID if it's not in .env
 security_group_default="e1aae29c-d680-4e7e-a90a-d10cdb18fd74"
 security_group=$(grep -E '^SECURITY_GROUP_ID=' .env | cut -d '=' -f2)
 
