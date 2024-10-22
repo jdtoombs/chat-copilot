@@ -13,7 +13,7 @@ while read -r line || [[ -n "$line" ]];
 do
   # Skip comments
   [[ "$line" =~ ^#.*$ ]] && continue
-  # skip  empty lines
+  # Skip empty lines
   [[ -z "$line" ]] && continue
   # Split env variables by character `=`
   if printf '%s\n' "$line" | grep -q -e '='; then
@@ -24,10 +24,33 @@ do
   # Read value of current variable if exists as Environment variable
   value=$(printf '%s\n' "${!varname}")
   # Otherwise use value from .env file
-  [[ -z $value ]] && value=${varvalue}
+  [[ -z "$value" ]] && value="$varvalue"
   
   # Append configuration property to JS file
   echo "  $varname: \"$value\"," >> ./env-config.js
+
 done < .env
 
+# Debugging: print what's in the .env file for SECURITY_GROUP_ID
+echo "Checking for SECURITY_GROUP_ID in .env file..."
+
+# Optionally add a default security group ID if it's not in .env
+security_group_default="e1aae29c-d680-4e7e-a90a-d10cdb18fd74"
+security_group=$(grep -E '^SECURITY_GROUP_ID=' .env | cut -d '=' -f2)
+
+# If SECURITY_GROUP_ID not found in .env, use the default value
+if [[ -z "$security_group" ]]; then
+  echo "SECURITY_GROUP_ID not found in .env, using default."
+  security_group="$security_group_default"
+else
+  echo "SECURITY_GROUP_ID found: $security_group"
+fi
+
+# Add the security group to the env-config.js file
+echo "  SECURITY_GROUP_ID: \"$security_group\"," >> ./env-config.js
+
+# Finish the JS file
 echo "}" >> ./env-config.js
+
+echo "env-config.js created with security group ID: $security_group"
+
