@@ -53,8 +53,10 @@ const Chat = ({
                         {appState === AppState.Chat && <ChatView />}
                     </>
                 ) : (
-                    // Render Unauth only when appState is not ProbeForBackend and user does not have access
-                    appState !== AppState.ProbeForBackend && <Unauth />
+                    // Do not render unauth if the app is probing for backend, signing out, or setting the user info as these states need to be completed in order to determine if it should be displayed.
+                    appState !== AppState.ProbeForBackend &&
+                    appState !== AppState.SigningOut &&
+                    appState !== AppState.SettingUserInfo && <Unauth />
                 )}
             </>
         </div>
