@@ -24,7 +24,7 @@ do
   # Read value of current variable if exists as Environment variable
   value=$(printf '%s\n' "${!varname}")
   # Otherwise use value from .env file
-  [[ -z $value ]] && value=$varvalue
+  [[ -z $value ]] && value=${varvalue}
   
   # Append configuration property to JS file
   echo "  $varname: \"$value\"," >> ./env-config.js
@@ -32,12 +32,11 @@ do
 done < .env
 
 # Add a default security group ID if it's not in .env
-# This is currently the admin group, identify base group.
-security_group_default=""
+security_group_default="4e802d2e-65dc-4bb8-98bc-b08a7d0ed53d"
 security_group=$(grep -E '^SECURITY_GROUP_ID=' .env | cut -d '=' -f2)
 
 # If SECURITY_GROUP_ID not found in .env, use the default value
-# User may ovveride this value in .env
+# User may override this value in .env
 if [[ -z "$security_group" ]]; then
   echo "SECURITY_GROUP_ID not found in .env, using default. If you would like to override this, please add SECURITY_GROUP_ID to your .env file"
   security_group="$security_group_default"
