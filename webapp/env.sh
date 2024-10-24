@@ -32,12 +32,14 @@ do
 done < .env
 
 # Add a default security group ID if it's not in .env
-security_group_default="e1aae29c-d680-4e7e-a90a-d10cdb18fd74"
+# This is currently the admin group, identify base group.
+security_group_default=""
 security_group=$(grep -E '^SECURITY_GROUP_ID=' .env | cut -d '=' -f2)
 
 # If SECURITY_GROUP_ID not found in .env, use the default value
+# User may ovveride this value in .env
 if [[ -z "$security_group" ]]; then
-  echo "SECURITY_GROUP_ID not found in .env, using default."
+  echo "SECURITY_GROUP_ID not found in .env, using default. If you would like to override this, please add SECURITY_GROUP_ID to your .env file"
   security_group="$security_group_default"
 else
   echo "SECURITY_GROUP_ID found: $security_group"
