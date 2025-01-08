@@ -372,6 +372,12 @@ public class ChatPlugin
 
         this._logger.LogInformation("Getting chat response! Silent version.");
 
+        string? specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString();
+        if (specializationKey != null)
+        {
+            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+        }
+
         CopilotChatMessage chatMessage = await this.GetChatResponseAsync(
             chatId,
             userId,
