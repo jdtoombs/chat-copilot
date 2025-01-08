@@ -354,7 +354,7 @@ public class ChatPlugin
     )
     {
         // Set the system description in the prompt options
-        await this.SetSystemDescriptionAsync(chatId, cancellationToken);
+        // await this.SetSystemDescriptionAsync(chatId, cancellationToken);
 
         this._logger.LogInformation("Saving suggestions user message to chat history.");
         var suggestionsMessage = await this.SaveNewMessageAsync(
