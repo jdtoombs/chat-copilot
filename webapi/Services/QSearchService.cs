@@ -49,9 +49,8 @@ public class QSearchService : IQSearchService
     /// </summary>
     public async Task<QSearchResult?> GetMatchesAsync(QSearchParameters qsearchParameters)
     {
-        string specializationId = qsearchParameters.SpecializationId;
         QAzureSearchRequest requestBody = new(qsearchParameters.Search);
-        var indexId = await this.GetIndexId(specializationId);
+        var indexId = qsearchParameters.IndexId;
         if (indexId == null)
         {
             return null;
@@ -120,11 +119,5 @@ public class QSearchService : IQSearchService
             this._httpClient.Dispose();
             this._httpClientHandler?.Dispose();
         }
-    }
-
-    private async Task<string?> GetIndexId(string specializationId)
-    {
-        var specialiazation = await this._specializationRepository.FindByIdAsync(specializationId);
-        return specialiazation?.IndexId;
     }
 }

@@ -16,6 +16,6 @@ public class QSearchParameters
     [JsonPropertyName("search")]
     public string Search { get; set; } = string.Empty;
 
-    [JsonPropertyName("specializationId")]
-    public string SpecializationId { get; set; } = string.Empty;
+    [JsonPropertyName("indexId")]
+    public string IndexId { get; set; } = string.Empty;
 }

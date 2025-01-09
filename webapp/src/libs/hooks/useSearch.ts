@@ -81,9 +81,9 @@ export const useSearch = () => {
         return result;
     };
 
-    const getResponse = async (specializationId: string, value: string) => {
+    const getResponse = async (indexId: string, value: string) => {
         const searchAsk: IAskSearch = {
-            specializationId,
+            indexId: indexId,
             search: value,
         };
         try {
