@@ -1,3 +1,13 @@
+####################
+# Global Variables #
+####################
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resource"
+  type        = map(string)
+  default     = null
+}
+
 ##################################
 # Azure Resource Group variables #
 ##################################
@@ -54,11 +64,6 @@ variable "sql_database_edition" {
 variable "sqldb_service_objective_name" {
   description = " The service objective name for the database"
   default     = "S1"
-}
-
-
-variable "tags" {
-  type = map(string)
 }
 
 variable "random_password_length" {

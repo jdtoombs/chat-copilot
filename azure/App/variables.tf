@@ -43,9 +43,9 @@ variable "tags" {
   type        = map(string)
   description = "Tags to be applied to all resources"
   default = {
-    client  = "vision"
-    owner   = "david.camden@quartech.com"
-    project = "pegasus"
+    client  = ""
+    owner   = ""
+    project = ""
   }
 }
 
@@ -85,7 +85,7 @@ variable "cosmosdb_sql_containers" {
 
 variable "throughput" {
   type        = number
-  default     = 800
+  default     = 10000
   description = "Cosmos db database throughput"
   validation {
     condition     = var.throughput >= 400 && var.throughput <= 1000000
@@ -159,3 +159,8 @@ variable "kubernetes_azure_tenant_id" {
   type        = string
   description = "Existing AKS Cluster Azure Tenant ID"
 }
+
+variable "app_api_object_id" {
+  type        = string
+  description = "Existing App Registration Object ID for API"
+} 

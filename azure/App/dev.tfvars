@@ -14,10 +14,18 @@ project_code = "copilot"
 
 environment = "dev"
 
+tags = {
+  client  = "Quartech"
+  owner   = "david.camden@quartech.com" 
+  project = "Q-Pilot"
+}
+
 kubernetes_azure_subscription_id = "55e460fd-3416-40f4-b548-a6cae492f532"
 kubernetes_azure_tenant_id       = "898fdc18-1bd2-4a3b-84a7-2efb988e3b90"
 kubernetes_cluster_name          = "aks-pegasus-cnc-shared"
 kubernetes_resource_group_name   = "rg-pegasus-cnc-shared-aks"
+
+app_api_object_id = "55f7148f-b09d-4916-ba12-5c3f1ff80b4a"
 
 
 //database_names = ["UserManagement", "SupervisorNotes", "SystemAdministration", "PersonsSearch"]
@@ -38,21 +46,21 @@ openai_deployments = [
     model_name = "gpt-4o-mini",
     version = "2024-07-18",
     sku_name = "GlobalStandard",
-    capacity = 24065
+    capacity = 50000
   },
   {
     name = "gpt-4o",
     model_name = "gpt-4o",
     version = "2024-08-06",
     sku_name = "GlobalStandard",
-    capacity = 30000
+    capacity = 10000
   },
   {
     name = "text-embedding-ada-002",
     model_name = "text-embedding-ada-002",
     version = 2,
     sku_name = "Standard",
-    capacity = 240
+    capacity = 100
   }
 ]
 

@@ -5,4 +5,6 @@ resource "azurerm_search_service" "search" {
   sku                 = var.sku
   replica_count       = var.replica_count
   partition_count     = var.partition_count
+
+  tags      = var.tags
 }

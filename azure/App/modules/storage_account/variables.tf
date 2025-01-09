@@ -1,3 +1,14 @@
+####################
+# Global Variables #
+####################
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resource"
+  type        = map(string)
+  default     = null
+}
+
+
 ##################################
 # Azure Resource Group variables #
 ##################################
@@ -10,12 +21,6 @@ variable "resource_group_name" {
 variable "location" {
   type        = string
   description = "Define the region where the module should be created, you should use the Resource Group location"
-}
-
-variable "tags" {
-  description = "A mapping of tags to assign to the resource"
-  type        = map(string)
-  default     = null
 }
 
 variable "name" {
