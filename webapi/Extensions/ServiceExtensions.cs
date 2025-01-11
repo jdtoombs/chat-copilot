@@ -433,6 +433,16 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
+    /// Add emailing services
+    /// </summary>
+    public static IServiceCollection AddEmailService(this IServiceCollection services)
+    {
+        services.AddScoped<IEmailSender, EmailSender>();
+
+        return services;
+    }
+
+    /// <summary>
     /// Trim all string properties, recursively.
     /// </summary>
     private static void TrimStringProperties<T>(T options)

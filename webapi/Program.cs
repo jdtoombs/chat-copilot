@@ -48,7 +48,8 @@ public sealed class Program
             .AddPersistentChatStore()
             .AddPlugins(builder.Configuration)
             .AddChatCopilotAuthentication(builder.Configuration)
-            .AddChatCopilotAuthorization();
+            .AddChatCopilotAuthorization()
+            .AddEmailService();
 
         // Add SignalR as the real time relay service
         builder.Services.AddSignalR(hubOptions => hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(5));
