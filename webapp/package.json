@@ -52,7 +52,7 @@
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
+    "prettier": "^3.4.2",
     "react-scripts": "^5.0.1",
     "serve": "^14.2.3",
     "typescript": "5.5.3"
