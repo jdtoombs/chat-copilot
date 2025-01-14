@@ -358,7 +358,6 @@ public class ChatHistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
-    [Authorize(Policy = AuthPolicyName.RequireSpecialization)]
     public async Task<IActionResult> DeleteChatSessionAsync(
         [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
         Guid chatId,
