@@ -16,6 +16,11 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+  - package-ecosystem: "nuget"
+    directory: "shared"
+    schedule:
+      interval: "weekly"
+      day: "monday"
 
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
