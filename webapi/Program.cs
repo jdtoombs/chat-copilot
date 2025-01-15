@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Hubs;
+using CopilotChat.WebApi.Plugins.Chat;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -50,6 +51,8 @@ public sealed class Program
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization();
 
+
+
         // Add SignalR as the real time relay service
         builder.Services.AddSignalR(hubOptions => hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(5));
         builder.Services.AddSingleton<ISecretClientAccessor, SecretClientAccessor>();
@@ -66,6 +69,20 @@ public sealed class Program
             .AddSingleton<IDefaultConfigurationFactory, DefaultConfigurationFactory>();
         // Configure and add semantic services
         builder.AddBotConfig().AddSemanticKernelServices().AddSemanticMemoryServices();
+
+        /*
+                // Add in configuration options and required services.
+                builder
+                    .Services.AddSingleton<ChatPluginNoSession>()
+                    .AddOptions(builder.Configuration)
+                    .AddPersistentChatStore()
+                    .AddPlugins(builder.Configuration)
+                    .AddChatCopilotAuthentication(builder.Configuration)
+                    .AddChatCopilotAuthorization();
+        */
+
+        builder.Services.AddSingleton<SingleMessageCompletionService>();
+
 
         // Add AppInsights telemetry
         builder
