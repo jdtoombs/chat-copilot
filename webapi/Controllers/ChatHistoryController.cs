@@ -40,7 +40,6 @@ public class ChatHistoryController : ControllerBase
     private const string ChatDeletedClientCall = "ChatDeleted";
     private const string ChatHistoryDeletedClientCall = "ChatHistoryDeleted";
     private const string GetChatRoute = "GetChatRoute";
-    private const string ChatsClearedClientCall = "ChatsCleared";
 
     private readonly ILogger<ChatHistoryController> _logger;
     private readonly IKernelMemory _memoryClient;
