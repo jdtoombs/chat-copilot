@@ -282,7 +282,7 @@ public class ChatPlugin
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
         // Query relevant semantic and document memories
-        (var memoryText, IDictionary<string, CitationSource> citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(
+        (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(
             userIntent,
             chatId,
             chatMemoryTokenBudget
@@ -1011,7 +1011,8 @@ public class ChatPlugin
                     SourceName = citation.SourceName,
                     Snippet = citation.Snippet,
                     SourceContentType = citation.SourceContentType,
-                });
+                }
+            );
         }
         var chatHistory = prompt.MetaPromptTemplate;
 
