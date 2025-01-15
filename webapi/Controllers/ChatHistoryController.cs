@@ -40,6 +40,7 @@ public class ChatHistoryController : ControllerBase
     private const string ChatDeletedClientCall = "ChatDeleted";
     private const string ChatHistoryDeletedClientCall = "ChatHistoryDeleted";
     private const string GetChatRoute = "GetChatRoute";
+    private const string ChatsClearedClientCall = "ChatsCleared";
 
     private readonly ILogger<ChatHistoryController> _logger;
     private readonly IKernelMemory _memoryClient;
@@ -358,7 +359,7 @@ public class ChatHistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
-    public async Task<IActionResult> DeleteChatSessionAsync(
+    public async Task<IActionResult> RemoveSelfFromChatAsync(
         [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
         Guid chatId,
         CancellationToken cancellationToken
@@ -377,18 +378,18 @@ public class ChatHistoryController : ControllerBase
         }
 
         // Delete any resources associated with the chat session.
-        try
-        {
-            await this.DeleteChatResourcesAsync(chatIdString, cancellationToken);
-        }
-        catch (AggregateException)
-        {
-            return this.StatusCode(500, $"Failed to delete resources for chat id '{chatId}'.");
-        }
 
+        //await this.DeleteChatResourcesAsync(chatIdString, cancellationToken);
+        var chatParticipants = await this._participantRepository.FindByChatIdAsync(chatIdString);
+        var currentUser = chatParticipants.First((p) => p.UserId == this._authInfo.UserId);
+        if (currentUser == null)
+        {
+            return this.NotFound("Current user is not in the selected chat session."); //We should never really hit this due to the auth middleware.
+        }
+        await this._participantRepository.DeleteAsync(currentUser);
         // Delete chat session and broadcast update to all participants.
-        await this._sessionRepository.DeleteAsync(chatToDelete);
-        await messageRelayHubContext
+        // await this._sessionRepository.DeleteAsync(chatToDelete);
+        await messageRelayHubContext // Even though we aren't truly deleting the chat anymore, the frontend should still operate as if we were.
             .Clients.Group(chatIdString)
             .SendAsync(
                 ChatDeletedClientCall,
@@ -398,6 +399,24 @@ public class ChatHistoryController : ControllerBase
             );
 
         return this.NoContent();
+    }
+
+    [HttpDelete]
+    [Route("chats/all")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
+    public async Task<IActionResult> RemoveSelfFromAllChatsAsync(
+        [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
+        CancellationToken cancellationToken
+    )
+    {
+        var removedParticipants = await this._participantRepository.RemoveAllParticipantsForUser(this._authInfo.UserId);
+        var chatSessionsToRemove = removedParticipants.Select((p) => p.ChatId);
+
+        return this.Ok(chatSessionsToRemove);
     }
 
     /// <summary>

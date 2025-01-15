@@ -130,6 +130,27 @@ public class CosmosDbContext<T> : IStorageContext<T>, IDisposable
             this._client.Dispose();
         }
     }
+
+    public async Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey)
+    {
+        var results = new List<T>();
+        var queryable = this._container.GetItemLinqQueryable<T>(true).Where(predicate);
+        var iterator = queryable.ToFeedIterator();
+        while (iterator.HasMoreResults)
+        {
+            var response = await iterator.ReadNextAsync();
+            foreach (var item in response)
+            {
+                var partitionKeyValue = typeof(T).GetProperty(partitionKey)?.GetValue(item);
+                if (partitionKeyValue == null)
+                {
+                    throw new InvalidOperationException("Partition key value cannot be null.");
+                }
+                await this._container.DeleteItemAsync<T>(item.Id, new PartitionKey(partitionKeyValue.ToString()));
+            }
+        }
+        return results;
+    }
 }
 
 /// <summary>

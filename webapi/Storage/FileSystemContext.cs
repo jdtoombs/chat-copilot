@@ -170,6 +170,17 @@ public class FileSystemContext<T> : IStorageContext<T>
             return JsonSerializer.Deserialize<EntityDictionary>(fileStream) ?? new EntityDictionary();
         }
     }
+
+    public Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey)
+    {
+        var compiledPredicate = predicate.Compile();
+        var entities = this._entities.Values.Where(compiledPredicate);
+        foreach (var entity in entities)
+        {
+            this._entities.Remove(entity.Id, out _);
+        }
+        return Task.FromResult(entities);
+    }
 }
 
 /// <summary>

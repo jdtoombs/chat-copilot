@@ -46,6 +46,13 @@ public interface IStorageContext<T>
     /// </summary>
     /// <param name="entity">The entity to be deleted from the context.</param>
     Task DeleteAsync(T entity);
+
+    /// <summary>
+    /// Delete many entities at once based on a predicate condition.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey);
 }
 
 /// <summary>
