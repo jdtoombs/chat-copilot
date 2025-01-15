@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 using System;
-using System.Threading;
 using System.Threading.Tasks;
-using CopilotChat.WebApi.Context;
+using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Models.Request;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
+using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Controllers;
 
@@ -17,11 +20,29 @@ namespace CopilotChat.WebApi.Controllers;
 public class SessionlessChatController : ControllerBase
 {
     private readonly SingleMessageCompletionService _singleMessageCompletionService;
-    public SessionlessChatController(
+
+    /*    public SessionlessChatController(
         SingleMessageCompletionService singleMessageCompletionService
     )
     {
         this._singleMessageCompletionService = singleMessageCompletionService;
+    }
+    */
+    public SessionlessChatController(
+        SpecializationRepository specializationSourceRepository,
+        SpecializationIndexRepository specializationIndexRepository,
+        OpenAIDeploymentRepository openAIDeploymentRepository,
+        IOptions<QAzureOpenAIChatOptions> specializationOptions,
+        ISecretClientAccessor secretClientAccessor
+    )
+    {
+        this._singleMessageCompletionService = new SingleMessageCompletionService(
+            specializationOptions.Value,
+            specializationSourceRepository,
+            specializationIndexRepository,
+            openAIDeploymentRepository,
+            secretClientAccessor.GetSecretClient()
+        );
     }
 
 
@@ -36,14 +57,13 @@ public class SessionlessChatController : ControllerBase
     //[Authorize(Policy = AuthPolicyName.RequireSpecialization)]
     public async Task<IActionResult> SessionlessChatAsync(
        // [FromServices] Kernel kernel,
-        [FromBody] Ask ask,
-        CancellationToken requestAbortedToken
+        [FromBody] Ask ask
     )
     {
 
-        var Test = this._singleMessageCompletionService.GetNumber();
+        var Test = this._singleMessageCompletionService.GetResponse();
         // KernelFunction? chatFunction = kernel.Plugins.GetFunction(ChatPluginName, ChatFunctionName);
-        return this.Ok(new { Success = true, Response = "WE GOOD!" });
+        return this.Ok(new { Success = true, Response = Test });
     }
 
 }

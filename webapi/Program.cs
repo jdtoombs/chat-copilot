@@ -70,19 +70,7 @@ public sealed class Program
         // Configure and add semantic services
         builder.AddBotConfig().AddSemanticKernelServices().AddSemanticMemoryServices();
 
-        /*
-                // Add in configuration options and required services.
-                builder
-                    .Services.AddSingleton<ChatPluginNoSession>()
-                    .AddOptions(builder.Configuration)
-                    .AddPersistentChatStore()
-                    .AddPlugins(builder.Configuration)
-                    .AddChatCopilotAuthentication(builder.Configuration)
-                    .AddChatCopilotAuthorization();
-        */
-
-        builder.Services.AddSingleton<SingleMessageCompletionService>();
-
+        //builder.Services.AddSingleton<SingleMessageCompletionService>();
 
         // Add AppInsights telemetry
         builder
