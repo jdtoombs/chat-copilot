@@ -1,4 +1,3 @@
-using System.Net.Http;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Secrets;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
@@ -12,12 +11,9 @@ namespace CopilotChat.WebApi.Services;
 
 public class SingleMessageCompletionService
 {
-    private readonly HttpClient _httpClient;
-    private readonly HttpClientHandler? _httpClientHandler;
     private readonly SpecializationRepository _specializationRepository;
     private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
-    //create object
     public SingleMessageCompletionService(
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
         SpecializationRepository specializationSourceRepository,
@@ -32,8 +28,6 @@ public class SingleMessageCompletionService
             openAIDeploymentRepository,
             secretClient
         );
-        this._httpClientHandler = new() { CheckCertificateRevocationList = true };
-        this._httpClient = new(this._httpClientHandler);
         this._specializationRepository = specializationSourceRepository;
     }
 
@@ -46,7 +40,6 @@ public class SingleMessageCompletionService
         CancellationToken cancellationToken
     )
     {
-
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
         var stream = await chatCompletion.GetChatMessageContentAsync(
             userPrompt,

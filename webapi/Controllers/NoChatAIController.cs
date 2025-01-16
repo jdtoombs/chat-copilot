@@ -50,9 +50,15 @@ public class SessionlessChatController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var Test = this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
-        // KernelFunction? chatFunction = kernel.Plugins.GetFunction(ChatPluginName, ChatFunctionName);
-        return this.Ok(new { Success = true, Response = Test });
+        if (string.IsNullOrEmpty(ask.Input))
+        {
+            return this.StatusCode(500, "No text input provided!");
+        }
+        else
+        {
+            var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
+            return this.Ok(new { Success = true, Response = textResponse });
+        }
     }
 
 }
