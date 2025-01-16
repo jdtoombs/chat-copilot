@@ -9,8 +9,8 @@ jobs:
       run:
         working-directory: ./webapp # Here the path to the folder where package-lock.json is located.
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: npm
@@ -29,8 +29,8 @@ jobs:
       run:
         working-directory: ./webapp # Here the path to the folder where package-lock.json is located.
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: npm

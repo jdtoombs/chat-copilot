@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 
 namespace CopilotChat.WebApi.Utilities;
@@ -31,23 +30,5 @@ public static class CitationUtils
                 "application/octet-stream" // Default content type for unknown extensions
             ,
         };
-    }
-
-    /// <summary>
-    /// Updates the count of citations for a given source in the dictionary.
-    /// If the source does not yet exist in the dictionary, it initializes the count to 1.
-    /// </summary>
-    /// <param name="map">The dictionary to update, passed by reference.</param>
-    /// <param name="key">The source name or identifier to count.</param>
-    public static void UpdateMapCount(ref Dictionary<string, int> map, string key)
-    {
-        if (map.TryGetValue(key, out int count))
-        {
-            map[key] = count + 1;
-        }
-        else
-        {
-            map[key] = 1;
-        }
     }
 }
