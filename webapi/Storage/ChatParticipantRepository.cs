@@ -54,6 +54,6 @@ public class ChatParticipantRepository : Repository<ChatParticipant>
 
     public Task<IEnumerable<ChatParticipant>> RemoveAllParticipantsForUser(string userId)
     {
-        return base.StorageContext.DeleteManyAsync(e => e.UserId == userId, "ChatId");
+        return base.StorageContext.DeleteManyAsync(e => e.UserId == userId);
     }
 }

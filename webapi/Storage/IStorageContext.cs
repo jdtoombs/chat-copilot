@@ -52,7 +52,7 @@ public interface IStorageContext<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey);
+    Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate);
 }
 
 /// <summary>

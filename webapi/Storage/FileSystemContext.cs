@@ -171,7 +171,7 @@ public class FileSystemContext<T> : IStorageContext<T>
         }
     }
 
-    public Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey)
+    public Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate)
     {
         var compiledPredicate = predicate.Compile();
         var entities = this._entities.Values.Where(compiledPredicate);

@@ -131,7 +131,7 @@ public class CosmosDbContext<T> : IStorageContext<T>, IDisposable
         }
     }
 
-    public async Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate, string partitionKey)
+    public async Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate)
     {
         var results = new List<T>();
         var queryable = this._container.GetItemLinqQueryable<T>(true).Where(predicate);
@@ -141,12 +141,8 @@ public class CosmosDbContext<T> : IStorageContext<T>, IDisposable
             var response = await iterator.ReadNextAsync();
             foreach (var item in response)
             {
-                var partitionKeyValue = typeof(T).GetProperty(partitionKey)?.GetValue(item);
-                if (partitionKeyValue == null)
-                {
-                    throw new InvalidOperationException("Partition key value cannot be null.");
-                }
-                await this._container.DeleteItemAsync<T>(item.Id, new PartitionKey(partitionKeyValue.ToString()));
+                results.Add(item);
+                await this._container.DeleteItemAsync<T>(item.Id, new PartitionKey(item.Partition));
             }
         }
         return results;
