@@ -1,17 +1,17 @@
 // Copyright (c) Quartech. All rights reserved.
 
-using CopilotChat.WebApi.Extensions;
-using System.Threading.Tasks;
-using CopilotChat.WebApi.Models.Request;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
-using CopilotChat.WebApi.Storage;
+using System;
 using System.Threading;
-using CopilotChat.WebApi.Services;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using System;
+using CopilotChat.WebApi.Extensions;
+using CopilotChat.WebApi.Models.Request;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
+using CopilotChat.WebApi.Services;
+using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Controllers;
 
