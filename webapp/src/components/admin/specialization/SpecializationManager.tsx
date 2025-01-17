@@ -28,33 +28,15 @@ import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import FieldArray from '../../shared/FieldArray';
 import { Row } from '../../shared/Row';
 import '@mdxeditor/editor/style.css';
-import {
-    MDXEditor,
-    UndoRedo,
-    BoldItalicUnderlineToggles,
-    toolbarPlugin,
-    ListsToggle,
-    DiffSourceToggleWrapper,
-    diffSourcePlugin,
-    listsPlugin,
-    codeBlockPlugin,
-    tablePlugin,
-    linkPlugin,
-    imagePlugin,
-    headingsPlugin,
-    quotePlugin,
-    jsxPlugin,
-    codeMirrorPlugin,
-    thematicBreakPlugin,
-    InsertTable,
-    BlockTypeSelect,
-} from '@mdxeditor/editor';
+//import { useCellValue, usePublisher } from '@mdxeditor/editor';
+
 import { AuthHelper } from '../../../libs/auth/AuthHelper';
 import { IAsk } from '../../../libs/semantic-kernel/model/Ask';
 import { ChatMessageType } from '../../../libs/models/ChatMessage';
 import { NoChatAIService } from '../../../libs/services/NoChatAIService';
 import { useMsal } from '@azure/msal-react';
 import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
+import MarkDownEditor from './MarkDownEditor';
 
 interface ISpecializationFile {
     file: File | null;
@@ -553,7 +535,7 @@ export const SpecializationManager: React.FC = () => {
     const AIFormat = async (): Promise<void> => {
         try {
             const markdownResponse = await getMarkdown();
-            console.log(markdownResponse);
+            setRoleInformation(markdownResponse.value);
         } catch (error) {
             console.error('Error in AIFormat:', error);
         }
@@ -819,41 +801,10 @@ export const SpecializationManager: React.FC = () => {
                             backgroundColor: 'white',
                         }}
                     >
-                        <MDXEditor
-                            key={id}
-                            markdown={roleInformation}
-                            plugins={[
-                                diffSourcePlugin({
-                                    diffMarkdown: 'An older version',
-                                    viewMode: 'rich-text',
-                                    readOnlyDiff: true,
-                                }),
-                                toolbarPlugin({
-                                    toolbarClassName: 'my-classname',
-                                    toolbarContents: () => (
-                                        <DiffSourceToggleWrapper>
-                                            <UndoRedo />
-                                            <BoldItalicUnderlineToggles />
-                                            <ListsToggle />
-                                            <InsertTable />
-                                            <BlockTypeSelect />
-                                        </DiffSourceToggleWrapper>
-                                    ),
-                                }),
-                                listsPlugin(),
-                                codeBlockPlugin(),
-                                tablePlugin(),
-                                linkPlugin(),
-                                imagePlugin(),
-                                headingsPlugin(),
-                                quotePlugin(),
-                                jsxPlugin(),
-                                codeMirrorPlugin(),
-                                thematicBreakPlugin(),
-                            ]}
-                            onChange={(newMarkdown) => {
-                                setRoleInformation(newMarkdown);
-                            }}
+                        <MarkDownEditor
+                            roleInformation={roleInformation}
+                            setRoleInformation={setRoleInformation}
+                            id={id}
                         />
                     </div>
                 </div>

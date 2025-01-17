@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using System;
 
 /// <summary>
 /// Controller responsible for handling chat messages and responses.
@@ -57,7 +58,9 @@ public class SessionlessChatController : ControllerBase
         else
         {
             var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
-            return this.Ok(new { Success = true, Response = textResponse });
+
+            return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
+
         }
     }
 

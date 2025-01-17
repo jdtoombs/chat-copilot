@@ -43,7 +43,7 @@ public class SingleMessageCompletionService
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
         var stream = await chatCompletion.GetChatMessageContentAsync(
             userPrompt,
-            null, // null because we currently do not use specialization data to generate suggestions.
+            null, //specialization
             kernel,
             cancellationToken
         );
