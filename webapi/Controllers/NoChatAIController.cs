@@ -3,17 +3,21 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using CopilotChat.WebApi.Extensions;
+using CopilotChat.WebApi.Models.Request;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using CopilotChat.WebApi.Extensions;
-using CopilotChat.WebApi.Models.Request;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
+
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Controllers;
+
 
 /// <summary>
 /// Controller responsible for handling chat messages and responses.

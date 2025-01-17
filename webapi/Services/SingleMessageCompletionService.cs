@@ -2,14 +2,18 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+
 using Azure.Security.KeyVault.Secrets;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.Extensions.DependencyInjection;
+
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
 
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace CopilotChat.WebApi.Services;
+
 
 public class SingleMessageCompletionService
 {
