@@ -24,7 +24,7 @@
     "@mdxeditor/editor": "^3.20.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@microsoft/signalr": "^8.0.7",
-    "@playwright/test": "^1.45.2",
+    "@playwright/test": "^1.49.1",
     "@reduxjs/toolkit": "^2.2.6",
     "debug": "^4.4.0",
     "jwt-decode": "^4.0.0",
