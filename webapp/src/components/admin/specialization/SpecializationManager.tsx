@@ -27,6 +27,28 @@ import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
 import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import FieldArray from '../../shared/FieldArray';
 import { Row } from '../../shared/Row';
+import '@mdxeditor/editor/style.css';
+import {
+    MDXEditor,
+    UndoRedo,
+    BoldItalicUnderlineToggles,
+    toolbarPlugin,
+    ListsToggle,
+    DiffSourceToggleWrapper,
+    diffSourcePlugin,
+    listsPlugin,
+    codeBlockPlugin,
+    tablePlugin,
+    linkPlugin,
+    imagePlugin,
+    headingsPlugin,
+    quotePlugin,
+    jsxPlugin,
+    codeMirrorPlugin,
+    thematicBreakPlugin,
+    InsertTable,
+    BlockTypeSelect,
+} from '@mdxeditor/editor';
 
 interface ISpecializationFile {
     file: File | null;
@@ -90,8 +112,6 @@ const useClasses = makeStyles({
         flexGrow: 1,
     },
 });
-
-const Rows = 8;
 
 /**
  * Specialization Manager component.
@@ -719,17 +739,65 @@ export const SpecializationManager: React.FC = () => {
                 <label htmlFor="context">
                     Chat Context<span className={classes.required}>*</span>
                 </label>
-                <Textarea
-                    id="context"
-                    required
-                    resize="vertical"
-                    className={determineIfNeedsAttention(roleInformation)}
-                    value={roleInformation}
-                    rows={Rows}
-                    onChange={(_event, data) => {
-                        setRoleInformation(data.value);
+
+                <div
+                    style={{
+                        resize: 'vertical',
+                        overflow: 'auto',
+                        minHeight: '150px',
+                        maxHeight: '500px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        border: '1px',
+                        borderBottom: '1px solid black',
                     }}
-                />
+                >
+                    <div
+                        className={determineIfNeedsAttention(roleInformation)}
+                        style={{
+                            minHeight: '150px',
+                            backgroundColor: 'white',
+                        }}
+                    >
+                        <MDXEditor
+                            key={id}
+                            markdown={roleInformation}
+                            plugins={[
+                                diffSourcePlugin({
+                                    diffMarkdown: 'An older version',
+                                    viewMode: 'rich-text',
+                                    readOnlyDiff: true,
+                                }),
+                                toolbarPlugin({
+                                    toolbarClassName: 'my-classname',
+                                    toolbarContents: () => (
+                                        <DiffSourceToggleWrapper>
+                                            <UndoRedo />
+                                            <BoldItalicUnderlineToggles />
+                                            <ListsToggle />
+                                            <InsertTable />
+                                            <BlockTypeSelect />
+                                        </DiffSourceToggleWrapper>
+                                    ),
+                                }),
+                                listsPlugin(),
+                                codeBlockPlugin(),
+                                tablePlugin(),
+                                linkPlugin(),
+                                imagePlugin(),
+                                headingsPlugin(),
+                                quotePlugin(),
+                                jsxPlugin(),
+                                codeMirrorPlugin(),
+                                thematicBreakPlugin(),
+                            ]}
+                            onChange={(newMarkdown) => {
+                                setRoleInformation(newMarkdown);
+                            }}
+                        />
+                    </div>
+                </div>
+
                 <label htmlFor="initialMessage">
                     Initial Chat Message<span className={classes.required}>*</span>
                 </label>

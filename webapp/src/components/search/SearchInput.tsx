@@ -31,29 +31,20 @@ const useClasses = makeStyles({
 });
 
 interface SearchInputProps {
-    onSubmit: (specialization: string, value: string) => Promise<void>;
-    defaultSpecializationId?: string;
+    onSubmit: (indexId: string, value: string) => Promise<void>;
 }
 
-interface Specialization {
+interface SpecializationIndex {
     id: string;
     name: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit, defaultSpecializationId = '' }) => {
+export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
     const classes = useClasses();
     const dispatch = useAppDispatch();
-    const { specializations } = useAppSelector((state: RootState) => state.admin);
-
-    // Find the specialization name based on the defaultSpecializationId
-    const defaultSpecialization = specializations.find((spec) => spec.id === defaultSpecializationId) ?? {
-        id: '',
-        name: '',
-    };
-
-    const [specialization, setSpecialization] = useState<Specialization>(defaultSpecialization);
-    const [value, setValue] = useState('');
+    const { specializationIndexes, specializations } = useAppSelector((state: RootState) => state.admin);
     const { app } = useAppSelector((state: RootState) => state);
+
     const filteredSpecializations = specializations.filter((_specialization) => {
         const hasMembership =
             app.activeUserInfo?.groups.some((val) => _specialization.groupMemberships.includes(val)) ?? false;
@@ -62,6 +53,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit, defaultSpeci
         }
         return;
     });
+    const filteredIndexes = specializationIndexes.filter((indx) =>
+        filteredSpecializations.some((spc) => spc.indexId == indx.id),
+    );
+
+    const [index, setIndex] = useState<SpecializationIndex>(
+        filteredIndexes.length ? filteredIndexes[0] : { id: '', name: '' },
+    );
+    const [value, setValue] = useState('');
 
     const dropdownId = useId();
 
@@ -72,10 +71,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit, defaultSpeci
     };
 
     const handleSubmit = () => {
-        if (value.trim() === '' || specialization.id.trim() === '') {
+        if (value.trim() === '' || index.id.trim() === '') {
             return; // only submit if value is not empty
         }
-        onSubmit(specialization.id, value)
+        onSubmit(index.id, value)
             .then(() => {
                 dispatch(setSelectedSearchItem({ filename: '', id: 0 }));
             })
@@ -99,19 +98,19 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit, defaultSpeci
                         className={classes.keyWidth}
                         aria-labelledby={dropdownId}
                         placeholder="Select specialization"
-                        value={specialization.name}
-                        selectedOptions={[specialization.name]}
+                        value={index.name}
+                        selectedOptions={[index.name]}
                     >
-                        {filteredSpecializations.map(
-                            (specialization) =>
-                                specialization.id != 'general' && (
+                        {filteredIndexes.map(
+                            (idx) =>
+                                idx.id != 'general' && (
                                     <Option
-                                        key={specialization.id}
+                                        key={idx.id}
                                         onClick={() => {
-                                            setSpecialization({ id: specialization.id, name: specialization.name });
+                                            setIndex({ id: idx.id, name: idx.name });
                                         }}
                                     >
-                                        {specialization.name}
+                                        {idx.name}
                                     </Option>
                                 ),
                         )}

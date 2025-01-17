@@ -15,13 +15,17 @@ resource "azurerm_cosmosdb_account" "main" {
     max_interval_in_seconds = 300
     max_staleness_prefix    = 100000
   }
+  tags      = var.tags
 }
 
 resource "azurerm_cosmosdb_sql_database" "main" {
   name                = "${var.name}-sqldb"
   resource_group_name = var.resource_group_name
   account_name        = azurerm_cosmosdb_account.main.name
-  throughput          = var.throughput
+  autoscale_settings {
+    max_throughput = var.throughput
+  }
+  
 }
 
 resource "azurerm_cosmosdb_sql_container" "azurerm_cosmosdb_sql_containers" {
@@ -33,4 +37,5 @@ resource "azurerm_cosmosdb_sql_container" "azurerm_cosmosdb_sql_containers" {
   partition_key_paths   = [each.value.partition_key_path]
   partition_key_version = 2
   //throughput            = var.throughput
+  
 }

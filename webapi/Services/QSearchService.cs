@@ -49,22 +49,22 @@ public class QSearchService : IQSearchService
     /// </summary>
     public async Task<QSearchResult?> GetMatchesAsync(QSearchParameters qsearchParameters)
     {
-        string specializationId = qsearchParameters.SpecializationId;
         QAzureSearchRequest requestBody = new(qsearchParameters.Search);
-        var indexId = await this.GetIndexId(specializationId);
+        var indexId = qsearchParameters.IndexId;
         if (indexId == null)
         {
             return null;
         }
-        var (apiKey, endpoint) = await this._qAzureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(indexId);
-        if (apiKey == null || endpoint == null)
+        var (indexName, apiKey, endpoint) =
+            await this._qAzureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(indexId);
+        if (indexName == null || apiKey == null || endpoint == null)
         {
             return null;
         }
         using var httpRequestMessage = new HttpRequestMessage()
         {
             Method = HttpMethod.Post,
-            RequestUri = new Uri($"{endpoint}indexes/{indexId}/docs/search?api-version=2020-06-30"),
+            RequestUri = new Uri($"{endpoint}indexes/{indexName}/docs/search?api-version=2020-06-30"),
             Content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json"),
         };
         httpRequestMessage.Headers.Add("api-Key", apiKey);
@@ -119,11 +119,5 @@ public class QSearchService : IQSearchService
             this._httpClient.Dispose();
             this._httpClientHandler?.Dispose();
         }
-    }
-
-    private async Task<string?> GetIndexId(string specializationId)
-    {
-        var specialiazation = await this._specializationRepository.FindByIdAsync(specializationId);
-        return specialiazation?.IndexId;
     }
 }

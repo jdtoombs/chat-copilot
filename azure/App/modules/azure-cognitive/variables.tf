@@ -1,3 +1,13 @@
+####################
+# Global Variables #
+####################
+
+variable "tags" {
+  description = "A mapping of tags to assign to the resource"
+  type        = map(string)
+  default     = null
+}
+
 variable "resource_group_name" {
   type = string
   description = "The name of the resource group"
