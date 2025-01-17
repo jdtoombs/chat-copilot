@@ -354,7 +354,7 @@ public class ChatPlugin
     )
     {
         // Set the system description in the prompt options
-        await this.SetSystemDescriptionAsync(chatId, cancellationToken);
+        // await this.SetSystemDescriptionAsync(chatId, cancellationToken);
 
         this._logger.LogInformation("Saving suggestions user message to chat history.");
         var suggestionsMessage = await this.SaveNewMessageAsync(
@@ -371,6 +371,12 @@ public class ChatPlugin
         chatContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
 
         this._logger.LogInformation("Getting chat response! Silent version.");
+
+        string? specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString();
+        if (specializationKey != null)
+        {
+            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+        }
 
         CopilotChatMessage chatMessage = await this.GetChatResponseAsync(
             chatId,
@@ -414,7 +420,7 @@ public class ChatPlugin
         string userId,
         KernelArguments chatContext,
         BotResponsePrompt promptView,
-        IEnumerable<CitationSource>? citations,
+        IEnumerable<CitationSource> citations,
         CancellationToken cancellationToken
     )
     {
@@ -479,7 +485,7 @@ public class ChatPlugin
         string userId,
         KernelArguments chatContext,
         BotResponsePrompt promptView,
-        IEnumerable<CitationSource>? citations,
+        IEnumerable<CitationSource> citations,
         CancellationToken cancellationToken
     )
     {
@@ -953,7 +959,7 @@ public class ChatPlugin
         BotResponsePrompt prompt,
         KernelArguments chatContext,
         CancellationToken cancellationToken,
-        IEnumerable<CitationSource>? citations = null
+        IEnumerable<CitationSource> citations
     )
     {
         // Create the stream
@@ -992,25 +998,21 @@ public class ChatPlugin
         );
 
         var citationMap = new Dictionary<string, CitationSource>();
-        var citationCountMap = new Dictionary<string, int>();
         var citationRegex = new Regex(@"\[(doc\d+|chatmemory/[^]]+)\](,)?");
 
         // Load uploaded citations into the citation map
-        if (citations != null)
+        foreach (var citation in citations)
         {
-            foreach (var citation in citations.ToList())
-            {
-                citationMap.Add(
-                    citation.Link,
-                    new CitationSource
-                    {
-                        Link = citation.SourceName,
-                        SourceName = citation.SourceName,
-                        Snippet = citation.Snippet,
-                        SourceContentType = citation.SourceContentType,
-                    }
-                );
-            }
+            citationMap.Add(
+                citation.Link,
+                new CitationSource
+                {
+                    Link = citation.SourceName,
+                    SourceName = citation.SourceName,
+                    Snippet = citation.Snippet,
+                    SourceContentType = citation.SourceContentType,
+                }
+            );
         }
         var chatHistory = prompt.MetaPromptTemplate;
 
@@ -1071,33 +1073,19 @@ public class ChatPlugin
                     if (messageContext?.Citations != null)
                     {
                         // Load data source citations into the citation map, with part numbering for repeated sources.
-                        foreach (
-                            var citation in messageContext.Citations.Select(
-                                (c, index) => new { Citation = c, Index = index }
-                            )
-                        )
+                        for (int i = 0; i < messageContext.Citations.Count; i++)
                         {
-                            var sourceName = citation.Citation.FilePath;
-                            var link = citation.Citation.FilePath;
-
-                            CitationUtils.UpdateMapCount(ref citationCountMap, sourceName);
-                            var partNumber = citationCountMap[sourceName];
-                            if (partNumber > 1)
-                            {
-                                sourceName = $"{sourceName} - Part {partNumber}";
-                            }
-                            else if (messageContext.Citations.Count(c => c.FilePath == citation.Citation.FilePath) > 1)
-                            {
-                                sourceName = $"{sourceName} - Part 1";
-                            }
+                            var citation = messageContext.Citations[i];
+                            var sourceName = citation.FilePath;
+                            var link = citation.FilePath;
 
                             citationMap.Add(
-                                $"doc{citation.Index + 1}",
+                                $"doc{i + 1}",
                                 new CitationSource
                                 {
                                     Link = link,
                                     SourceName = sourceName,
-                                    Snippet = citation.Citation.Content,
+                                    Snippet = citation.Content,
                                     SourceContentType = CitationUtils.GetContentType(link),
                                 }
                             );

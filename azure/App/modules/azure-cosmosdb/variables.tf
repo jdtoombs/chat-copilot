@@ -45,7 +45,7 @@ variable "cosmosdb_sql_containers" {
 
 variable "throughput" {
   type        = number
-  default     = 800
+  default     = 10000
   description = "Cosmos db database throughput"
   validation {
     condition     = var.throughput >= 400 && var.throughput <= 1000000

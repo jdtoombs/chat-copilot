@@ -40,9 +40,7 @@ export const SearchRoom: React.FC = () => {
     const classes = useClasses();
     const search = useSearch();
 
-    const { searchData, selectedSearchItem, selectedSpecializationId } = useAppSelector(
-        (state: RootState) => state.search,
-    );
+    const { searchData, selectedSearchItem } = useAppSelector((state: RootState) => state.search);
     const values = searchData.value;
     let displayContent: string[] = [];
     let metaData: ISearchMetaData = {};
@@ -65,8 +63,8 @@ export const SearchRoom: React.FC = () => {
 
     const scrollViewTargetRef = React.useRef<HTMLDivElement>(null);
 
-    const handleSubmit = async (specialization: string, value: string) => {
-        await search.getResponse(specialization, value);
+    const handleSubmit = async (indexId: string, value: string) => {
+        await search.getResponse(indexId, value);
     };
 
     useEffect(() => {
@@ -81,7 +79,7 @@ export const SearchRoom: React.FC = () => {
 
     return (
         <div className={classes.root}>
-            <SearchInput onSubmit={handleSubmit} defaultSpecializationId={selectedSpecializationId} />
+            <SearchInput onSubmit={handleSubmit} />
             <div ref={scrollViewTargetRef} className={classes.scroll}>
                 <div>
                     {displayContent.map((content, index) => (

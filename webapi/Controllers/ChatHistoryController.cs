@@ -106,20 +106,16 @@ public class ChatHistoryController : ControllerBase
             return this.BadRequest("Chat session parameters cannot be null.");
         }
 
+        var specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
+
         var systemDescription = this._promptOptions.SystemDescription;
         var newChat = new ChatSession(
             chatParameters.Title,
-            systemDescription,
+            specialization?.RoleInformation ?? this._promptOptions.SystemPersona,
             chatParameters.specializationId,
             chatParameters.Id
         );
         await this._sessionRepository.CreateAsync(newChat);
-
-        Specialization? specialization = null;
-        if (chatParameters.specializationId != "general")
-        {
-            specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
-        }
         var initialMessage = string.IsNullOrEmpty(specialization?.InitialChatMessage)
             ? this._promptOptions.InitialBotMessage
             : specialization.InitialChatMessage;
@@ -362,7 +358,6 @@ public class ChatHistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
-    [Authorize(Policy = AuthPolicyName.RequireSpecialization)]
     public async Task<IActionResult> DeleteChatSessionAsync(
         [FromServices] IHubContext<MessageRelayHub> messageRelayHubContext,
         Guid chatId,

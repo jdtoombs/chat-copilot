@@ -97,7 +97,18 @@ resource "azurerm_key_vault_access_policy" "vaultaccess" {
   object_id    = data.azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
   # cluster access to secrets should be read-only
   secret_permissions = [
-    "Get", "List"
+    "Get", "List", "Set", "Restore"
+  ]
+  provider = azurerm.kubernetes
+}
+
+resource "azurerm_key_vault_access_policy" "vaultaccessforapi" {
+  key_vault_id = module.azure_keyvault.key_vault_id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = var.app_api_object_id
+  # cluster access to secrets should be read-only
+  secret_permissions = [
+    "Get", "List", "Set", "Restore"
   ]
   provider = azurerm.kubernetes
 }
@@ -289,6 +300,7 @@ module "azure_open_ai" {
   account_kind        = "OpenAI"
   sku_name = "S0"
   openai_deployments  = var.openai_deployments
+  tags                = var.tags
 }
 
 module "azure_computer_vision" {
@@ -297,8 +309,9 @@ module "azure_computer_vision" {
   resource_group_name = azurerm_resource_group.openai.name
   account_location    = var.location.name
   account_kind        = "ComputerVision"
-  sku_name = "F0"
+  sku_name = "S1"
   openai_deployments  = []
+  tags                = var.tags
 }
 
 module "azure_ai_search" {
@@ -308,4 +321,5 @@ module "azure_ai_search" {
   location            = var.location_openai.name
   replica_count       = 2
   partition_count     = 1
+  tags                = var.tags
 }

@@ -49,7 +49,8 @@ public sealed class Program
             .AddPersistentChatStore()
             .AddPlugins(builder.Configuration)
             .AddChatCopilotAuthentication(builder.Configuration)
-            .AddChatCopilotAuthorization();
+            .AddChatCopilotAuthorization()
+            .AddEmailService();
 
 
 
