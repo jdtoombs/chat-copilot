@@ -51,4 +51,3 @@ public class SingleMessageCompletionService
         return stream?.Content ?? "no response!";
     }
 }
-
