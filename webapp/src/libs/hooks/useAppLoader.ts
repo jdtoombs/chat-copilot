@@ -159,7 +159,9 @@ export const useAppLoader = (): [AppState, Dispatch<SetStateAction<AppState>>] =
         const conversationId = urlParams.get('conversation');
 
         if (conversationId) {
-            chatIdToLoad = conversationId;
+            if (conversations[conversationId].createdOnServer) {
+                chatIdToLoad = conversationId;
+            }
         } else {
             const firstConvo = maxBy(Object.values(conversations), (chatState) => chatState.lastUpdatedTimestamp ?? 0);
             if (firstConvo?.createdOnServer) {

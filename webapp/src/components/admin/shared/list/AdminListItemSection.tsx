@@ -130,7 +130,7 @@ export const AdminItemListSection = <T extends IListItem>({
                             <AdminListItem
                                 key={item.id}
                                 id={item.id}
-                                label={item.label ?? item.name}
+                                label={item.label}
                                 name={item.name}
                                 isSelected={isSelected}
                                 editMode={!!item.isActive}
