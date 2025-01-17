@@ -2,7 +2,7 @@
   "name": "hr-policies-indexer",
   "description": null,
   "dataSourceName": "sharepoint-hr-datasource",
-  "skillsetName": "skillset-with-projection",
+  "skillsetName": "skillset-with-projection-hr-policies",
   "targetIndexName": "hr-policies",
   "disabled": null,
   "schedule": null,
