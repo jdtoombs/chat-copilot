@@ -32,7 +32,8 @@ public class SingleMessageCompletionService
     }
 
     /// <summary>
-    /// Retrieves the search results using AzureAISearch service.
+    /// Retrieves the chat completion using semantic kernel.
+    /// no specialization
     /// </summary>
     public async Task<string> GetResponse(
         string userPrompt,
@@ -47,14 +48,7 @@ public class SingleMessageCompletionService
             kernel,
             cancellationToken
         );
-
-        // Dummy implementation to avoid failure
-        //await Task.Delay(500); // Simulate an async operation, e.g., API call, database access, etc.
         return stream?.Content ?? "no response!";
     }
-
-
-
-
 }
 

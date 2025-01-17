@@ -60,8 +60,6 @@ public class SessionlessChatController : ControllerBase
             var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
 
             return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
-
         }
     }
-
 }

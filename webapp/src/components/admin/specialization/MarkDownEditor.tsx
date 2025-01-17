@@ -49,8 +49,8 @@ const MarkDownEditor: React.FC<MarkDownEditorProps> = ({ roleInformation, setRol
         <div className="specialization-manager">
             <MDXEditor
                 key={id}
-                ref={editorRef} // Attach the ref here
-                markdown={roleInformation} // Pass roleInformation as the markdown prop
+                ref={editorRef}
+                markdown={roleInformation}
                 plugins={[
                     diffSourcePlugin({
                         diffMarkdown: 'An older version',
@@ -81,7 +81,7 @@ const MarkDownEditor: React.FC<MarkDownEditorProps> = ({ roleInformation, setRol
                     thematicBreakPlugin(),
                 ]}
                 onChange={(newMarkdown: string) => {
-                    setRoleInformation(newMarkdown); // Update the parent component state with new markdown
+                    setRoleInformation(newMarkdown);
                 }}
             />
         </div>
