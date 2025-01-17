@@ -9,7 +9,7 @@ import { BaseService } from './BaseService';
 export class NoChatAIService extends BaseService {
     /**
      * getBotResponseNoChat - Calling this with a valid ask object will query the chatbot through a POST request,
-     * chat id and other chat paramters not required as this is simply a message and response
+     * chat id and other chat parameters not required as this is simply a message and response
      * @param ask query for the chat bot
      * @param accessToken valid access token
      * @param enabledPlugins plugins, if any
