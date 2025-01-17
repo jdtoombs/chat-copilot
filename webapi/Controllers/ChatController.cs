@@ -190,10 +190,13 @@ public class ChatController : ControllerBase, IDisposable
         chat.LastUpdatedTimestamp = DateTimeOffset.Now;
         await chatSessionRepository.UpsertAsync(chat);
         // Broadcast AskResult to all users
-        await messageRelayHubContext
-            .Clients.Group(chatIdString)
-            .SendAsync(GeneratingResponseClientCall, chatIdString, null);
 
+        if (!silent)
+        {
+            await messageRelayHubContext
+                .Clients.Group(chatIdString)
+                .SendAsync(GeneratingResponseClientCall, chatIdString, null);
+        }
         return this.Ok(chatAskResult);
     }
 
