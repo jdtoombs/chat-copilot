@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Azure.Security.KeyVault.Secrets;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 
