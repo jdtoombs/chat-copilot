@@ -1,13 +1,13 @@
 // Copyright (c) Quartech. All rights reserved.
 
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Security.KeyVault.Secrets;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.Extensions.DependencyInjection;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
+using Azure.Security.KeyVault.Secrets;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CopilotChat.WebApi.Services;
 
