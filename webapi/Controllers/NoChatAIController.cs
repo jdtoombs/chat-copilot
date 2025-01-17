@@ -1,5 +1,10 @@
 // Copyright (c) Quartech. All rights reserved.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using CopilotChat.WebApi.Extensions;
+using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
@@ -7,14 +12,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using CopilotChat.WebApi.Models.Request;
-using CopilotChat.WebApi.Extensions;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CopilotChat.WebApi.Controllers;
-
 
 /// <summary>
 /// Controller responsible for handling chat messages and responses.
@@ -61,7 +60,11 @@ public class SessionlessChatController : ControllerBase
         }
         else
         {
-            var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
+            var textResponse = await this._singleMessageCompletionService.GetResponse(
+                ask.Input,
+                kernel,
+                cancellationToken
+            );
 
             return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
         }

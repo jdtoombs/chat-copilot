@@ -1,13 +1,13 @@
 // Copyright (c) Quartech. All rights reserved.
 
+using System.Threading;
+using System.Threading.Tasks;
+using Azure.Security.KeyVault.Secrets;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
-using Azure.Security.KeyVault.Secrets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -38,11 +38,7 @@ public class SingleMessageCompletionService
     /// Retrieves the chat completion using semantic kernel.
     /// no specialization
     /// </summary>
-    public async Task<string> GetResponse(
-        string userPrompt,
-        Kernel kernel,
-        CancellationToken cancellationToken
-    )
+    public async Task<string> GetResponse(string userPrompt, Kernel kernel, CancellationToken cancellationToken)
     {
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
         var stream = await chatCompletion.GetChatMessageContentAsync(
