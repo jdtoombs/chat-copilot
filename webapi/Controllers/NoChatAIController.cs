@@ -1,5 +1,6 @@
+// Copyright (c) Quartech. All rights reserved.
+
 using CopilotChat.WebApi.Extensions;
-namespace CopilotChat.WebApi.Controllers;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
@@ -11,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using System;
+
+namespace CopilotChat.WebApi.Controllers;
 
 /// <summary>
 /// Controller responsible for handling chat messages and responses.

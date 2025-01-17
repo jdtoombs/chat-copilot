@@ -1,8 +1,10 @@
+// Copyright (c) Quartech. All rights reserved.
+
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Secrets;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
-using System.Threading;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +22,8 @@ public class SingleMessageCompletionService
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         SecretClient secretClient
-    ){
+    )
+    {
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
             qAzureOpenAIChatOptions,
             specializationSourceRepository,
