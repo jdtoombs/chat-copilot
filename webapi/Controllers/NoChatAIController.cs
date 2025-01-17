@@ -58,15 +58,13 @@ public class SessionlessChatController : ControllerBase
         {
             return this.StatusCode(500, "No text input provided!");
         }
-        else
-        {
-            var textResponse = await this._singleMessageCompletionService.GetResponse(
-                ask.Input,
-                kernel,
-                cancellationToken
-            );
 
-            return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
-        }
+        var textResponse = await this._singleMessageCompletionService.GetResponse(
+            ask.Input,
+            kernel,
+            cancellationToken
+        );
+
+        return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
     }
 }
