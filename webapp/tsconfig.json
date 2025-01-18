@@ -14,7 +14,7 @@
         "inlineSources": true,
         "removeComments": true,
         "downlevelIteration": true,
-        "target": "ES2018",
+        "target": "ESNext",
         "useDefineForClassFields": true,
         "lib": ["DOM", "DOM.Iterable", "ESNext", "ES6", "WebWorker"],
         "allowJs": false,
@@ -29,7 +29,7 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react-jsx",
-        "types": [],
+        "types": ["vite/client"],
         "composite": true
     },
     "include": ["src", "src/assets/custom.d.ts"]

@@ -7,9 +7,9 @@ image:
 
 fe:
   env:
-    - name: "REACT_APP_BACKEND_URI"
+    - name: "VITE_APP_BACKEND_URI"
       value: "https://q-pilot-dev.api.pegasus.quartechlab.com/"
-    - name: "REACT_APP_ENVIRONMENT"
+    - name: "VITE_APP_ENVIRONMENT"
       value: "development"
 
 webapp:

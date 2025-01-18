@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-import { expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import * as util from './utils';
 
 /*
 Summary: Tests the Multiuser feature of Q-Pilot Chat. Specifically if a user can
 generate a chatid for their chat session and then if another user can join that same chat session.
 */
-export async function shareAndJoinChatSessionTest(page) {
-    const userAccount1 = process.env.REACT_APP_TEST_USER_ACCOUNT1 as string;
-    const password1 = process.env.REACT_APP_TEST_USER_PASSWORD1 as string;
-    const userAccount2 = process.env.REACT_APP_TEST_USER_ACCOUNT2 as string;
-    const password2 = process.env.REACT_APP_TEST_USER_PASSWORD2 as string;
+export async function shareAndJoinChatSessionTest(page: Page) {
+    const userAccount1 = process.env.VITE_APP_TEST_USER_ACCOUNT1 as string;
+    const password1 = process.env.VITE_APP_TEST_USER_PASSWORD1 as string;
+    const userAccount2 = process.env.VITE_APP_TEST_USER_ACCOUNT2 as string;
+    const password2 = process.env.VITE_APP_TEST_USER_PASSWORD2 as string;
 
     await util.loginHelper(page, userAccount1, password1);
     await util.createNewChat(page);
@@ -34,7 +34,7 @@ export async function shareAndJoinChatSessionTest(page) {
     await page.getByTestId('logOutMenuButton').click();
 
     const usernameToLowerCase = userAccount1.toLowerCase();
-    const locatorVal = ('[data-test-id="' + usernameToLowerCase + '"]') as string;
+    const locatorVal = `[data-test-id="${usernameToLowerCase}"]`;
     await page.locator(locatorVal).click();
 
     // Login with the second user account
