@@ -7,7 +7,7 @@ module.exports = {
         node: true,
     },
     extends: [
-        'react-app/jest',
+        'jest',
         'plugin:react/recommended',
         'plugin:react-hooks/recommended',
         'plugin:@typescript-eslint/strict-type-checked',
