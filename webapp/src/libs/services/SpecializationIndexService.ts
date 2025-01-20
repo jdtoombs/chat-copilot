@@ -24,6 +24,7 @@ export class SpecializationIndexService extends BaseService {
         formData.append('aiSearchDeploymentConnection', body.aiSearchDeploymentConnection);
         formData.append('openAIDeploymentConnection', body.openAIDeploymentConnection);
         formData.append('embeddingDeployment', body.embeddingDeployment);
+        formData.append('label', body.label);
 
         const result = await this.getResponseAsync<ISpecializationIndex>(
             { commandPath: 'indexes', method: 'POST', body: formData },
@@ -40,6 +41,7 @@ export class SpecializationIndexService extends BaseService {
         formData.append('aiSearchDeploymentConnection', body.aiSearchDeploymentConnection);
         formData.append('openAIDeploymentConnection', body.openAIDeploymentConnection);
         formData.append('embeddingDeployment', body.embeddingDeployment);
+        formData.append('label', body.label);
 
         const result = await this.getResponseAsync<ISpecializationIndex>(
             { commandPath: `indexes/${id}`, method: 'PATCH', body: formData },

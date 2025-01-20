@@ -58,7 +58,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
     );
 
     const [index, setIndex] = useState<SpecializationIndex>(
-        filteredIndexes.length ? filteredIndexes[0] : { id: '', name: '' },
+        filteredIndexes.length ? { id: filteredIndexes[0].id, name: filteredIndexes[0].label } : { id: '', name: '' },
     );
     const [value, setValue] = useState('');
 
@@ -107,10 +107,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
                                     <Option
                                         key={idx.id}
                                         onClick={() => {
-                                            setIndex({ id: idx.id, name: idx.name });
+                                            setIndex({ id: idx.id, name: idx.label });
                                         }}
                                     >
-                                        {idx.name}
+                                        {idx.label}
                                     </Option>
                                 ),
                         )}

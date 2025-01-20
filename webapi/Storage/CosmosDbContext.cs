@@ -130,6 +130,23 @@ public class CosmosDbContext<T> : IStorageContext<T>, IDisposable
             this._client.Dispose();
         }
     }
+
+    public async Task<IEnumerable<T>> DeleteManyAsync(Expression<Func<T, bool>> predicate)
+    {
+        var results = new List<T>();
+        var queryable = this._container.GetItemLinqQueryable<T>(true).Where(predicate);
+        var iterator = queryable.ToFeedIterator();
+        while (iterator.HasMoreResults)
+        {
+            var response = await iterator.ReadNextAsync();
+            foreach (var item in response)
+            {
+                results.Add(item);
+                await this._container.DeleteItemAsync<T>(item.Id, new PartitionKey(item.Partition));
+            }
+        }
+        return results;
+    }
 }
 
 /// <summary>
