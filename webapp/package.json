@@ -25,7 +25,7 @@
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@microsoft/signalr": "^8.0.7",
     "@playwright/test": "^1.49.1",
-    "@reduxjs/toolkit": "^2.2.6",
+    "@reduxjs/toolkit": "^2.5.0",
     "debug": "^4.4.0",
     "jwt-decode": "^4.0.0",
     "microsoft-cognitiveservices-speech-sdk": "^1.38.0",
