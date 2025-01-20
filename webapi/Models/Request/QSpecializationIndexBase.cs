@@ -7,6 +7,9 @@ public class QSpecializationIndexBase
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
+    [JsonPropertyName("label")]
+    public string? Label { get; set; }
+
     [JsonPropertyName("queryType")]
     public string? QueryType { get; set; }
 

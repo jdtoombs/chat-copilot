@@ -60,7 +60,7 @@ const useClasses = makeStyles({
 
 interface IAdminListItemProps {
     name: string;
-    label: string;
+    label?: string;
     id: string;
     editMode: boolean;
     isSelected: boolean;
@@ -71,13 +71,15 @@ interface IAdminListItemProps {
 export const AdminListItem = ({
     isSelected,
     name,
+    label,
     id,
     editMode,
     onItemSelected,
     onItemToggled,
 }: IAdminListItemProps) => {
     const classes = useClasses();
-    const friendlyTitle = name.length > 30 ? name.substring(0, 30) + '...' : name;
+    const labelOrName = label ?? name;
+    const friendlyTitle = labelOrName.length > 30 ? labelOrName.substring(0, 30) + '...' : labelOrName;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const [{ isDragging }, drag] = useDrag({
