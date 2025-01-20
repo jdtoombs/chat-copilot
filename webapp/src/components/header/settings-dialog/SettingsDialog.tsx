@@ -102,9 +102,9 @@ export const SettingsDialog: React.FC<ISettingsDialogProps> = ({ open, closeDial
                                     <Body1 color={tokens.colorNeutralForeground3}>
                                         Backend version: {serviceInfo.version}
                                         <br />
-                                        Frontend version: {process.env.VITE_APP_SK_VERSION ?? '-'}
+                                        Frontend version: {window._env_.VITE_APP_SK_VERSION}
                                         <br />
-                                        {process.env.VITE_APP_SK_BUILD_INFO}
+                                        {window._env_.VITE_APP_SK_BUILD_INFO}
                                     </Body1>
                                 </AccordionPanel>
                             </AccordionItem>

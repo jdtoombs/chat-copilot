@@ -7,6 +7,8 @@ declare global {
 }
 
 interface ENVType {
+    VITE_APP_SK_BUILD_INFO: string;
+    VITE_APP_SK_VERSION: string;
     // Add New Runtime Variables here
     VITE_APP_BACKEND_URI: string;
     VITE_APP_ENVIRONMENT: string;
