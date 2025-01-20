@@ -56,7 +56,7 @@ public class SessionlessChatController : ControllerBase
     {
         if (string.IsNullOrEmpty(ask.Input))
         {
-            return this.StatusCode(500, "No text input provided!");
+            return this.StatusCode(400, "No text input provided!");
         }
 
         var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
