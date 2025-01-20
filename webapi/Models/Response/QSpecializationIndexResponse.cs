@@ -11,6 +11,9 @@ public class QSpecializationIndexResponse
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
+    [JsonPropertyName("label")]
+    public string Label { get; set; } = string.Empty;
+
     [JsonPropertyName("queryType")]
     public string QueryType { get; set; } = string.Empty;
 
@@ -26,6 +29,7 @@ public class QSpecializationIndexResponse
     public QSpecializationIndexResponse(SpecializationIndex index)
     {
         this.Id = index.Id;
+        this.Label = index.Label;
         this.QueryType = index.QueryType;
         this.Name = index.Name;
         this.AISearchDeploymentConnection = index.AISearchDeploymentConnection;

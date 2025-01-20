@@ -68,6 +68,7 @@ export const SpecializationIndexManager: React.FC = () => {
     );
     const [id, setId] = useState('');
     const [name, setName] = useState('');
+    const [label, setLabel] = useState('');
     const [queryType, setQueryType] = useState('');
     const [aiSearchDeploymentConnection, setAiSearchDeploymentConnection] = useState('');
     const [openAIDeploymentConnection, setOpenAIDeploymentConnection] = useState('');
@@ -79,6 +80,7 @@ export const SpecializationIndexManager: React.FC = () => {
 
     const isValid =
         !!name &&
+        !!label &&
         !!queryType &&
         !!aiSearchDeploymentConnection &&
         !!openAIDeploymentConnection &&
@@ -88,6 +90,7 @@ export const SpecializationIndexManager: React.FC = () => {
         const index: ISpecializationIndex = {
             id: '',
             name,
+            label,
             queryType,
             aiSearchDeploymentConnection,
             openAIDeploymentConnection,
@@ -107,6 +110,7 @@ export const SpecializationIndexManager: React.FC = () => {
         fillState({
             name: '',
             id: '',
+            label: '',
             queryType: '',
             aiSearchDeploymentConnection: '',
             openAIDeploymentConnection: '',
@@ -123,6 +127,7 @@ export const SpecializationIndexManager: React.FC = () => {
     const fillState = (index: ISpecializationIndex) => {
         setId(index.id);
         setName(index.name);
+        setLabel(index.label);
         setQueryType(index.queryType);
         setAiSearchDeploymentConnection(index.aiSearchDeploymentConnection);
         setOpenAIDeploymentConnection(index.openAIDeploymentConnection);
@@ -142,6 +147,7 @@ export const SpecializationIndexManager: React.FC = () => {
             fillState({
                 name: '',
                 id: '',
+                label: '',
                 queryType: '',
                 aiSearchDeploymentConnection: '',
                 openAIDeploymentConnection: '',
@@ -164,6 +170,17 @@ export const SpecializationIndexManager: React.FC = () => {
                     value={name}
                     onChange={(_event, data) => {
                         setName(data.value);
+                    }}
+                />
+                <label htmlFor="label">
+                    Label<span className={classes.required}>*</span>
+                </label>
+                <Input
+                    id="label"
+                    required
+                    value={label}
+                    onChange={(_event, data) => {
+                        setLabel(data.value);
                     }}
                 />
                 <label htmlFor="queryType">

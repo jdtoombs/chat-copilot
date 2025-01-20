@@ -15,7 +15,7 @@
         "test": "playwright test"
     },
     "dependencies": {
-        "@azure/msal-browser": "^3.28.0",
+        "@azure/msal-browser": "^3.28.1",
         "@azure/msal-react": "^2.0.19",
         "@fluentui/react-components": "^9.57.0",
         "@fluentui/react-datepicker-compat": "^0.4.60",
@@ -24,7 +24,7 @@
         "@microsoft/microsoft-graph-client": "^3.0.7",
         "@microsoft/signalr": "^8.0.7",
         "@playwright/test": "^1.49.1",
-        "@reduxjs/toolkit": "^2.2.6",
+        "@reduxjs/toolkit": "^2.5.0",
         "@vitejs/plugin-react": "^4.3.4",
         "browserslist-to-esbuild": "^2.1.1",
         "debug": "^4.4.0",
@@ -34,7 +34,7 @@
         "react-dnd": "^16.0.1",
         "react-dnd-html5-backend": "^16.0.1",
         "react-dom": "^18.3.1",
-        "react-markdown": "^9.0.1",
+        "react-markdown": "^9.0.3",
         "react-multi-carousel": "2.8.5",
         "react-redux": "^9.2.0",
         "rehype-mathjax": "^6.0.0",
@@ -61,6 +61,7 @@
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
         "prettier": "^3.4.2",
+        "react-scripts": "^5.0.1",
         "serve": "^14.2.4",
         "ts-jest": "^29.2.5",
         "typescript": "5.5.3"
