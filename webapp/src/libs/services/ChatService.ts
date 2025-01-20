@@ -142,6 +142,16 @@ export class ChatService extends BaseService {
         return result;
     };
 
+    public deleteAllChatsAsync = async (accessToken: string): Promise<void> => {
+        return this.getResponseAsync(
+            {
+                commandPath: 'chats/all',
+                method: 'DELETE',
+            },
+            accessToken,
+        );
+    };
+
     /**
      * Deletes the chat history for a given chat ID asynchronously.
      *
