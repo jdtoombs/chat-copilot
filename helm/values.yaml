@@ -334,6 +334,11 @@ webapi:
         secretKeyRef:
           name: q-pilot-webapi-secret
           key: KernelMemory-Services-AzureVision-Endpoint
+    - name: "KernelMemory__Services__AzureBlobs-ConnectionString"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: KernelMemory-Services-AzureBlobs-ConnectionString
     - name: "AZURE_CLIENT_SECRET"
       valueFrom:
         secretKeyRef:
