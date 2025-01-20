@@ -13,6 +13,8 @@ public class SpecializationIndex : IStorageEntity
 
     public string Name { get; set; }
 
+    public string Label { get; set; }
+
     public string QueryType { get; set; }
 
     public string AISearchDeploymentConnection { get; set; }
@@ -25,6 +27,7 @@ public class SpecializationIndex : IStorageEntity
 
     public SpecializationIndex(
         string Name,
+        string Label,
         string QueryType,
         string AISearchDeploymentConnection,
         string OpenAIDeploymentConnection,
@@ -34,6 +37,7 @@ public class SpecializationIndex : IStorageEntity
     {
         this.Id = Guid.NewGuid().ToString();
         this.Name = Name;
+        this.Label = Label;
         this.QueryType = QueryType;
         this.AISearchDeploymentConnection = AISearchDeploymentConnection;
         this.OpenAIDeploymentConnection = OpenAIDeploymentConnection;

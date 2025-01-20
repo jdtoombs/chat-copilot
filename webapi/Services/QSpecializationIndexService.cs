@@ -31,6 +31,7 @@ public class QSpecializationIndexService : IQSpecializationIndexService
     {
         var indexInsert = new SpecializationIndex(
             index.Name,
+            index.Label,
             index.QueryType,
             index.AISearchDeploymentConnection,
             index.OpenAIDeploymentConnection,
@@ -51,6 +52,7 @@ public class QSpecializationIndexService : IQSpecializationIndexService
         }
 
         indexToEdit.Name = qIndexMutate.Name ?? indexToEdit.Name;
+        indexToEdit.Label = qIndexMutate.Label ?? indexToEdit.Label;
         indexToEdit.QueryType = qIndexMutate.QueryType ?? indexToEdit.QueryType;
         indexToEdit.AISearchDeploymentConnection =
             qIndexMutate.AISearchDeploymentConnection ?? indexToEdit.AISearchDeploymentConnection;
