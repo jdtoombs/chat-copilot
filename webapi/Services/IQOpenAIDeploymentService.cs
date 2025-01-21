@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
@@ -17,4 +17,6 @@ public interface IQOpenAIDeploymentService
     Task<OpenAIDeployment?> UpdateDeployment(Guid indexId, QOpenAIDeploymentMutate qDeploymentMutate);
 
     Task<OpenAIDeployment?> DeleteDeployment(Guid indexId);
+
+    Task OrderDeployments(OrderMapGuidToInt deploymentOrder);
 }
