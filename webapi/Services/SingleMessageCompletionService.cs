@@ -2,7 +2,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Security.KeyVault.Secrets;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
 using Microsoft.SemanticKernel;
@@ -13,37 +12,25 @@ namespace CopilotChat.WebApi.Services;
 public class SingleMessageCompletionService
 {
     private readonly SpecializationRepository _specializationRepository;
-    private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private readonly Kernel _kernel;
 
-    public SingleMessageCompletionService(
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository indexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        SecretClient secretClient
-    )
+    public SingleMessageCompletionService(SpecializationRepository specializationSourceRepository, Kernel kernel)
     {
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions,
-            specializationSourceRepository,
-            indexRepository,
-            openAIDeploymentRepository,
-            secretClient
-        );
         this._specializationRepository = specializationSourceRepository;
+        this._kernel = kernel;
     }
 
     /// <summary>
     /// Retrieves the chat completion using semantic kernel.
     /// no specialization
     /// </summary>
-    public async Task<string> GetResponse(string userPrompt, Kernel kernel, CancellationToken cancellationToken)
+    public async Task<string> GetResponse(string userPrompt, CancellationToken cancellationToken)
     {
-        var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
+        var chatCompletion = this._kernel.GetRequiredService<IChatCompletionService>();
         var stream = await chatCompletion.GetChatMessageContentAsync(
             userPrompt,
             null, //specialization
-            kernel,
+            this._kernel,
             cancellationToken
         );
         return stream?.Content ?? "no response!";

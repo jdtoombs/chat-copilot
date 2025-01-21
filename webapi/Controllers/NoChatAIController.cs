@@ -3,14 +3,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Models.Request;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 
 namespace CopilotChat.WebApi.Controllers;
@@ -23,21 +20,9 @@ public class SessionlessChatController : ControllerBase
 {
     private readonly SingleMessageCompletionService _singleMessageCompletionService;
 
-    public SessionlessChatController(
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository specializationIndexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        ISecretClientAccessor secretClientAccessor
-    )
+    public SessionlessChatController(SpecializationRepository specializationSourceRepository, Kernel kernel)
     {
-        this._singleMessageCompletionService = new SingleMessageCompletionService(
-            specializationOptions.Value,
-            specializationSourceRepository,
-            specializationIndexRepository,
-            openAIDeploymentRepository,
-            secretClientAccessor.GetSecretClient()
-        );
+        this._singleMessageCompletionService = new SingleMessageCompletionService(specializationSourceRepository, kernel);
     }
 
     [Route("sessionless/chat")]
@@ -47,9 +32,7 @@ public class SessionlessChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    //[Authorize(Policy = AuthPolicyName.RequireSpecialization)]
     public async Task<IActionResult> SessionlessChatAsync(
-        [FromServices] Kernel kernel,
         [FromBody] Ask ask,
         CancellationToken cancellationToken
     )
@@ -59,7 +42,7 @@ public class SessionlessChatController : ControllerBase
             return this.StatusCode(400, "No text input provided!");
         }
 
-        var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, kernel, cancellationToken);
+        var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, cancellationToken);
 
         return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
     }
