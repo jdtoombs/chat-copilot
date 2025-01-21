@@ -20,12 +20,9 @@ public class SessionlessChatController : ControllerBase
 {
     private readonly SingleMessageCompletionService _singleMessageCompletionService;
 
-    public SessionlessChatController(SpecializationRepository specializationSourceRepository, Kernel kernel)
+    public SessionlessChatController(Kernel kernel)
     {
-        this._singleMessageCompletionService = new SingleMessageCompletionService(
-            specializationSourceRepository,
-            kernel
-        );
+        this._singleMessageCompletionService = new SingleMessageCompletionService(kernel);
     }
 
     [Route("sessionless/chat")]
