@@ -22,7 +22,10 @@ public class SessionlessChatController : ControllerBase
 
     public SessionlessChatController(SpecializationRepository specializationSourceRepository, Kernel kernel)
     {
-        this._singleMessageCompletionService = new SingleMessageCompletionService(specializationSourceRepository, kernel);
+        this._singleMessageCompletionService = new SingleMessageCompletionService(
+            specializationSourceRepository,
+            kernel
+        );
     }
 
     [Route("sessionless/chat")]
@@ -32,10 +35,7 @@ public class SessionlessChatController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    public async Task<IActionResult> SessionlessChatAsync(
-        [FromBody] Ask ask,
-        CancellationToken cancellationToken
-    )
+    public async Task<IActionResult> SessionlessChatAsync([FromBody] Ask ask, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(ask.Input))
         {
