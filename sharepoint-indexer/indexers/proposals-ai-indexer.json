@@ -1,0 +1,38 @@
+{
+  "name": "proposals-ai-indexer",
+  "description": null,
+  "dataSourceName": "sharepoint-proposals-ai-datasource",
+  "skillsetName": "skillset-with-projection-proposals-ai",
+  "targetIndexName": "proposals-ai",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "indexedFileNameExtensions": ".pdf, .docx",
+      "excludedFileNameExtensions": ".png, .jpg",
+      "dataToExtract": "contentAndMetadata"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_spo_site_library_item_id",
+      "targetFieldName": "chunk_id",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": null
+      }
+    },
+    {
+      "sourceFieldName": "metadata_spo_item_name",
+      "targetFieldName": "title",
+      "mappingFunction": null
+    }
+  ],
+  "outputFieldMappings": [],
+  "cache": null,
+  "encryptionKey": null
+}

@@ -1,0 +1,83 @@
+{
+  "name": "skillset-with-projection-contractors-resume",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+      "name": "#1",
+      "description": "Splits large text into chunks.",
+      "context": "/document",
+      "defaultLanguageCode": "en",
+      "textSplitMode": "pages",
+      "maximumPageLength": 20000,
+      "pageOverlapLength": 5000,
+      "maximumPagesToTake": 0,
+      "unit": "characters",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "textItems",
+          "targetName": "pages"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+      "name": "#2",
+      "description": "Generate embeddings from SharePoint content",
+      "context": "/document/pages/*",
+      "resourceUri": "https://copilot-cne-app-dev-openai.openai.azure.com",
+      "apiKey": "<redacted>",
+      "deploymentId": "text-embedding-ada-002",
+      "dimensions": 1536,
+      "modelName": "text-embedding-ada-002",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/pages/*",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "embedding",
+          "targetName": "vector"
+        }
+      ]
+    }
+  ],
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "resume-contractors-ai",
+        "parentKeyFieldName": "document_id",
+        "sourceContext": "/document/pages/*",
+        "mappings": [
+          {
+            "name": "content",
+            "source": "/document/pages/*",
+            "inputs": []
+          },
+          {
+            "name": "vector",
+            "source": "/document/pages/*/vector",
+            "inputs": []
+          },
+          {
+            "name": "title",
+            "source": "/document/title",
+            "inputs": []
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}
