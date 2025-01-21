@@ -334,7 +334,7 @@ webapi:
         secretKeyRef:
           name: q-pilot-webapi-secret
           key: KernelMemory-Services-AzureVision-Endpoint
-    - name: "KernelMemory__Services__AzureBlobs-ConnectionString"
+    - name: "KernelMemory__Services__AzureBlobs__ConnectionString"
       valueFrom:
         secretKeyRef:
           name: q-pilot-webapi-secret
@@ -401,7 +401,8 @@ webapi:
         QAzureOpenAIChatConfig-AISearchDeploymentConnections-1-ApiKey,
         KernelMemory-Services-AzureVision-Key,
         KernelMemory-Services-AzureVision-Endpoint,
-        q-pilot-client-secret
+        q-pilot-client-secret,
+        KernelMemory-Services-AzureBlobs-ConnectionString
       ]
 
   ingress:
