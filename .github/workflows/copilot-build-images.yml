@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           - file: ./docker/webapi/Dockerfile
-            image: ${{ github.event.repository.name }}-webapi
+            image: chat-copilot-webapi
             build-args: |
 
           # Only build nginx image
@@ -22,7 +22,7 @@ jobs:
           #   build-args: |
 
           - file: ./docker/webapp/Dockerfile.nginx
-            image: ${{ github.event.repository.name }}-webapp
+            image: chat-copilot-webapp
             build-args: |
 
           # Excluded for now
