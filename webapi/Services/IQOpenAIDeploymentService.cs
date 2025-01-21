@@ -19,4 +19,6 @@ public interface IQOpenAIDeploymentService
     Task<OpenAIDeployment?> DeleteDeployment(Guid indexId);
 
     Task OrderDeployments(OrderMapGuidToInt deploymentOrder);
+
+    Task<string> GetAPIKeyFromVaultForDeployment(OpenAIDeployment deployment);
 }

@@ -42,7 +42,7 @@ public class SpecializationController : ControllerBase
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IOptions<PromptsOptions> promptsOptions,
-        ISecretClientAccessor secretClientAccessor
+        IQOpenAIDeploymentService qOpenAIDeploymentService
     )
     {
         this._logger = logger;
@@ -52,7 +52,7 @@ public class SpecializationController : ControllerBase
             specializationSourceRepository,
             indexRepository,
             openAIDeploymentRepository,
-            secretClientAccessor.GetSecretClient()
+            qOpenAIDeploymentService
         );
         this._qspecializationService = new QSpecializationService(
             specializationSourceRepository,
