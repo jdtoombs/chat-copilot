@@ -64,10 +64,7 @@ public class OpenAIDeploymentController(
     {
         try
         {
-            var deploymentToEdit = await qOpenAIDeploymentService.UpdateDeployment(
-                deploymentId,
-                qDeploymentMutate
-            );
+            var deploymentToEdit = await qOpenAIDeploymentService.UpdateDeployment(deploymentId, qDeploymentMutate);
             if (deploymentToEdit != null)
             {
                 return this.Ok(deploymentToEdit);
