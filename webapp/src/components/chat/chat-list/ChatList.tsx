@@ -22,7 +22,8 @@ import { FeatureKeys } from '../../../redux/features/app/AppState';
 import { Conversations } from '../../../redux/features/conversations/ConversationsState';
 import { Breakpoints } from '../../../styles';
 import { FileUploader } from '../../FileUploader';
-import { Dismiss20, Filter20 } from '../../shared/BundledIcons';
+import { Delete16, Dismiss20, Filter20 } from '../../shared/BundledIcons';
+import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import { isToday } from '../../utils/TextUtils';
 import { NewBotMenu } from './bot-menu/NewBotMenu';
 import { SimplifiedNewBotMenu } from './bot-menu/SimplifiedNewBotMenu';
@@ -85,7 +86,7 @@ export const ChatList: FC = () => {
     const { features } = useAppSelector((state: RootState) => state.app);
     const { conversations } = useAppSelector((state: RootState) => state.conversations);
     const { selectedId } = useAppSelector((state: RootState) => state.conversations);
-
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isFiltering, setIsFiltering] = useState(false);
     const [filterText, setFilterText] = useState('');
     const [conversationsView, setConversationsView] = useState<ConversationsView>({
@@ -197,7 +198,17 @@ export const ChatList: FC = () => {
         <div className={classes.root}>
             <div className={classes.header}>
                 {features[FeatureKeys.SimplifiedExperience].enabled ? (
-                    <SimplifiedNewBotMenu onFileUpload={() => fileUploaderRef.current?.click()} />
+                    <>
+                        <SimplifiedNewBotMenu onFileUpload={() => fileUploaderRef.current?.click()} />
+                        <Button
+                            icon={<Delete16 />}
+                            onClick={() => {
+                                setIsDeleteDialogOpen(true);
+                            }}
+                        >
+                            Clear
+                        </Button>
+                    </>
                 ) : (
                     <>
                         {!isFiltering && (
@@ -234,6 +245,22 @@ export const ChatList: FC = () => {
                     <ChatListSection header="Older" conversations={conversationsView.olderConversations} />
                 )}
             </div>
+            <ConfirmationDialog
+                open={isDeleteDialogOpen}
+                title="Delete all chats"
+                content={`Are you sure you want to delete all chats?`}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onConfirm={() => {
+                    chat.deleteAllChats().catch(() => {
+                        console.error('Error triggering clear all chats');
+                    });
+                    setIsDeleteDialogOpen(false);
+                }}
+                onCancel={() => {
+                    setIsDeleteDialogOpen(false);
+                }}
+            />
         </div>
     );
 };
