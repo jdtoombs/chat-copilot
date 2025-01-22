@@ -79,7 +79,7 @@ public class ChatPlugin
     /// </summary>
     private readonly QSpecializationService _qSpecializationService;
 
-    private readonly QOpenAIDeploymentService _qOpenAIDeploymentService;
+    private readonly IQOpenAIDeploymentService _qOpenAIDeploymentService;
 
     /// <summary>
     /// The current specialization in use, may be null if not yet set or if no specialization applies.
@@ -120,6 +120,7 @@ public class ChatPlugin
         SpecializationRepository specializationSourceRepository,
         SpecializationIndexRepository specializationIndexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
+        IQOpenAIDeploymentService qOpenAIDeploymentService,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
@@ -142,7 +143,7 @@ public class ChatPlugin
             specializationSourceRepository,
             qAzureOpenAIChatOptions.Value
         );
-        this._qOpenAIDeploymentService = new QOpenAIDeploymentService(openAIDeploymentRepository, secretClient);
+        this._qOpenAIDeploymentService = qOpenAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
             chatSessionRepository,
@@ -154,7 +155,7 @@ public class ChatPlugin
             specializationSourceRepository,
             specializationIndexRepository,
             openAIDeploymentRepository,
-            secretClient
+            qOpenAIDeploymentService
         );
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag

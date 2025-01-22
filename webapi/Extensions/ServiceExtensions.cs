@@ -443,6 +443,16 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
+    /// Add deployment services
+    /// </summary>
+    public static IServiceCollection AddDeploymentService(this IServiceCollection services)
+    {
+        services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
+
+        return services;
+    }
+
+    /// <summary>
     /// Trim all string properties, recursively.
     /// </summary>
     private static void TrimStringProperties<T>(T options)

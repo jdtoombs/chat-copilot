@@ -1,6 +1,5 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Services;
@@ -12,26 +11,12 @@ using Microsoft.Extensions.Logging;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class OpenAIDeploymentController : ControllerBase
+public class OpenAIDeploymentController(
+    ILogger<OpenAIDeploymentController> logger,
+    OpenAIDeploymentRepository openAIDeploymentRepository,
+    IQOpenAIDeploymentService qOpenAIDeploymentService
+) : ControllerBase
 {
-    private readonly ILogger<OpenAIDeploymentController> _logger;
-    private readonly OpenAIDeploymentRepository _openAIDeploymentRepository;
-    private readonly QOpenAIDeploymentService _qOpenAIDeploymentService;
-
-    public OpenAIDeploymentController(
-        ILogger<OpenAIDeploymentController> logger,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        ISecretClientAccessor secretClientAccessor
-    )
-    {
-        this._logger = logger;
-        this._openAIDeploymentRepository = openAIDeploymentRepository;
-        this._qOpenAIDeploymentService = new QOpenAIDeploymentService(
-            openAIDeploymentRepository,
-            secretClientAccessor.GetSecretClient()
-        );
-    }
-
     [HttpGet]
     [Route("openAIDeployments")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,7 +24,7 @@ public class OpenAIDeploymentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDeploymentsAsync()
     {
-        var deployments = await this._openAIDeploymentRepository.GetAllDeploymentsAsync();
+        var deployments = await openAIDeploymentRepository.GetAllDeploymentsAsync();
         return this.Ok(deployments);
     }
 
@@ -54,14 +39,14 @@ public class OpenAIDeploymentController : ControllerBase
     {
         try
         {
-            var deployment = await this._qOpenAIDeploymentService.SaveDeployment(deploymentCreate);
+            var deployment = await qOpenAIDeploymentService.SaveDeployment(deploymentCreate);
             var deploymentResponse = new QOpenAIDeploymentResponse(deployment);
 
             return this.Ok(deploymentResponse);
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Deployment creation threw an exception");
+            logger.LogError(ex, "Deployment creation threw an exception");
 
             return this.StatusCode(500, "Failed to create deployment.");
         }
@@ -79,10 +64,7 @@ public class OpenAIDeploymentController : ControllerBase
     {
         try
         {
-            var deploymentToEdit = await this._qOpenAIDeploymentService.UpdateDeployment(
-                deploymentId,
-                qDeploymentMutate
-            );
+            var deploymentToEdit = await qOpenAIDeploymentService.UpdateDeployment(deploymentId, qDeploymentMutate);
             if (deploymentToEdit != null)
             {
                 return this.Ok(deploymentToEdit);
@@ -91,7 +73,7 @@ public class OpenAIDeploymentController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Deployment update threw an exception");
+            logger.LogError(ex, "Deployment update threw an exception");
 
             return this.StatusCode(500, $"Failed to update deployment for id '{deploymentId}'.");
         }
@@ -107,7 +89,7 @@ public class OpenAIDeploymentController : ControllerBase
     {
         try
         {
-            var deploymentToDelete = await this._qOpenAIDeploymentService.DeleteDeployment(deploymentId);
+            var deploymentToDelete = await qOpenAIDeploymentService.DeleteDeployment(deploymentId);
             if (deploymentToDelete != null)
             {
                 return this.Ok(true);
@@ -116,7 +98,7 @@ public class OpenAIDeploymentController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Deployment delete threw an exception");
+            logger.LogError(ex, "Deployment delete threw an exception");
 
             return this.StatusCode(500, $"Failed to delete deployment for id '{deploymentId}'.");
         }
@@ -131,12 +113,12 @@ public class OpenAIDeploymentController : ControllerBase
     {
         try
         {
-            await this._qOpenAIDeploymentService.OrderDeployments(deploymentOrder);
+            await qOpenAIDeploymentService.OrderDeployments(deploymentOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Deployment swap order threw an exception");
+            logger.LogError(ex, "Deployment swap order threw an exception");
 
             return this.StatusCode(500, $"Failed to order deployments: {ex.Message}.");
         }
