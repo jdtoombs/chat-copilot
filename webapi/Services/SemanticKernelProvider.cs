@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using CopilotChat.WebApi.Extensions;
-using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
