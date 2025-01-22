@@ -25,7 +25,7 @@ public sealed class SemanticKernelProvider
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeploymentAPIKeys> openAIDeployments
+        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
     )
     {
         this._kernel = InitializeSemanticKernel(
@@ -47,7 +47,7 @@ public sealed class SemanticKernelProvider
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeploymentAPIKeys> openAIDeployments
+        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
     )
     {
         var builder = Kernel.CreateBuilder();
