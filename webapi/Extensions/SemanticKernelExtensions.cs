@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
+using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
@@ -25,6 +26,18 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Plugins.Core;
 
 namespace CopilotChat.WebApi.Extensions;
+
+public class OpenAIDeploymentAPIKeys
+{
+    public OpenAIDeploymentAPIKeys(OpenAIDeployment deployment, string apiKey)
+    {
+        this.Deployment = deployment;
+        this.ApiKey = apiKey;
+    }
+
+    public OpenAIDeployment Deployment { get; set; }
+    public string ApiKey { get; set; }
+}
 
 /// <summary>
 /// Extension methods for registering Semantic Kernel related services.
@@ -138,27 +151,32 @@ internal static class SemanticKernelExtensions
             var openAiDeploymentsTask = openAiService.GetAllDeployments();
             openAiDeploymentsTask.Wait();
             var openAiDeployments = openAiDeploymentsTask.Result;
-            var keyMap = new Dictionary<string, string>();
+            var deploymentAndKeys = new List<OpenAIDeploymentAPIKeys>();
             var secretClient = sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient();
             foreach (var deployment in openAiDeployments)
             {
-                var secretValue = secretClient.GetSecretAsync(deployment.SecretName).GetAwaiter().GetResult();
-                keyMap.Add(deployment.SecretName, secretValue.Value.Value ?? "");
+                try
+                {
+                    var secretValue = secretClient.GetSecretAsync(deployment.SecretName).GetAwaiter().GetResult();
+                    deploymentAndKeys.Add(new OpenAIDeploymentAPIKeys(deployment, secretValue.Value.Value));
+                }
+                catch (Azure.RequestFailedException e)
+                {
+                    sp.GetRequiredService<ILogger>()
+                        .LogWarning(
+                            "Could not retrieve secret key for {0}, Azure responded: {1}",
+                            deployment.Name,
+                            e.Message
+                        );
+                }
             }
-            // async Task InsertAPIKeyIntoDict(string secretName)
-            // {
-            //     var secretValue = await secretClient.GetSecretAsync(secretName);
-            //     keyMap.Add(secretName, secretValue.Value.Value ?? "");
-            // }
-            // var tasks = openAiDeployments.Select(a => InsertAPIKeyIntoDict(a.SecretName));
-            // Task.WaitAll(tasks.ToArray());
+
             return new SemanticKernelProvider(
                 sp,
                 builder.Configuration,
                 sp.GetRequiredService<IHttpClientFactory>(),
                 builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>(),
-                openAiDeployments,
-                keyMap
+                deploymentAndKeys
             );
         });
     }
