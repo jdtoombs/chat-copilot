@@ -19,7 +19,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SingleCompletionController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
 {
-    [Route("singleCompletion")]
+    [Route("singleCompletionController")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

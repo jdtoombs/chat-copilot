@@ -17,7 +17,7 @@ export class SingleCompletionService extends BaseService {
     public getBotResponseNoChat = async (ask: IAsk, accessToken: string): Promise<IAskResult> => {
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: 'singleCompletion',
+                commandPath: 'singleCompletionController',
                 method: 'POST',
                 body: ask,
             },
