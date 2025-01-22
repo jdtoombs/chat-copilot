@@ -65,9 +65,14 @@ internal static class ISemanticMemoryClientExtensions
             .GetRequiredService<IDefaultConfigurationFactory>()
             .GetDefaultConfiguration();
 
+        KernelMemoryBuilderBuildOptions kmbOptions = new() { AllowMixingVolatileAndPersistentData = true };
+
         IKernelMemory memory = memoryBuilder
             .FromMemoryConfiguration(memoryConfig, appBuilder.Configuration, defaultConfig)
             .Build();
+
+        // use this if having problems with mixing Volatile And PersistentData
+        // .Build(kmbOptions);
 
         appBuilder.Services.AddSingleton(memory);
     }

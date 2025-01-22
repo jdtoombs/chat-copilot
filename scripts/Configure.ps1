@@ -202,7 +202,7 @@ $webappProjectPath = Join-Path "$PSScriptRoot" '../webapp'
 $webappEnvFilePath = Join-Path "$webappProjectPath" '/.env'
 
 Write-Host "Setting up '.env'..."
-Set-Content -Path $webappEnvFilePath -Value "REACT_APP_BACKEND_URI=https://localhost:40443/"
+Set-Content -Path $webappEnvFilePath -Value "VITE_APP_BACKEND_URI=https://localhost:40443/"
 
 Write-Host "($webappEnvFilePath)"
 Write-Host "========"

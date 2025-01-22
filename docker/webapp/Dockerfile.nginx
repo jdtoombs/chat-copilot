@@ -3,7 +3,7 @@
 
 # builder
 FROM node:lts-alpine AS builder
-# ENV REACT_APP_BACKEND_URI=https://q-pilot-dev.api.pegasus.quartechlab.com/
+# ENV VITE_APP_BACKEND_URI=https://q-pilot-dev.api.pegasus.quartechlab.com/
 WORKDIR /app
 COPY webapp/ .
 RUN yarn install \
@@ -17,7 +17,7 @@ RUN yarn build
 FROM nginx:stable-alpine
 EXPOSE 3000
 RUN sed -i 's/80/3000/g' /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy .env file and shell script to container
 WORKDIR /usr/share/nginx/html

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
@@ -40,6 +41,9 @@ public class QSpecializationService : IQSpecializationService
         BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(
             qAzureOpenAIChatOptions.BlobStorage.SpecializationContainerName
         );
+
+        // Create a new container only if it does not exist
+        blobContainerClient.CreateIfNotExists(PublicAccessType.Blob);
 
         this._qBlobStorage = new QBlobStorage(blobContainerClient);
     }
