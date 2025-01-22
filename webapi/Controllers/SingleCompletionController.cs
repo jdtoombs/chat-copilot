@@ -1,15 +1,12 @@
-// Copyright (c) Quartech. All rights reserved.
+﻿// Copyright (c) Quartech. All rights reserved.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Services;
-using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.SemanticKernel;
 
 namespace CopilotChat.WebApi.Controllers;
 

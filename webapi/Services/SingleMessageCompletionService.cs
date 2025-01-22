@@ -1,9 +1,7 @@
-// Copyright (c) Quartech. All rights reserved.
+﻿// Copyright (c) Quartech. All rights reserved.
 
 using System.Threading;
 using System.Threading.Tasks;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
-using CopilotChat.WebApi.Storage;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 
