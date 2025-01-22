@@ -443,6 +443,15 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
+    /// Add Single message service
+    /// </summary>
+    public static IServiceCollection AddSingleMessageCompletionService(this IServiceCollection services)
+    {
+        services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
+        return services;
+    }
+
+    /// <summary>
     /// Trim all string properties, recursively.
     /// </summary>
     private static void TrimStringProperties<T>(T options)

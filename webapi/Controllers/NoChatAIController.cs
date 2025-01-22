@@ -16,15 +16,8 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling chat messages and responses.
 /// </summary>
 [ApiController]
-public class SessionlessChatController : ControllerBase
+public class SessionlessChatController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
 {
-    private readonly SingleMessageCompletionService _singleMessageCompletionService;
-
-    public SessionlessChatController(Kernel kernel)
-    {
-        this._singleMessageCompletionService = new SingleMessageCompletionService(kernel);
-    }
-
     [Route("sessionless/chat")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,7 +32,7 @@ public class SessionlessChatController : ControllerBase
             return this.StatusCode(400, "No text input provided!");
         }
 
-        var textResponse = await this._singleMessageCompletionService.GetResponse(ask.Input, cancellationToken);
+        var textResponse = await singleMessageCompletionService.GetResponse(ask.Input, cancellationToken);
 
         return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
     }

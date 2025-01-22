@@ -9,7 +9,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace CopilotChat.WebApi.Services;
 
-public class SingleMessageCompletionService(Kernel kernel)
+public class SingleMessageCompletionService(Kernel kernel) : ISingleMessageCompletionService
 {
     /// <summary>
     /// Retrieves the chat completion using semantic kernel.
