@@ -21,7 +21,7 @@ Start-Process pwsh -ArgumentList "-command ""& '$BackendScript'"""
 # check if the backend is running before proceeding
 $backendRunning = $false
 
-# get the port from the REACT_APP_BACKEND_URI env variable
+# get the port from the VITE_APP_BACKEND_URI env variable
 $envFilePath = Join-Path $PSScriptRoot '..\webapp\.env'
 $envContent = Get-Content -Path $envFilePath
 $port = [regex]::Match($envContent, ':(\d+)/').Groups[1].Value

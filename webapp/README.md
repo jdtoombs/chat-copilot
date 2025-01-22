@@ -19,9 +19,9 @@ Update the following when adding new runtime environment variables:
 example use:
 ```typescript
 export const BackendServiceUrl =
-    window._env_.REACT_APP_BACKEND_URI.trim() === ''
+    window._env_.VITE_APP_BACKEND_URI.trim() === ''
         ? window.origin
-        : window._env_.REACT_APP_BACKEND_URI;
+        : window._env_.VITE_APP_BACKEND_URI;
 ```
 
 # (Under Development)

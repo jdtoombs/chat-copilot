@@ -7,9 +7,11 @@ declare global {
 }
 
 interface ENVType {
+    VITE_APP_SK_BUILD_INFO: string;
+    VITE_APP_SK_VERSION: string;
     // Add New Runtime Variables here
-    REACT_APP_BACKEND_URI: string;
-    REACT_APP_ENVIRONMENT: string;
+    VITE_APP_BACKEND_URI: string;
+    VITE_APP_ENVIRONMENT: string;
     // The security group the user must have in order to access the site
     SECURITY_GROUP_ID: string;
 }
