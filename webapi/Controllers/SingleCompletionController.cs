@@ -17,7 +17,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling chat messages and responses.
 /// </summary>
 [ApiController]
-public class SessionlessChatController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
+public class SingleCompletionController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
 {
     [Route("singleCompletion")]
     [HttpPost]
