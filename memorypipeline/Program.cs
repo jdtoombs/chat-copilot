@@ -21,10 +21,15 @@ var defaultConfig = serviceProvider
     .GetRequiredService<IDefaultConfigurationFactory>()
     .GetDefaultConfiguration();
 
+KernelMemoryBuilderBuildOptions kmbOptions = new() { AllowMixingVolatileAndPersistentData = true };
+
 IKernelMemory memory = new KernelMemoryBuilder(builder.Services)
     .FromAppSettings(defaultConfig)
     .WithCustomOcr(builder.Configuration)
     .Build();
+
+// use this if having problems with mixing Volatile And PersistentData
+// .Build(kmbOptions);
 
 builder.Services.AddSingleton(memory);
 

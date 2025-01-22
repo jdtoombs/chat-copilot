@@ -118,7 +118,8 @@ internal static class SemanticKernelExtensions
                 qAzureOpenAIChatOptions: sp.GetRequiredService<IOptions<QAzureOpenAIChatOptions>>(),
                 contentSafety: sp.GetService<AzureContentSafety>(),
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
-                openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>()
+                openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
+                qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>()
             ),
             nameof(ChatPlugin)
         );
@@ -133,7 +134,7 @@ internal static class SemanticKernelExtensions
             var openAiRepo = sp.GetRequiredService<OpenAIDeploymentRepository>();
             var openAiService = new QOpenAIDeploymentService(
                 openAiRepo,
-                sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient()
+                sp.GetRequiredService<ISecretClientAccessor>()
             );
             var openAiDeploymentsTask = openAiService.GetAllDeployments();
             openAiDeploymentsTask.Wait();

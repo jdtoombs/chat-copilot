@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Security.KeyVault.Secrets;
+using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Storage;
@@ -10,48 +10,42 @@ using Newtonsoft.Json;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QOpenAIDeploymentService : IQOpenAIDeploymentService
+public class QOpenAIDeploymentService(
+    OpenAIDeploymentRepository deploymentRepository,
+    ISecretClientAccessor secretClientAccessor
+) : IQOpenAIDeploymentService
 {
-    private OpenAIDeploymentRepository _openAIDeploymentRepository;
-    private SecretClient _secretClient;
-
-    public QOpenAIDeploymentService(OpenAIDeploymentRepository deploymentRepository, SecretClient secretClient)
-    {
-        this._openAIDeploymentRepository = deploymentRepository;
-        this._secretClient = secretClient;
-    }
-
     public async Task<OpenAIDeployment?> DeleteDeployment(Guid indexId)
     {
-        var deploymentToDelete = await this._openAIDeploymentRepository.FindByIdAsync(indexId.ToString());
+        var deploymentToDelete = await deploymentRepository.FindByIdAsync(indexId.ToString());
         if (deploymentToDelete == null)
         {
             return null;
         }
-        await this._openAIDeploymentRepository.DeleteAsync(deploymentToDelete);
+        await deploymentRepository.DeleteAsync(deploymentToDelete);
         return deploymentToDelete;
     }
 
     public Task<IEnumerable<OpenAIDeployment>> GetAllDeployments()
     {
-        return this._openAIDeploymentRepository.GetAllDeploymentsAsync();
+        return deploymentRepository.GetAllDeploymentsAsync();
     }
 
     public Task<OpenAIDeployment> GetDeployment(string id)
     {
-        return this._openAIDeploymentRepository.FindByIdAsync(id);
+        return deploymentRepository.FindByIdAsync(id);
     }
 
     public async Task<string> GetAPIKeyFromVaultForDeployment(OpenAIDeployment deployment)
     {
         var secretName = deployment.SecretName;
-        var secretValue = await this._secretClient.GetSecretAsync(secretName);
+        var secretValue = await secretClientAccessor.GetSecretClient().GetSecretAsync(secretName);
         return secretValue.Value.Value ?? "";
     }
 
     public async Task<IEnumerable<ChatCompletionDeployment>> GetAllChatCompletionDeployments()
     {
-        var deployments = await this._openAIDeploymentRepository.GetAllDeploymentsAsync();
+        var deployments = await deploymentRepository.GetAllDeploymentsAsync();
         var chatCompletionDeployments = new List<ChatCompletionDeployment>();
         foreach (OpenAIDeployment connection in deployments)
         {
@@ -87,7 +81,7 @@ public class QOpenAIDeploymentService : IQOpenAIDeploymentService
             deserializeEmbeddings ?? new List<string>()
         );
 
-        await this._openAIDeploymentRepository.CreateAsync(deploymentInsert);
+        await deploymentRepository.CreateAsync(deploymentInsert);
         return deploymentInsert;
     }
 
@@ -100,7 +94,7 @@ public class QOpenAIDeploymentService : IQOpenAIDeploymentService
         var deserializeImageGeneration = JsonConvert.DeserializeObject<List<string>>(
             qDeploymentMutate.ImageGenerationDeployments
         );
-        var deploymentToEdit = await this._openAIDeploymentRepository.FindByIdAsync(indexId.ToString());
+        var deploymentToEdit = await deploymentRepository.FindByIdAsync(indexId.ToString());
 
         deploymentToEdit.Name = qDeploymentMutate.Name ?? deploymentToEdit.Name;
         deploymentToEdit.SecretName = qDeploymentMutate.SecretName ?? deploymentToEdit.SecretName;
@@ -111,7 +105,7 @@ public class QOpenAIDeploymentService : IQOpenAIDeploymentService
         deploymentToEdit.ImageGenerationDeployments =
             deserializeImageGeneration ?? deploymentToEdit.ImageGenerationDeployments;
 
-        await this._openAIDeploymentRepository.UpsertAsync(deploymentToEdit);
+        await deploymentRepository.UpsertAsync(deploymentToEdit);
         return deploymentToEdit;
     }
 
@@ -136,7 +130,7 @@ public class QOpenAIDeploymentService : IQOpenAIDeploymentService
             {
                 // Update the order
                 deployment.Order = newOrder;
-                upsertTasks.Add(this._openAIDeploymentRepository.UpsertAsync(deployment));
+                upsertTasks.Add(deploymentRepository.UpsertAsync(deployment));
             }
         }
         await Task.WhenAll(upsertTasks);
