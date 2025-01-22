@@ -33,7 +33,7 @@ import '@mdxeditor/editor/style.css';
 import { AuthHelper } from '../../../libs/auth/AuthHelper';
 import { IAsk } from '../../../libs/semantic-kernel/model/Ask';
 import { ChatMessageType } from '../../../libs/models/ChatMessage';
-import { NoChatAIService } from '../../../libs/services/NoChatAIService';
+import { SingleCompletionService } from '../../../libs/services/SingleCompletionService';
 import { useMsal } from '@azure/msal-react';
 import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
 import MarkDownEditor from './MarkDownEditor';
@@ -527,7 +527,7 @@ export const SpecializationManager: React.FC = () => {
             ],
         };
         //passing ask object, auth token, and plugins
-        const noChatMessageService = new NoChatAIService();
+        const noChatMessageService = new SingleCompletionService();
         const authToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
         return noChatMessageService.getBotResponseNoChat(ask, authToken);
     };

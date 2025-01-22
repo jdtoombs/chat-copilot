@@ -6,7 +6,7 @@ import { BaseService } from './BaseService';
 /**
  * A class for interactging with chat bot WITHOUT a particular chat. or specialization
  */
-export class NoChatAIService extends BaseService {
+export class SingleCompletionService extends BaseService {
     /**
      * getBotResponseNoChat - Calling this with a valid ask object will query the chatbot through a POST request,
      * chat id and other chat parameters not required as this is simply a message and response
@@ -17,7 +17,7 @@ export class NoChatAIService extends BaseService {
     public getBotResponseNoChat = async (ask: IAsk, accessToken: string): Promise<IAskResult> => {
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: 'getSingleCompletion', // to be updated to a valid path when it is created.. removing chat id
+                commandPath: 'singleCompletion',
                 method: 'POST',
                 body: ask,
             },

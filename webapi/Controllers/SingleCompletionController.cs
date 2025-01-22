@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
+using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +19,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SessionlessChatController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
 {
-    [Route("getSingleCompletion")]
+    [Route("singleCompletion")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,6 +35,6 @@ public class SessionlessChatController(ISingleMessageCompletionService singleMes
 
         var textResponse = await singleMessageCompletionService.GetResponse(ask.Input, cancellationToken);
 
-        return this.Ok(new { value = textResponse, variables = Array.Empty<object>() });
+        return this.Ok(new AskResult { Value = textResponse });
     }
 }
