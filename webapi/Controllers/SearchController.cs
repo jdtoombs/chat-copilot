@@ -28,7 +28,8 @@ public class SearchController : ControllerBase
         SpecializationIndexRepository specializationIndexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        IQOpenAIDeploymentService qOpenAIDeploymentService
+        IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQBlobStorage qBlobStorage
     )
     {
         this._logger = logger;
@@ -37,7 +38,8 @@ public class SearchController : ControllerBase
             specializationSourceRepository,
             specializationIndexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qBlobStorage
         );
     }
 

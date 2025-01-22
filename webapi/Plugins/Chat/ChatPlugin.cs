@@ -127,6 +127,7 @@ public class ChatPlugin
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         SecretClient secretClient,
         ILogger logger,
+        IQBlobStorage qBlobStorage,
         AzureContentSafety? contentSafety = null,
         bool isUserIntentExtractionEnabled = true
     ) // Parameter for feature flag
@@ -141,7 +142,8 @@ public class ChatPlugin
         this._promptOptions = promptOptions.Value.Copy();
         this._qSpecializationService = new QSpecializationService(
             specializationSourceRepository,
-            qAzureOpenAIChatOptions.Value
+            qAzureOpenAIChatOptions.Value,
+            qBlobStorage
         );
         this._qOpenAIDeploymentService = qOpenAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
@@ -155,7 +157,8 @@ public class ChatPlugin
             specializationSourceRepository,
             specializationIndexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qBlobStorage
         );
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
