@@ -140,27 +140,32 @@ internal static class SemanticKernelExtensions
             var openAiDeploymentsTask = openAiService.GetAllDeployments();
             openAiDeploymentsTask.Wait();
             var openAiDeployments = openAiDeploymentsTask.Result;
-            var keyMap = new Dictionary<string, string>();
+            var deploymentAndKeys = new List<OpenAIDeploymentAPIKey>();
             var secretClient = sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient();
             foreach (var deployment in openAiDeployments)
             {
-                var secretValue = secretClient.GetSecretAsync(deployment.SecretName).GetAwaiter().GetResult();
-                keyMap.Add(deployment.SecretName, secretValue.Value.Value ?? "");
+                try
+                {
+                    var secretValue = secretClient.GetSecretAsync(deployment.SecretName).GetAwaiter().GetResult();
+                    deploymentAndKeys.Add(new OpenAIDeploymentAPIKey(deployment, secretValue.Value.Value));
+                }
+                catch (Azure.RequestFailedException e)
+                {
+                    sp.GetRequiredService<ILogger>()
+                        .LogWarning(
+                            "Could not retrieve secret key for {0}, Azure responded: {1}",
+                            deployment.Name,
+                            e.Message
+                        );
+                }
             }
-            // async Task InsertAPIKeyIntoDict(string secretName)
-            // {
-            //     var secretValue = await secretClient.GetSecretAsync(secretName);
-            //     keyMap.Add(secretName, secretValue.Value.Value ?? "");
-            // }
-            // var tasks = openAiDeployments.Select(a => InsertAPIKeyIntoDict(a.SecretName));
-            // Task.WaitAll(tasks.ToArray());
+
             return new SemanticKernelProvider(
                 sp,
                 builder.Configuration,
                 sp.GetRequiredService<IHttpClientFactory>(),
                 builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>(),
-                openAiDeployments,
-                keyMap
+                deploymentAndKeys
             );
         });
     }
