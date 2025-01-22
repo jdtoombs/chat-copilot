@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-import { expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import * as util from './utils';
 
 /*
 Summary: Checks if the server is running and healthy
 */
-export async function serverHealth(page) {
-    // Make sure the server is running.
+
+export async function serverHealth(page: Page): Promise<void> {
     await page.goto('https://localhost:40443/healthz');
-    await expect(page.getByText('Healthy')).toBeDefined();
+    await expect(page.getByText('Healthy')).toBeVisible();
 }
 
 /*
@@ -21,7 +21,7 @@ Summary: Tests for the following behaviour from the WebApp:
 - Chat History has the correct number of messages and that the last message is from Q-Pilot
 - SK core function testing for jokes and fun facts
 */
-export async function basicBotResponses(page) {
+export async function basicBotResponses(page: Page) {
     await util.loginAndCreateNewChat(page);
 
     const joke = 'Can you tell me a funny joke about penguins?';
@@ -43,7 +43,7 @@ export async function basicBotResponses(page) {
 /*
 Summary: Tests if the title for the current chat can be changed
 */
-export async function chatTitleChange(page) {
+export async function chatTitleChange(page: Page) {
     await util.loginAndCreateNewChat(page);
 
     await page.getByTestId('editChatTitleButtonSimplified').click();
@@ -56,7 +56,7 @@ export async function chatTitleChange(page) {
 /*
 Summary: Tests if a single document can be uploaded and then found in the 'Files' tab
 */
-export async function documentUpload(page) {
+export async function documentUpload(page: Page) {
     await util.loginAndCreateNewChat(page);
 
     const testFilename = 'Lorem_ipsum.pdf';

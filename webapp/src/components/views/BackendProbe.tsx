@@ -98,7 +98,7 @@ export const BackendProbe: FC<IData> = ({ onBackendFound }) => {
                     <Body1>
                         If running locally, ensure that you have the{' '}
                         <code>
-                            <b>REACT_APP_BACKEND_URI</b>
+                            <b>VITE_APP_BACKEND_URI</b>
                         </code>{' '}
                         variable set in your <b>webapp/.env</b> file
                     </Body1>

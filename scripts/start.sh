@@ -7,7 +7,7 @@ set -e
 ScriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ScriptDir"
 
-# get the port from the REACT_APP_BACKEND_URI env variable
+# get the port from the VITE_APP_BACKEND_URI env variable
 envContent=$(grep -v '^#' ../webapp/.env | xargs)
 backendPort=$(echo $envContent | sed -n 's/.*:\([0-9]*\).*/\1/p')
 
