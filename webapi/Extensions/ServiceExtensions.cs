@@ -476,10 +476,10 @@ public static class CopilotChatServiceExtensions
     public static IServiceCollection AddSingleMessageCompletionService(this IServiceCollection services)
     {
         services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
-      
+
         return services;
     }
-  
+
     /// <summary>
     /// Add deployment services
     /// </summary>

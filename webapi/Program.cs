@@ -50,7 +50,7 @@ public sealed class Program
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization()
             .AddEmailService()
-            .AddSingleMessageCompletionService();
+            .AddSingleMessageCompletionService()
             .AddDeploymentService();
 
 
