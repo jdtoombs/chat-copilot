@@ -17,7 +17,7 @@ export class NoChatAIService extends BaseService {
     public getBotResponseNoChat = async (ask: IAsk, accessToken: string): Promise<IAskResult> => {
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: 'sessionless/chat', // to be updated to a valid path when it is created.. removing chat id
+                commandPath: 'getSingleCompletion', // to be updated to a valid path when it is created.. removing chat id
                 method: 'POST',
                 body: ask,
             },

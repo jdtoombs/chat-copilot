@@ -18,7 +18,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SessionlessChatController(ISingleMessageCompletionService singleMessageCompletionService) : ControllerBase
 {
-    [Route("sessionless/chat")]
+    [Route("getSingleCompletion")]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
