@@ -14,6 +14,8 @@ const useClasses = makeStyles({
         flexDirection: 'column',
         justifyContent: 'space-between',
         height: '100%',
+        paddingLeft: tokens.spacingHorizontalL,
+        paddingRight: tokens.spacingHorizontalL,
     },
     scroll: {
         ...shorthands.margin(tokens.spacingVerticalXS),
