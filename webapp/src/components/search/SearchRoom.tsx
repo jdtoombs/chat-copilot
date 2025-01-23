@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft. All rights reserved.
-
 import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import React, { useEffect } from 'react';
 import { useSearch } from '../../libs/hooks/useSearch';
@@ -33,6 +31,33 @@ const useClasses = makeStyles({
         flexDirection: 'row',
         justifyContent: 'center',
         ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingVerticalNone),
+    },
+    cardContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+        flexDirection: 'column',
+    },
+    card: {
+        width: '350px',
+        maxWidth: '100%',
+        height: '300px',
+        backgroundColor: 'white',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        padding: tokens.spacingVerticalM,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
+    list: {
+        listStyleType: 'disc',
+        paddingLeft: tokens.spacingHorizontalM,
+    },
+    listItem: {
+        color: tokens.colorNeutralForeground1,
+        marginBottom: tokens.spacingVerticalXS,
     },
 });
 
@@ -116,7 +141,17 @@ export const SearchRoom: React.FC = () => {
                     </div>
                 </div>
             ) : (
-                <div>search instructions here</div>
+                <div className={classes.cardContainer}>
+                    <h1>How to use Q-Pilot Search</h1>
+                    <div className={classes.card}>
+                        <ul className={classes.list}>
+                            <li className={classes.listItem}>Select a document index to search</li>
+                            <li className={classes.listItem}>Type a search query and submit</li>
+                            <li className={classes.listItem}>Select a search result from the left window</li>
+                            <li className={classes.listItem}>View the highlighted result within the document</li>
+                        </ul>
+                    </div>
+                </div>
             )}
 
             <div className={classes.input}></div>
