@@ -45,7 +45,7 @@ const useClasses = makeStyles({
         width: '350px',
         maxWidth: '100%',
         height: '300px',
-        backgroundColor: 'white',
+        backgroundColor: tokens.colorNeutralBackground1,
         boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
         borderRadius: '8px',
         padding: tokens.spacingVerticalM,
