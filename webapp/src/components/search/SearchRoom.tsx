@@ -106,7 +106,7 @@ export const SearchRoom: React.FC = () => {
         <div className={classes.root}>
             <SearchInput onSubmit={handleSubmit} />
 
-            {values.length > 0 ? (
+            {selectedSearchItem.filename ? (
                 <div ref={scrollViewTargetRef} className={classes.scroll}>
                     <div>
                         {displayContent.map((content, index) => (
