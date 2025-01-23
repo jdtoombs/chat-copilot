@@ -28,27 +28,15 @@ import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import FieldArray from '../../shared/FieldArray';
 import { Row } from '../../shared/Row';
 import '@mdxeditor/editor/style.css';
-import {
-    MDXEditor,
-    UndoRedo,
-    BoldItalicUnderlineToggles,
-    toolbarPlugin,
-    ListsToggle,
-    DiffSourceToggleWrapper,
-    diffSourcePlugin,
-    listsPlugin,
-    codeBlockPlugin,
-    tablePlugin,
-    linkPlugin,
-    imagePlugin,
-    headingsPlugin,
-    quotePlugin,
-    jsxPlugin,
-    codeMirrorPlugin,
-    thematicBreakPlugin,
-    InsertTable,
-    BlockTypeSelect,
-} from '@mdxeditor/editor';
+//import { useCellValue, usePublisher } from '@mdxeditor/editor';
+
+import { AuthHelper } from '../../../libs/auth/AuthHelper';
+import { IAsk } from '../../../libs/semantic-kernel/model/Ask';
+import { ChatMessageType } from '../../../libs/models/ChatMessage';
+import { SingleCompletionService } from '../../../libs/services/SingleCompletionService';
+import { useMsal } from '@azure/msal-react';
+import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
+import MarkDownEditor from './MarkDownEditor';
 
 interface ISpecializationFile {
     file: File | null;
@@ -119,6 +107,7 @@ const useClasses = makeStyles({
  * @returns {*}
  */
 export const SpecializationManager: React.FC = () => {
+    const { instance, inProgress } = useMsal();
     const classes = useClasses();
     const specialization = useSpecialization();
     const dispatch = useAppDispatch();
@@ -517,6 +506,46 @@ export const SpecializationManager: React.FC = () => {
         [classes.needsAttention, saveAttempted],
     );
 
+    const getMarkdown = async (): Promise<IAskResult> => {
+        const markDownPrompt = `
+            Take the provided text, which serves as instructions about the role behavior of a chat model,
+            and convert it into a well-structured Markdown document.
+            Use appropriate titles and paragraphs to organize the information in a way that is clear and easy
+            for the chatbot to interpret and apply. IMPORTANT: REPLY ONLY WITH THE UPDATED MARKDOWN DO NOT WRITE ANYTHING ELSE IN YOUR RESPONSE.
+            HERE IS THE INPUT TEXT for you to convert:
+ 
+            ${roleInformation}
+        `;
+        //Configure ask object for service function request
+        const ask: IAsk = {
+            input: markDownPrompt,
+            variables: [
+                {
+                    key: 'messageType',
+                    value: ChatMessageType.Message.toString(),
+                },
+            ],
+        };
+        //passing ask object, auth token, and plugins
+        const noChatMessageService = new SingleCompletionService();
+        const authToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+        return noChatMessageService.getBotResponseNoChat(ask, authToken);
+    };
+
+    const AIFormat = async (): Promise<void> => {
+        try {
+            const markdownResponse = await getMarkdown();
+            setRoleInformation(markdownResponse.value);
+        } catch (error) {
+            console.error('Error in AIFormat:', error);
+        }
+    };
+    const handleClick = () => {
+        AIFormat().catch((error) => {
+            console.error('Error in AIFormat:', error);
+        });
+    };
+
     return (
         <div className={classes.scrollableContainer}>
             <div className={classes.root}>
@@ -736,9 +765,22 @@ export const SpecializationManager: React.FC = () => {
                         setDescription(data.value);
                     }}
                 />
-                <label htmlFor="context">
-                    Chat Context<span className={classes.required}>*</span>
-                </label>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label htmlFor="context" style={{ marginRight: '10px' }}>
+                        Chat Context<span style={{ color: 'red' }}>*</span>
+                    </label>
+                    <label
+                        onClick={handleClick}
+                        style={{
+                            cursor: 'pointer',
+                            color: 'blue',
+                            marginLeft: '10px',
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        (Format With AI)
+                    </label>
+                </div>
 
                 <div
                     style={{
@@ -759,41 +801,10 @@ export const SpecializationManager: React.FC = () => {
                             backgroundColor: 'white',
                         }}
                     >
-                        <MDXEditor
-                            key={id}
-                            markdown={roleInformation}
-                            plugins={[
-                                diffSourcePlugin({
-                                    diffMarkdown: 'An older version',
-                                    viewMode: 'rich-text',
-                                    readOnlyDiff: true,
-                                }),
-                                toolbarPlugin({
-                                    toolbarClassName: 'my-classname',
-                                    toolbarContents: () => (
-                                        <DiffSourceToggleWrapper>
-                                            <UndoRedo />
-                                            <BoldItalicUnderlineToggles />
-                                            <ListsToggle />
-                                            <InsertTable />
-                                            <BlockTypeSelect />
-                                        </DiffSourceToggleWrapper>
-                                    ),
-                                }),
-                                listsPlugin(),
-                                codeBlockPlugin(),
-                                tablePlugin(),
-                                linkPlugin(),
-                                imagePlugin(),
-                                headingsPlugin(),
-                                quotePlugin(),
-                                jsxPlugin(),
-                                codeMirrorPlugin(),
-                                thematicBreakPlugin(),
-                            ]}
-                            onChange={(newMarkdown) => {
-                                setRoleInformation(newMarkdown);
-                            }}
+                        <MarkDownEditor
+                            roleInformation={roleInformation}
+                            setRoleInformation={setRoleInformation}
+                            id={id}
                         />
                     </div>
                 </div>

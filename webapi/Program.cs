@@ -50,6 +50,7 @@ public sealed class Program
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization()
             .AddEmailService()
+            .AddSingleMessageCompletionService()
             .AddDeploymentService();
 
         // Add SignalR as the real time relay service
