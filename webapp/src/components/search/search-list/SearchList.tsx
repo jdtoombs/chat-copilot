@@ -49,18 +49,27 @@ const useClasses = makeStyles({
         backgroundColor: tokens.colorSubtleBackground,
         fontSize: tokens.fontSizeBase500,
     },
+    noResults: {
+        textAlign: 'center',
+        color: tokens.colorNeutralForegroundDisabled,
+        fontSize: tokens.fontSizeBase300,
+        marginTop: tokens.spacingVerticalM,
+    },
 });
 
 export const SearchList: FC = () => {
     const classes = useClasses();
     const { searchData } = useAppSelector((state: RootState) => state.search);
     const values = searchData.value;
+
     return (
         <div className={classes.root}>
             <div aria-label={'chat list'} className={classes.list}>
-                {values.map((value, index) => {
-                    return <SearchListSection key={index} index={index} value={value} />;
-                })}
+                {values.length > 0 ? (
+                    values.map((value, index) => <SearchListSection key={index} index={index} value={value} />)
+                ) : (
+                    <div className={classes.noResults}>No Search Results</div>
+                )}
             </div>
         </div>
     );
