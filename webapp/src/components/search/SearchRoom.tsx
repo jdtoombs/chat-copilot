@@ -80,30 +80,32 @@ export const SearchRoom: React.FC = () => {
     return (
         <div className={classes.root}>
             <SearchInput onSubmit={handleSubmit} />
-            <div ref={scrollViewTargetRef} className={classes.scroll}>
-                <div>
-                    {displayContent.map((content, index) => (
-                        <p key={index} dangerouslySetInnerHTML={{ __html: content }} />
-                    ))}
-                </div>
-                <div id="meta-data">
-                    {metaData.source?.filename && (
-                        <div>
-                            <span>
-                                <b>Filename</b>
-                            </span>
-                            : <span>{metaData.source.filename}</span>
-                        </div>
-                    )}
-                    {metaData.source?.url && (
-                        <div>
-                            <span>
-                                <b>URL</b>
-                            </span>
-                            : <span>{metaData.source.url}</span>
-                        </div>
-                    )}
-                    {/* {metaData.page_number !== undefined && (
+
+            {values.length > 0 ? (
+                <div ref={scrollViewTargetRef} className={classes.scroll}>
+                    <div>
+                        {displayContent.map((content, index) => (
+                            <p key={index} dangerouslySetInnerHTML={{ __html: content }} />
+                        ))}
+                    </div>
+                    <div id="meta-data">
+                        {metaData.source?.filename && (
+                            <div>
+                                <span>
+                                    <b>Filename</b>
+                                </span>
+                                : <span>{metaData.source.filename}</span>
+                            </div>
+                        )}
+                        {metaData.source?.url && (
+                            <div>
+                                <span>
+                                    <b>URL</b>
+                                </span>
+                                : <span>{metaData.source.url}</span>
+                            </div>
+                        )}
+                        {/* {metaData.page_number !== undefined && (
                         <div>
                             <span>
                                 <b>Page Number</b>
@@ -111,8 +113,12 @@ export const SearchRoom: React.FC = () => {
                             : <span>{metaData.page_number}</span>
                         </div>
                     )} */}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div>search instructions here</div>
+            )}
+
             <div className={classes.input}></div>
         </div>
     );

@@ -90,7 +90,7 @@ export const ChatType: FC = () => {
                     Chat
                 </Tab>
                 <Tab data-testid="searchTab" id="search" value="search" aria-label="Search Tab" title="Search Tab">
-                    Search - Beta
+                    Search
                 </Tab>
                 <Tab
                     disabled={!hasAdmin}
