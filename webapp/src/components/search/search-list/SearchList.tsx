@@ -12,9 +12,22 @@ const useClasses = makeStyles({
         display: 'flex',
         flexShrink: 0,
         width: '320px',
-        height: 'calc(100% - 44px)', //44px fixed height for tab list above this element.
+        height: 'calc(100% - 44px)',
         backgroundColor: tokens.colorNeutralBackground4,
         flexDirection: 'column',
+        ...Breakpoints.small({
+            width: '64px',
+        }),
+    },
+    noResultsContainer: {
+        display: 'flex',
+        flexShrink: 0,
+        width: '320px',
+        height: 'calc(100% - 44px)',
+        backgroundColor: tokens.colorNeutralBackground4,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
         ...Breakpoints.small({
             width: '64px',
         }),
@@ -62,15 +75,17 @@ export const SearchList: FC = () => {
     const { searchData } = useAppSelector((state: RootState) => state.search);
     const values = searchData.value;
 
-    return (
+    return values.length > 0 ? (
         <div className={classes.root}>
             <div aria-label={'chat list'} className={classes.list}>
-                {values.length > 0 ? (
-                    values.map((value, index) => <SearchListSection key={index} index={index} value={value} />)
-                ) : (
-                    <div className={classes.noResults}>No Search Results</div>
-                )}
+                {values.map((value, index) => (
+                    <SearchListSection key={index} index={index} value={value} />
+                ))}
             </div>
+        </div>
+    ) : (
+        <div className={classes.noResultsContainer}>
+            <div className={classes.noResults}>No Search Results</div>
         </div>
     );
 };
