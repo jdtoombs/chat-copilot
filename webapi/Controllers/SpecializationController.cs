@@ -41,7 +41,8 @@ public class SpecializationController : ControllerBase
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IOptions<PromptsOptions> promptsOptions,
-        IQOpenAIDeploymentService qOpenAIDeploymentService
+        IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQSearchDeploymentService qSearchDeploymentService
     )
     {
         this._logger = logger;
@@ -51,7 +52,8 @@ public class SpecializationController : ControllerBase
             specializationSourceRepository,
             indexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qSearchDeploymentService
         );
         this._qspecializationService = new QSpecializationService(
             specializationSourceRepository,
@@ -83,35 +85,6 @@ public class SpecializationController : ControllerBase
 
         return this.Ok(orderedSpecializations);
     }
-
-    /// <summary>
-    /// Get all available specialization indexes maintained in the system.
-    /// </summary>
-    /// <returns>A list of available specialization indexes. An empty list if no specialization indexes are found.</returns>
-    // [HttpGet]
-    // [Route("specialization/indexes")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // public List<string> GetAllSpecializationIndexes()
-    // {
-    //     return this._qAzureOpenAIChatExtension.GetAllSpecializationIndexNames();
-    // }
-
-    /// <summary>
-    /// Get all chat completion deployments.
-    /// </summary>
-    /// <returns>A list of chat completion deployments.</returns>
-    // [HttpGet]
-    // [Route("specialization/deployments")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // public List<string> GetAllChatCompletionDeployments()
-    // {
-    //     return this._qAzureOpenAIChatExtension.GetAllChatCompletionDeployments().Select(deploy => deploy.Name).ToList();
-    // }
 
     /// <summary>
     /// Creates a new specialization.

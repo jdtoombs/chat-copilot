@@ -50,7 +50,8 @@ public sealed class Program
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization()
             .AddEmailService()
-            .AddDeploymentService();
+            .AddOpenAIDeploymentService()
+            .AddSearchDeploymentService();
 
         // Add SignalR as the real time relay service
         builder.Services.AddSignalR(hubOptions => hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(5));

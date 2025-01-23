@@ -202,6 +202,7 @@ public static class CopilotChatServiceExtensions
         IStorageContext<ChatUser> chatUserStorageContext;
         IStorageContext<SpecializationIndex> specializationIndexStorageContext;
         IStorageContext<OpenAIDeployment> openAIDeploymentStorageContext;
+        IStorageContext<AISearchDeployment> aiSearchDeploymentStorageContext;
 
         ChatStoreOptions chatStoreConfig = services
             .BuildServiceProvider()
@@ -220,6 +221,7 @@ public static class CopilotChatServiceExtensions
                 chatUserStorageContext = new VolatileContext<ChatUser>();
                 specializationIndexStorageContext = new VolatileContext<SpecializationIndex>();
                 openAIDeploymentStorageContext = new VolatileContext<OpenAIDeployment>();
+                aiSearchDeploymentStorageContext = new VolatileContext<AISearchDeployment>();
                 break;
             }
 
@@ -298,6 +300,14 @@ public static class CopilotChatServiceExtensions
                         )
                     )
                 );
+                aiSearchDeploymentStorageContext = new FileSystemContext<AISearchDeployment>(
+                    new FileInfo(
+                        Path.Combine(
+                            directory,
+                            $"{Path.GetFileNameWithoutExtension(fullPath)}_aiSearchDeployments{Path.GetExtension(fullPath)}"
+                        )
+                    )
+                );
                 break;
             }
 
@@ -348,6 +358,11 @@ public static class CopilotChatServiceExtensions
                     chatStoreConfig.Cosmos.Database,
                     chatStoreConfig.Cosmos.OpenAIDeploymentContainer
                 );
+                aiSearchDeploymentStorageContext = new CosmosDbContext<AISearchDeployment>(
+                    chatStoreConfig.Cosmos.ConnectionString,
+                    chatStoreConfig.Cosmos.Database,
+                    chatStoreConfig.Cosmos.AISearchDeploymentContainer
+                );
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 break;
             }
@@ -371,6 +386,9 @@ public static class CopilotChatServiceExtensions
         );
         services.AddSingleton<OpenAIDeploymentRepository>(
             new OpenAIDeploymentRepository(openAIDeploymentStorageContext)
+        );
+        services.AddSingleton<AISearchDeploymentRepository>(
+            new AISearchDeploymentRepository(aiSearchDeploymentStorageContext)
         );
 
         return services;
@@ -445,9 +463,16 @@ public static class CopilotChatServiceExtensions
     /// <summary>
     /// Add deployment services
     /// </summary>
-    public static IServiceCollection AddDeploymentService(this IServiceCollection services)
+    public static IServiceCollection AddOpenAIDeploymentService(this IServiceCollection services)
     {
         services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSearchDeploymentService(this IServiceCollection services)
+    {
+        services.AddScoped<IQSearchDeploymentService, QAISearchDeploymentService>();
 
         return services;
     }

@@ -121,6 +121,7 @@ public class ChatPlugin
         SpecializationIndexRepository specializationIndexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQSearchDeploymentService qSearchDeploymentService,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
@@ -155,7 +156,8 @@ public class ChatPlugin
             specializationSourceRepository,
             specializationIndexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qSearchDeploymentService
         );
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag

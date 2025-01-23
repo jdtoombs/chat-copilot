@@ -28,7 +28,8 @@ public class QSearchService : IQSearchService
         SpecializationRepository specializationSourceRepository,
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
-        IQOpenAIDeploymentService qOpenAIDeploymentService
+        IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQSearchDeploymentService qSearchDeploymentService
     )
     {
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
@@ -36,7 +37,8 @@ public class QSearchService : IQSearchService
             specializationSourceRepository,
             indexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qSearchDeploymentService
         );
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
         this._httpClient = new(this._httpClientHandler);

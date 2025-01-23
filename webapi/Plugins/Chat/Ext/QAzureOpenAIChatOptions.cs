@@ -31,13 +31,6 @@ public class QAzureOpenAIChatOptions
     //     new List<OpenAIDeploymentConnection>();
 
     [Required]
-    public IList<AISearchDeploymentConnection> AISearchDeploymentConnections { get; set; } =
-        new List<AISearchDeploymentConnection>();
-
-    [Required]
-    public IList<QSpecializationIndex> SpecializationIndexes { get; set; } = new List<QSpecializationIndex>();
-
-    [Required]
     public BlobStorageOption BlobStorage { get; set; } = new BlobStorageOption();
 
     public class ChatCompletionDeployment
