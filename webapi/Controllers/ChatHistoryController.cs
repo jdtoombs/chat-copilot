@@ -72,6 +72,7 @@ public class ChatHistoryController : ControllerBase
         SpecializationRepository specializationSourceRepository,
         IOptions<PromptsOptions> promptsOptions,
         IOptions<QAzureOpenAIChatOptions> specializationOptions,
+        IQBlobStorage qBlobStorage,
         IAuthInfo authInfo
     )
     {
@@ -84,7 +85,8 @@ public class ChatHistoryController : ControllerBase
         this._promptOptions = promptsOptions.Value;
         this._qSpecializationService = new QSpecializationService(
             specializationSourceRepository,
-            specializationOptions.Value
+            specializationOptions.Value,
+            qBlobStorage
         );
         this._authInfo = authInfo;
     }
