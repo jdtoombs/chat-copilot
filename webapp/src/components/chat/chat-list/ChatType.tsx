@@ -76,6 +76,8 @@ export const ChatType: FC = () => {
                 dispatch(setAdminSelected(AdminScreen.FEEDBACK));
             } else if (selectedAdminSubTab === 'openAIDeployments') {
                 dispatch(setAdminSelected(AdminScreen.OPENAIDEPLOYMENT));
+            } else if (selectedAdminSubTab === 'aiSearchDeployments') {
+                dispatch(setAdminSelected(AdminScreen.AISEARCHDEPLOYMENT));
             }
         } else {
             dispatch(setSearchSelected({ selected: false, specializationId: '' }));
@@ -125,6 +127,9 @@ export const ChatType: FC = () => {
                         </Tab>
                         <Tab id="openAIDeployments" value={'openAIDeployments'}>
                             Open AI Deployments
+                        </Tab>
+                        <Tab id="aiSearchDeployments" value={'aiSearchDeployments'}>
+                            AI Search Deployments
                         </Tab>
                     </TabList>
                 </div>
