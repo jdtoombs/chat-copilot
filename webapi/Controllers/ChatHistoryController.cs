@@ -350,12 +350,7 @@ public class ChatHistoryController(
         // await sessionRepository.DeleteAsync(chatToDelete);
         await messageRelayHubContext // Even though we aren't truly deleting the chat anymore, the frontend should still operate as if we were.
             .Clients.Group(chatIdString)
-            .SendAsync(
-                ChatDeletedClientCall,
-                chatIdString,
-                authInfo.UserId,
-                cancellationToken: cancellationToken
-            );
+            .SendAsync(ChatDeletedClientCall, chatIdString, authInfo.UserId, cancellationToken: cancellationToken);
 
         return this.NoContent();
     }
