@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using CopilotChat.WebApi.Models.Storage;
+using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,8 +25,7 @@ public sealed class SemanticKernelProvider
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeployment> openAIDeployments,
-        IDictionary<string, string> secretNameKeyMap
+        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
     )
     {
         this._kernel = InitializeSemanticKernel(
@@ -34,8 +33,7 @@ public sealed class SemanticKernelProvider
             configuration,
             httpClientFactory,
             qAzureOpenAIChatOptions,
-            openAIDeployments,
-            secretNameKeyMap
+            openAIDeployments
         );
     }
 
@@ -49,8 +47,7 @@ public sealed class SemanticKernelProvider
         IConfiguration configuration,
         IHttpClientFactory httpClientFactory,
         QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeployment> openAIDeployments,
-        IDictionary<string, string> secretNameKeyMap
+        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
     )
     {
         var builder = Kernel.CreateBuilder();
@@ -64,26 +61,26 @@ public sealed class SemanticKernelProvider
             case string y when y.Equals("AzureOpenAIText", StringComparison.OrdinalIgnoreCase):
                 foreach (var openAIDeployment in openAIDeployments)
                 {
-                    foreach (var deployment in openAIDeployment.ChatCompletionDeployments)
+                    foreach (var chatCompletionDeployment in openAIDeployment.Deployment.ChatCompletionDeployments)
                     {
 #pragma warning disable CA2000 // No need to dispose of HttpClient instances from IHttpClientFactory
                         builder.AddAzureOpenAIChatCompletion(
-                            deployment.Name,
-                            openAIDeployment.Endpoint?.ToString(),
-                            secretNameKeyMap[openAIDeployment.SecretName],
+                            chatCompletionDeployment.Name,
+                            openAIDeployment.Deployment.Endpoint?.ToString(),
+                            openAIDeployment.ApiKey,
                             httpClient: httpClientFactory.CreateClient(),
-                            serviceId: $"{deployment.Name} ({openAIDeployment.Name})"
+                            serviceId: $"{chatCompletionDeployment.Name} ({openAIDeployment.Deployment.Name})"
                         );
                     }
-                    foreach (var deployment in openAIDeployment.ImageGenerationDeployments)
+                    foreach (var imageGenDeployment in openAIDeployment.Deployment.ImageGenerationDeployments)
                     {
 #pragma warning disable SKEXP0010 // Experimental method AddAzureOpenAITextToImage, suppressed instability warning
                         builder.AddAzureOpenAITextToImage(
-                            deployment,
-                            openAIDeployment.Endpoint?.ToString(),
-                            secretNameKeyMap[openAIDeployment.SecretName],
+                            imageGenDeployment,
+                            openAIDeployment.Deployment.Endpoint?.ToString(),
+                            openAIDeployment.ApiKey,
                             httpClient: httpClientFactory.CreateClient(),
-                            serviceId: deployment
+                            serviceId: imageGenDeployment
                         );
                     }
                 }

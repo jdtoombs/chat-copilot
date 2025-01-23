@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using CopilotChat.Shared;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Auth.Specializations;
@@ -395,6 +397,32 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
+    /// Add blob storage services
+    /// </summary>
+    public static IServiceCollection AddBlobStorage(this IServiceCollection services)
+    {
+        QAzureOpenAIChatOptions qAzureOpenAIChatOptions = services
+            .BuildServiceProvider()
+            .GetRequiredService<IOptions<QAzureOpenAIChatOptions>>()
+            .Value;
+
+        BlobServiceClient blobServiceClient = new(qAzureOpenAIChatOptions.BlobStorage.ConnectionString);
+
+        BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(
+            qAzureOpenAIChatOptions.BlobStorage.SpecializationContainerName
+        );
+
+        // Create a new container only if it does not exist
+        blobContainerClient.CreateIfNotExists(PublicAccessType.Blob);
+
+        services.AddSingleton<BlobContainerClient>(blobContainerClient);
+
+        services.AddScoped<IQBlobStorage, QBlobStorage>();
+
+        return services;
+    }
+
+    /// <summary>
     /// Add authorization services
     /// </summary>
     public static IServiceCollection AddChatCopilotAuthorization(this IServiceCollection services)
@@ -451,27 +479,21 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
-    /// Add emailing services
+    /// Add proprietary services
     /// </summary>
-    public static IServiceCollection AddEmailService(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        // specialization services
+        services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();
+
+        // email services
         services.AddScoped<IEmailSender, EmailSender>();
 
-        return services;
-    }
+        // completion services
+        services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
 
-    /// <summary>
-    /// Add deployment services
-    /// </summary>
-    public static IServiceCollection AddOpenAIDeploymentService(this IServiceCollection services)
-    {
+        // deployment services
         services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddSearchDeploymentService(this IServiceCollection services)
-    {
         services.AddScoped<IQSearchDeploymentService, QAISearchDeploymentService>();
 
         return services;

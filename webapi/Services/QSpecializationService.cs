@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
@@ -19,38 +18,19 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for specialization service.
 /// </summary>
-public class QSpecializationService : IQSpecializationService
+public class QSpecializationService(
+    SpecializationRepository specializationSourceRepository,
+    QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
+    IQBlobStorage qBlobStorage
+) : IQSpecializationService
 {
-    private SpecializationRepository _specializationSourceRepository;
-
-    private QAzureOpenAIChatOptions _qAzureOpenAIChatOptions;
-
-    private QBlobStorage _qBlobStorage;
-
-    public QSpecializationService(
-        SpecializationRepository specializationSourceRepository,
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions
-    )
-    {
-        this._specializationSourceRepository = specializationSourceRepository;
-        this._qAzureOpenAIChatOptions = qAzureOpenAIChatOptions;
-
-        BlobServiceClient blobServiceClient = new(qAzureOpenAIChatOptions.BlobStorage.ConnectionString);
-
-        BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient(
-            qAzureOpenAIChatOptions.BlobStorage.SpecializationContainerName
-        );
-
-        this._qBlobStorage = new QBlobStorage(blobContainerClient);
-    }
-
     /// <summary>
     /// Retrieve all specializations.
     /// </summary>
     /// <returns>The task result contains all specializations</returns>
     public Task<IEnumerable<Specialization>> GetAllSpecializations()
     {
-        return this._specializationSourceRepository.GetAllSpecializationsAsync();
+        return specializationSourceRepository.GetAllSpecializationsAsync();
     }
 
     /// <summary>
@@ -60,7 +40,7 @@ public class QSpecializationService : IQSpecializationService
     /// <returns>Returns the specialization source</returns>
     public Task<Specialization> GetSpecializationAsync(string id)
     {
-        return this._specializationSourceRepository.GetSpecializationAsync(id);
+        return specializationSourceRepository.GetSpecializationAsync(id);
     }
 
     /// <summary>
@@ -73,14 +53,14 @@ public class QSpecializationService : IQSpecializationService
         // Add the image to the blob storage or use the default image
         var imageFilePath =
             qSpecializationMutate.ImageFile == null
-                ? ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage)
-                : await this._qBlobStorage.AddBlobAsync(qSpecializationMutate.ImageFile);
+                ? ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.DefaultSpecializationImage)
+                : await qBlobStorage.AddBlobAsync(qSpecializationMutate.ImageFile);
 
         // Add the icon to the blob storage or use the default icon
         var iconFilePath =
             qSpecializationMutate.IconFile == null
-                ? ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon)
-                : await this._qBlobStorage.AddBlobAsync(qSpecializationMutate.IconFile);
+                ? ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.DefaultSpecializationIcon)
+                : await qBlobStorage.AddBlobAsync(qSpecializationMutate.IconFile);
 
         var deserializedSuggestions = JsonConvert.DeserializeObject<List<string>>(qSpecializationMutate.Suggestions);
 
@@ -114,7 +94,7 @@ public class QSpecializationService : IQSpecializationService
                 CanGenImages: qSpecializationMutate.CanGenImages
             );
 
-        await this._specializationSourceRepository.CreateAsync(specializationSource);
+        await specializationSourceRepository.CreateAsync(specializationSource);
 
         return specializationSource;
     }
@@ -133,7 +113,7 @@ public class QSpecializationService : IQSpecializationService
         QSpecializationMutate qSpecializationMutate
     )
     {
-        Specialization? specializationToUpdate = await this._specializationSourceRepository.FindByIdAsync(
+        Specialization? specializationToUpdate = await specializationSourceRepository.FindByIdAsync(
             specializationId.ToString()
         );
 
@@ -147,7 +127,7 @@ public class QSpecializationService : IQSpecializationService
             qSpecializationMutate.ImageFile,
             specializationToUpdate.ImageFilePath,
             Convert.ToBoolean(qSpecializationMutate.DeleteImageFile, CultureInfo.InvariantCulture),
-            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationImage)
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.DefaultSpecializationImage)
         );
 
         // Update the icon file and set the file path
@@ -155,7 +135,7 @@ public class QSpecializationService : IQSpecializationService
             qSpecializationMutate.IconFile,
             specializationToUpdate.IconFilePath,
             Convert.ToBoolean(qSpecializationMutate.DeleteIconFile, CultureInfo.InvariantCulture),
-            ResourceUtils.GetImageAsDataUri(this._qAzureOpenAIChatOptions.DefaultSpecializationIcon)
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.DefaultSpecializationIcon)
         );
 
         specializationToUpdate.IsActive = Convert.ToBoolean(
@@ -232,7 +212,7 @@ public class QSpecializationService : IQSpecializationService
             deserializedSuggestions != null ? deserializedSuggestions : specializationToUpdate.Suggestions;
         specializationToUpdate.CanGenImages = qSpecializationMutate.CanGenImages;
 
-        await this._specializationSourceRepository.UpsertAsync(specializationToUpdate);
+        await specializationSourceRepository.UpsertAsync(specializationToUpdate);
 
         return specializationToUpdate;
     }
@@ -244,11 +224,11 @@ public class QSpecializationService : IQSpecializationService
     /// <returns>The task result contains the delete state</returns>
     public async Task<bool> DeleteSpecialization(Guid specializationId)
     {
-        Specialization? specializationToDelete = await this._specializationSourceRepository.FindByIdAsync(
+        Specialization? specializationToDelete = await specializationSourceRepository.FindByIdAsync(
             specializationId.ToString()
         );
 
-        await this._specializationSourceRepository.DeleteAsync(specializationToDelete);
+        await specializationSourceRepository.DeleteAsync(specializationToDelete);
 
         // Attempt to create URIs for image and icon
         if (
@@ -257,15 +237,15 @@ public class QSpecializationService : IQSpecializationService
         )
         {
             // Delete image file from blob storage if it exists
-            if (await this._qBlobStorage.BlobExistsAsync(imageFileUri))
+            if (await qBlobStorage.BlobExistsAsync(imageFileUri))
             {
-                await this._qBlobStorage.DeleteBlobByURIAsync(imageFileUri);
+                await qBlobStorage.DeleteBlobByURIAsync(imageFileUri);
             }
 
             // Delete icon file from blob storage if it exists
-            if (await this._qBlobStorage.BlobExistsAsync(iconFileUri))
+            if (await qBlobStorage.BlobExistsAsync(iconFileUri))
             {
-                await this._qBlobStorage.DeleteBlobByURIAsync(iconFileUri);
+                await qBlobStorage.DeleteBlobByURIAsync(iconFileUri);
             }
         }
         return true;
@@ -299,7 +279,7 @@ public class QSpecializationService : IQSpecializationService
             {
                 // Update the order
                 specialization.Order = newOrder;
-                upsertTasks.Add(this._specializationSourceRepository.UpsertAsync(specialization));
+                upsertTasks.Add(specializationSourceRepository.UpsertAsync(specialization));
             }
         }
         await Task.WhenAll(upsertTasks);
@@ -328,25 +308,25 @@ public class QSpecializationService : IQSpecializationService
             return filePathDefault;
         }
 
-        var blobExists = await this._qBlobStorage.BlobExistsAsync(fileUri);
+        var blobExists = await qBlobStorage.BlobExistsAsync(fileUri);
 
         // 1. File provided and a default file path is stored in the DB
         if (file != null && !blobExists)
         {
-            return await this._qBlobStorage.AddBlobAsync(file);
+            return await qBlobStorage.AddBlobAsync(file);
         }
 
         // 2. File provided and a Blob Storage URI is stored in the DB
         if (file != null && blobExists)
         {
-            await this._qBlobStorage.DeleteBlobByURIAsync(fileUri);
-            return await this._qBlobStorage.AddBlobAsync(file);
+            await qBlobStorage.DeleteBlobByURIAsync(fileUri);
+            return await qBlobStorage.AddBlobAsync(file);
         }
 
         // 3. File not provided and a default file path is stored in the DB and delete flag is set
         if (file == null && blobExists && delete)
         {
-            await this._qBlobStorage.DeleteBlobByURIAsync(fileUri);
+            await qBlobStorage.DeleteBlobByURIAsync(fileUri);
 
             return filePathDefault;
         }

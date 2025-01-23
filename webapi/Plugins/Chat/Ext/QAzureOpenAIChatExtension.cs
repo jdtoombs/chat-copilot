@@ -47,13 +47,15 @@ public class QAzureOpenAIChatExtension
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSearchDeploymentService qSearchDeploymentService
+        IQSearchDeploymentService qSearchDeploymentService,
+        IQBlobStorage qBlobStorage
     )
     {
         this._qAzureOpenAIChatOptions = qAzureOpenAIChatOptions;
         this._qSpecializationService = new QSpecializationService(
             specializationSourceRepository,
-            qAzureOpenAIChatOptions
+            qAzureOpenAIChatOptions,
+            qBlobStorage
         );
         this._qSpecializationIndexService = new QSpecializationIndexService(indexRepository);
         this._qOpenAIDeploymentService = qOpenAIDeploymentService;
