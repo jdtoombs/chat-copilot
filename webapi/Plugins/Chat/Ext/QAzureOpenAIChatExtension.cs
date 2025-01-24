@@ -21,14 +21,14 @@ public class QAzureOpenAIChatExtension(
     /// <summary>
     /// Default specialization key.
     /// </summary>
-    public string DefaultSpecialization { get; } = "general";
+    private string DefaultSpecialization { get; } = "general";
 
     /// <summary>
     /// Name of the key which carries the specialization
     /// </summary>
     public string ContextKey { get; } = "specialization";
 
-    public bool isEnabled(string? specializationId)
+    private bool isEnabled(string? specializationId)
     {
         return qAzureOpenAIChatOptions.Enabled && specializationId != this.DefaultSpecialization;
     }
@@ -96,7 +96,7 @@ public class QAzureOpenAIChatExtension(
     }
 #pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
+    private Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
     {
         return new Uri(
             connectionEndpoint,
@@ -104,7 +104,7 @@ public class QAzureOpenAIChatExtension(
         );
     }
 
-    public QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
+    private QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
     {
         return qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(connection =>
             connection.Name == connectionName
@@ -128,37 +128,5 @@ public class QAzureOpenAIChatExtension(
             aiSearchDeploymentConnection?.APIKey,
             aiSearchDeploymentConnection?.Endpoint?.ToString()
         );
-    }
-
-    /// <summary>
-    /// Retrieve all chat completion deployments from the available OpenAI deployment connections.
-    /// </summary>
-    // public List<QAzureOpenAIChatOptions.ChatCompletionDeployment> GetAllChatCompletionDeployments()
-    // {
-    //     var chatCompletionDeployments = new List<QAzureOpenAIChatOptions.ChatCompletionDeployment>();
-    //     foreach (
-    //         QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in qAzureOpenAIChatOptions.OpenAIDeploymentConnections
-    //     )
-    //     {
-    //         foreach (var deployment in connection.ChatCompletionDeployments)
-    //         {
-    //             var deploymentWithConnection = new QAzureOpenAIChatOptions.ChatCompletionDeployment
-    //             {
-    //                 Name = $"{deployment.Name} ({connection.Name})",
-    //                 CompletionTokenLimit = deployment.CompletionTokenLimit,
-    //             };
-    //             chatCompletionDeployments.Add(deploymentWithConnection);
-    //         }
-    //     }
-    //     return chatCompletionDeployments;
-    // }
-
-    /// <summary>
-    /// Get the default chat completion deployment.
-    /// </summary>
-#pragma warning disable CA1024
-    public string GetDefaultChatCompletionDeployment()
-    {
-        return qAzureOpenAIChatOptions.DefaultModel;
     }
 }
