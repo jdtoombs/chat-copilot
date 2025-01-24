@@ -99,7 +99,7 @@ public class QAzureOpenAIChatExtension
         }
 
         var openAIDeploymentConnection = await this._qOpenAIDeploymentService.GetDeployment(
-            specialization?.OpenAIDeploymentId ?? ""
+            specialization.OpenAIDeploymentId ?? ""
         );
         var openAIDeploymentApiKey = await this._qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(
             openAIDeploymentConnection
