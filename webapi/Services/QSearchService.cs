@@ -82,7 +82,6 @@ public class QSearchService : IQSearchService
     {
         if (searchResponse != null)
         {
-#pragma warning disable CS8601 // Possible null reference assignment.
             var groupedByfilename = searchResponse
                 .values.Where(res => res.highlights != null)
                 .GroupBy(value => value.filename)
@@ -101,7 +100,6 @@ public class QSearchService : IQSearchService
                         )
                         .ToArray(),
                 });
-#pragma warning restore CS8601 // Possible null reference assignment.
             return new QSearchResult { count = searchResponse.Count, values = groupedByfilename };
         }
         return new QSearchResult();
