@@ -126,6 +126,7 @@ public class ChatPlugin
         IOptions<DocumentMemoryOptions> documentImportOptions,
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         IQSpecializationService qSpecializationService,
+        IQSpecializationIndexService qSpecializationIndexService,
         SecretClient secretClient,
         ILogger logger,
         IQBlobStorage qBlobStorage,
@@ -151,12 +152,8 @@ public class ChatPlugin
         );
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
             qAzureOpenAIChatOptions.Value,
-            specializationSourceRepository,
-            specializationIndexRepository,
-            openAIDeploymentRepository,
             qOpenAIDeploymentService,
-            qSpecializationService,
-            qBlobStorage
+            qSpecializationIndexService
         );
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
