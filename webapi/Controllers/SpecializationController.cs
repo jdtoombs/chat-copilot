@@ -21,35 +21,11 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for managing specializations.
 /// </summary>
 [ApiController]
-public class SpecializationController : ControllerBase
+public class SpecializationController(
+    ILogger<SpecializationController> logger,
+    IQSpecializationService qSpecializationService
+) : ControllerBase
 {
-    private readonly ILogger<SpecializationController> _logger;
-
-    private readonly IQSpecializationService _qspecializationService;
-
-    private readonly QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
-
-    private readonly PromptsOptions _promptOptions;
-
-    public SpecializationController(
-        ILogger<SpecializationController> logger,
-        IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        IOptions<PromptsOptions> promptsOptions,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSpecializationService qSpecializationService,
-        IQSpecializationIndexService qSpecializationIndexService
-    )
-    {
-        this._logger = logger;
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            specializationOptions,
-            qOpenAIDeploymentService,
-            qSpecializationIndexService
-        );
-        this._qspecializationService = qSpecializationService;
-        this._promptOptions = promptsOptions.Value;
-    }
-
     /// <summary>
     /// Get all available specializations maintained in the system.
     /// </summary>
@@ -61,7 +37,7 @@ public class SpecializationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<OkObjectResult> GetAllSpecializations()
     {
-        var specializations = await this._qspecializationService.GetAllSpecializations();
+        var specializations = await qSpecializationService.GetAllSpecializations();
 
         var specializationResponses = specializations.Select(s => new QSpecializationResponse(s));
 
@@ -73,35 +49,6 @@ public class SpecializationController : ControllerBase
 
         return this.Ok(orderedSpecializations);
     }
-
-    /// <summary>
-    /// Get all available specialization indexes maintained in the system.
-    /// </summary>
-    /// <returns>A list of available specialization indexes. An empty list if no specialization indexes are found.</returns>
-    // [HttpGet]
-    // [Route("specialization/indexes")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // public List<string> GetAllSpecializationIndexes()
-    // {
-    //     return this._qAzureOpenAIChatExtension.GetAllSpecializationIndexNames();
-    // }
-
-    /// <summary>
-    /// Get all chat completion deployments.
-    /// </summary>
-    /// <returns>A list of chat completion deployments.</returns>
-    // [HttpGet]
-    // [Route("specialization/deployments")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    // [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    // [ProducesResponseType(StatusCodes.Status404NotFound)]
-    // public List<string> GetAllChatCompletionDeployments()
-    // {
-    //     return this._qAzureOpenAIChatExtension.GetAllChatCompletionDeployments().Select(deploy => deploy.Name).ToList();
-    // }
 
     /// <summary>
     /// Creates a new specialization.
@@ -123,14 +70,14 @@ public class SpecializationController : ControllerBase
     {
         try
         {
-            var _specializationsource = await this._qspecializationService.SaveSpecialization(qSpecializationMutate);
+            var _specializationsource = await qSpecializationService.SaveSpecialization(qSpecializationMutate);
 
             QSpecializationResponse qSpecializationResponse = new(_specializationsource);
             return this.Ok(qSpecializationResponse);
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Specialization create threw an exception");
+            logger.LogError(ex, "Specialization create threw an exception");
 
             return this.StatusCode(500, $"Failed to create specialization for label '{qSpecializationMutate.Label}'.");
         }
@@ -154,7 +101,7 @@ public class SpecializationController : ControllerBase
     {
         try
         {
-            Specialization? specializationToEdit = await this._qspecializationService.UpdateSpecialization(
+            Specialization? specializationToEdit = await qSpecializationService.UpdateSpecialization(
                 specializationId,
                 qSpecializationMutate
             );
@@ -169,7 +116,7 @@ public class SpecializationController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Specialization update threw an exception");
+            logger.LogError(ex, "Specialization update threw an exception");
 
             return this.StatusCode(500, $"Failed to edit specialization for id '{specializationId}'.");
         }
@@ -190,11 +137,11 @@ public class SpecializationController : ControllerBase
     {
         try
         {
-            Specialization specialization = await this._qspecializationService.GetSpecializationAsync(
+            Specialization specialization = await qSpecializationService.GetSpecializationAsync(
                 specializationId.ToString()
             );
 
-            bool result = await this._qspecializationService.DeleteSpecialization(specializationId);
+            bool result = await qSpecializationService.DeleteSpecialization(specializationId);
 
             if (result)
             {
@@ -205,7 +152,7 @@ public class SpecializationController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Specialization delete threw an exception");
+            logger.LogError(ex, "Specialization delete threw an exception");
 
             return this.StatusCode(500, $"Failed to delete specialization for id '{specializationId}'.");
         }
@@ -220,12 +167,12 @@ public class SpecializationController : ControllerBase
     {
         try
         {
-            await this._qspecializationService.OrderSpecializations(qSpecializationOrder);
+            await qSpecializationService.OrderSpecializations(qSpecializationOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Specialization swap order threw an exception");
+            logger.LogError(ex, "Specialization swap order threw an exception");
 
             return this.StatusCode(500, $"Failed to order specializations: {ex.Message}.");
         }
