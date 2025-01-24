@@ -21,44 +21,15 @@ using Microsoft.KernelMemory;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class ChatArchiveController : ControllerBase
+public class ChatArchiveController(
+    IKernelMemory memoryClient,
+    ChatSessionRepository chatRepository,
+    ChatMessageRepository chatMessageRepository,
+    ChatArchiveEmbeddingConfig embeddingConfig,
+    IOptions<PromptsOptions> promptOptions,
+    ILogger<ChatArchiveController> logger
+) : ControllerBase
 {
-    private readonly ILogger<ChatArchiveController> _logger;
-    private readonly IKernelMemory _memoryClient;
-    private readonly ChatSessionRepository _chatRepository;
-    private readonly ChatMessageRepository _chatMessageRepository;
-    private readonly ChatParticipantRepository _chatParticipantRepository;
-    private readonly ChatArchiveEmbeddingConfig _embeddingConfig;
-    private readonly PromptsOptions _promptOptions;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="memoryClient">Memory client.</param>
-    /// <param name="chatRepository">The chat session repository.</param>
-    /// <param name="chatMessageRepository">The chat message repository.</param>
-    /// <param name="chatParticipantRepository">The chat participant repository.</param>
-    /// <param name="promptOptions">The document memory options.</param>
-    /// <param name="logger">The logger.</param>
-    public ChatArchiveController(
-        IKernelMemory memoryClient,
-        ChatSessionRepository chatRepository,
-        ChatMessageRepository chatMessageRepository,
-        ChatParticipantRepository chatParticipantRepository,
-        ChatArchiveEmbeddingConfig embeddingConfig,
-        IOptions<PromptsOptions> promptOptions,
-        ILogger<ChatArchiveController> logger
-    )
-    {
-        this._memoryClient = memoryClient;
-        this._logger = logger;
-        this._chatRepository = chatRepository;
-        this._chatMessageRepository = chatMessageRepository;
-        this._chatParticipantRepository = chatParticipantRepository;
-        this._embeddingConfig = embeddingConfig;
-        this._promptOptions = promptOptions.Value;
-    }
-
     /// <summary>
     /// Download a chat archive.
     /// </summary>
@@ -76,7 +47,7 @@ public class ChatArchiveController : ControllerBase
         CancellationToken cancellationToken = default
     )
     {
-        this._logger.LogDebug("Received call to download a chat archive");
+        logger.LogDebug("Received call to download a chat archive");
 
         var chatArchive = await this.CreateChatArchiveAsync(chatId, cancellationToken);
 
@@ -95,11 +66,11 @@ public class ChatArchiveController : ControllerBase
         var chatArchive = new ChatArchive
         {
             // Get embedding configuration
-            EmbeddingConfigurations = this._embeddingConfig,
+            EmbeddingConfigurations = embeddingConfig,
         };
 
         // get the chat title
-        ChatSession chat = await this._chatRepository.FindByIdAsync(chatIdString);
+        ChatSession chat = await chatRepository.FindByIdAsync(chatIdString);
         chatArchive.ChatTitle = chat.Title;
 
         // get the system description
@@ -108,7 +79,7 @@ public class ChatArchiveController : ControllerBase
         // get the chat history
         chatArchive.ChatHistory = await this.GetAllChatMessagesAsync(chatIdString);
 
-        foreach (var memory in this._promptOptions.MemoryMap.Keys)
+        foreach (var memory in promptOptions.Value.MemoryMap.Keys)
         {
             chatArchive.Embeddings.Add(
                 memory,
@@ -121,7 +92,7 @@ public class ChatArchiveController : ControllerBase
             "GlobalDocuments",
             await this.GetMemoryRecordsAndAppendToEmbeddingsAsync(
                 Guid.Empty.ToString(),
-                this._promptOptions.DocumentMemoryName,
+                promptOptions.Value.DocumentMemoryName,
                 cancellationToken
             )
         );
@@ -131,7 +102,7 @@ public class ChatArchiveController : ControllerBase
             "ChatDocuments",
             await this.GetMemoryRecordsAndAppendToEmbeddingsAsync(
                 chatIdString,
-                this._promptOptions.DocumentMemoryName,
+                promptOptions.Value.DocumentMemoryName,
                 cancellationToken
             )
         );
@@ -157,8 +128,8 @@ public class ChatArchiveController : ControllerBase
         List<Citation> collectionMemoryRecords;
         try
         {
-            var result = await this._memoryClient.SearchMemoryAsync(
-                this._promptOptions.MemoryIndexName,
+            var result = await memoryClient.SearchMemoryAsync(
+                promptOptions.Value.MemoryIndexName,
                 query: "*", // dummy query since we don't care about relevance. An empty string will cause exception.
                 relevanceThreshold: -1, // no relevance required since the collection only has one entry
                 chatId,
@@ -171,7 +142,7 @@ public class ChatArchiveController : ControllerBase
         catch (Exception connectorException) when (!connectorException.IsCriticalException())
         {
             // A store exception might be thrown if the collection does not exist, depending on the memory store connector.
-            this._logger.LogError(connectorException, "Cannot search collection {0}", memoryName);
+            logger.LogError(connectorException, "Cannot search collection {0}", memoryName);
             collectionMemoryRecords = new();
         }
 
@@ -185,6 +156,6 @@ public class ChatArchiveController : ControllerBase
     /// <returns>The list of chat messages in descending order of the timestamp</returns>
     private async Task<List<CopilotChatMessage>> GetAllChatMessagesAsync(string chatId)
     {
-        return (await this._chatMessageRepository.FindByChatIdAsync(chatId)).ToList();
+        return (await chatMessageRepository.FindByChatIdAsync(chatId)).ToList();
     }
 }
