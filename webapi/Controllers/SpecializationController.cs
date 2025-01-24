@@ -7,13 +7,10 @@ using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Models.Storage;
-using CopilotChat.WebApi.Options;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Controllers;
 
