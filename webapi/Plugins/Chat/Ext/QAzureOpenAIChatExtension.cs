@@ -16,7 +16,7 @@ public class QAzureOpenAIChatExtension(
     QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
     IQOpenAIDeploymentService qOpenAIDeploymentService,
     IQSpecializationIndexService qSpecializationIndexService
-)
+) : IQAzureOpenAIChatExtension
 {
     /// <summary>
     /// Default specialization key.
