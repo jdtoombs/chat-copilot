@@ -50,7 +50,7 @@ public class ChatController(
     IDictionary<string, Plugin> plugins
 ) : ControllerBase, IDisposable
 {
-    private readonly List<IDisposable> _disposables = new List<IDisposable>();
+    private readonly List<IDisposable> _disposables = new();
 
     private const string ChatPluginName = nameof(ChatPlugin);
     private const string ChatFunctionName = "Chat";
