@@ -77,7 +77,7 @@ public class ChatPlugin
     /// <summary>
     /// The QSpecializationService used for managing specializations.
     /// </summary>
-    private readonly QSpecializationService _qSpecializationService;
+    private readonly IQSpecializationService _qSpecializationService;
 
     private readonly IQOpenAIDeploymentService _qOpenAIDeploymentService;
 
@@ -125,6 +125,7 @@ public class ChatPlugin
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
+        IQSpecializationService qSpecializationService,
         SecretClient secretClient,
         ILogger logger,
         IQBlobStorage qBlobStorage,
@@ -140,11 +141,7 @@ public class ChatPlugin
         this._messageRelayHubContext = messageRelayHubContext;
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
-        this._qSpecializationService = new QSpecializationService(
-            specializationSourceRepository,
-            qAzureOpenAIChatOptions.Value,
-            qBlobStorage
-        );
+        this._qSpecializationService = qSpecializationService;
         this._qOpenAIDeploymentService = qOpenAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
@@ -158,6 +155,7 @@ public class ChatPlugin
             specializationIndexRepository,
             openAIDeploymentRepository,
             qOpenAIDeploymentService,
+            qSpecializationService,
             qBlobStorage
         );
         this._contentSafety = contentSafety;
