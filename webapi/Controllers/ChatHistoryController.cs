@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 
 namespace CopilotChat.WebApi.Controllers;
@@ -39,7 +40,7 @@ public class ChatHistoryController(
     ChatMessageRepository messageRepository,
     ChatParticipantRepository participantRepository,
     ChatMemorySourceRepository sourceRepository,
-    PromptsOptions promptOptions,
+    IOptions<PromptsOptions> promptOptions,
     IQSpecializationService qSpecializationService,
     IAuthInfo authInfo
 ) : ControllerBase
@@ -68,16 +69,16 @@ public class ChatHistoryController(
 
         var specialization = await qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
 
-        var systemDescription = promptOptions.SystemDescription;
+        var systemDescription = promptOptions.Value.SystemDescription;
         var newChat = new ChatSession(
             chatParameters.Title,
-            specialization?.RoleInformation ?? promptOptions.SystemPersona,
+            specialization?.RoleInformation ?? promptOptions.Value.SystemPersona,
             chatParameters.specializationId,
             chatParameters.Id
         );
         await sessionRepository.CreateAsync(newChat);
         var initialMessage = string.IsNullOrEmpty(specialization?.InitialChatMessage)
-            ? promptOptions.InitialBotMessage
+            ? promptOptions.Value.InitialBotMessage
             : specialization.InitialChatMessage;
 
         // Create initial bot message
@@ -271,7 +272,7 @@ public class ChatHistoryController(
             }
             else
             {
-                chat!.SystemDescription = promptOptions.SystemDescription;
+                chat!.SystemDescription = promptOptions.Value.SystemDescription;
             }
             chat!.specializationId = chatParameters.SpecializationId;
             await sessionRepository.UpsertAsync(chat);
@@ -418,7 +419,7 @@ public class ChatHistoryController(
             // Create deleted chat history bot message
             var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
                 chat.Id,
-                promptOptions.ChatHistoryDeletedMessage,
+                promptOptions.Value.ChatHistoryDeletedMessage,
                 string.Empty,
                 null,
                 TokenUtils.EmptyTokenUsages()
@@ -474,7 +475,7 @@ public class ChatHistoryController(
 
         // Create and store the tasks for deleting semantic memories.
         cleanupTasks.Add(
-            memoryClient.RemoveChatMemoriesAsync(promptOptions.MemoryIndexName, chatId, cancellationToken)
+            memoryClient.RemoveChatMemoriesAsync(promptOptions.Value.MemoryIndexName, chatId, cancellationToken)
         );
 
         // Create a task that represents the completion of all cleanupTasks

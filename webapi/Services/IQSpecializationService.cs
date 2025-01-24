@@ -47,4 +47,6 @@ public interface IQSpecializationService
     /// <param name="specializationId">Unique identifier of the specialization</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the delete state</returns>
     Task<bool> DeleteSpecialization(Guid specializationId);
+
+    Task OrderSpecializations(OrderMapGuidToInt specializationOrder);
 }
