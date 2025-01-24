@@ -10,6 +10,8 @@ using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
 /// <summary>
 /// Chat extension class to support Azure search indexes for bot response.
 /// </summary>
@@ -34,7 +36,6 @@ public class QAzureOpenAIChatExtension(
         return qAzureOpenAIChatOptions.Value.Enabled && specializationId != this.DefaultSpecialization;
     }
 
-#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     public async Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization)
     {
         if (
@@ -95,7 +96,6 @@ public class QAzureOpenAIChatExtension(
             ),
         };
     }
-#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
     private Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
     {
