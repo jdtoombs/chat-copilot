@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
 using CopilotChat.WebApi.Models.Storage;
@@ -165,29 +164,6 @@ public class QAzureOpenAIChatExtension
         var apiKey = await this._qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
         return (specializationIndex.Name, apiKey, aiSearchDeploymentConnection?.Endpoint?.ToString());
     }
-
-    /// <summary>
-    /// Retrieve all chat completion deployments from the available OpenAI deployment connections.
-    /// </summary>
-    // public List<QAzureOpenAIChatOptions.ChatCompletionDeployment> GetAllChatCompletionDeployments()
-    // {
-    //     var chatCompletionDeployments = new List<QAzureOpenAIChatOptions.ChatCompletionDeployment>();
-    //     foreach (
-    //         QAzureOpenAIChatOptions.OpenAIDeploymentConnection connection in this._qAzureOpenAIChatOptions.OpenAIDeploymentConnections
-    //     )
-    //     {
-    //         foreach (var deployment in connection.ChatCompletionDeployments)
-    //         {
-    //             var deploymentWithConnection = new QAzureOpenAIChatOptions.ChatCompletionDeployment
-    //             {
-    //                 Name = $"{deployment.Name} ({connection.Name})",
-    //                 CompletionTokenLimit = deployment.CompletionTokenLimit,
-    //             };
-    //             chatCompletionDeployments.Add(deploymentWithConnection);
-    //         }
-    //     }
-    //     return chatCompletionDeployments;
-    // }
 
     /// <summary>
     /// Get the default chat completion deployment.
