@@ -10,7 +10,6 @@ using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
-using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -30,32 +29,22 @@ public class SpecializationController : ControllerBase
 
     private readonly QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
-    private readonly QAzureOpenAIChatOptions _qAzureOpenAIChatOptions;
-
     private readonly PromptsOptions _promptOptions;
 
     public SpecializationController(
         ILogger<SpecializationController> logger,
         IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository indexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
         IOptions<PromptsOptions> promptsOptions,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
         IQSpecializationService qSpecializationService,
-        IQBlobStorage qBlobStorage
+        IQSpecializationIndexService qSpecializationIndexService
     )
     {
         this._logger = logger;
-        this._qAzureOpenAIChatOptions = specializationOptions.Value;
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
             specializationOptions.Value,
-            specializationSourceRepository,
-            indexRepository,
-            openAIDeploymentRepository,
             qOpenAIDeploymentService,
-            qSpecializationService,
-            qBlobStorage
+            qSpecializationIndexService
         );
         this._qspecializationService = qSpecializationService;
         this._promptOptions = promptsOptions.Value;
