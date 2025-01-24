@@ -9,5 +9,6 @@ namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 public interface IQAzureOpenAIChatExtension
 {
     Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization);
+
     Task<(string? indexName, string? ApiKey, string? Endpoint)> GetAISearchDeploymentConnectionDetails(string indexId);
 }

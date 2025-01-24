@@ -52,8 +52,8 @@ public class QAzureOpenAIChatExtension(
             return null;
         }
 
-        var aiSearchDeploymentConnection = qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(c =>
-            c.Name == qSpecializationIndex.AISearchDeploymentConnection
+        var aiSearchDeploymentConnection = qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(
+            c => c.Name == qSpecializationIndex.AISearchDeploymentConnection
         );
         if (aiSearchDeploymentConnection == null)
         {
