@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Services;
-using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,23 +10,11 @@ using Microsoft.Extensions.Logging;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class SpecializationIndexController : ControllerBase
-{
-    private readonly ILogger<SpecializationIndexController> _logger;
-
-    private readonly SpecializationIndexRepository _indexRepository;
-    private readonly QSpecializationIndexService _qSpecializationIndexService;
-
-    public SpecializationIndexController(
+public class SpecializationIndexController(
         ILogger<SpecializationIndexController> logger,
-        SpecializationIndexRepository indexRepository
-    )
-    {
-        this._logger = logger;
-        this._indexRepository = indexRepository;
-        this._qSpecializationIndexService = new QSpecializationIndexService(indexRepository);
-    }
-
+        IQSpecializationIndexService qSpecializationIndexService
+    ) : ControllerBase
+{
     [HttpGet]
     [Route("indexes")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,7 +22,7 @@ public class SpecializationIndexController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetIndexesAsync()
     {
-        var indexes = await this._qSpecializationIndexService.GetAllIndexes();
+        var indexes = await qSpecializationIndexService.GetAllIndexes();
         return this.Ok(indexes);
     }
 
@@ -50,14 +37,14 @@ public class SpecializationIndexController : ControllerBase
     {
         try
         {
-            var index = await this._qSpecializationIndexService.SaveIndex(indexCreate);
+            var index = await qSpecializationIndexService.SaveIndex(indexCreate);
             var specializationResponse = new QSpecializationIndexResponse(index);
 
             return this.Ok(specializationResponse);
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Index creation threw an exception");
+            logger.LogError(ex, "Index creation threw an exception");
 
             return this.StatusCode(500, "Failed to create index.");
         }
@@ -75,7 +62,7 @@ public class SpecializationIndexController : ControllerBase
     {
         try
         {
-            var indexToEdit = await this._qSpecializationIndexService.UpdateIndex(indexId, qIndexMutate);
+            var indexToEdit = await qSpecializationIndexService.UpdateIndex(indexId, qIndexMutate);
             if (indexToEdit != null)
             {
                 return this.Ok(indexToEdit);
@@ -84,7 +71,7 @@ public class SpecializationIndexController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Index update threw an exception");
+            logger.LogError(ex, "Index update threw an exception");
 
             return this.StatusCode(500, $"Failed to update index for id '{indexId}'.");
         }
@@ -100,7 +87,7 @@ public class SpecializationIndexController : ControllerBase
     {
         try
         {
-            var indexToDelete = await this._qSpecializationIndexService.DeleteIndex(indexId);
+            var indexToDelete = await qSpecializationIndexService.DeleteIndex(indexId);
             if (indexToDelete != null)
             {
                 return this.Ok(true);
@@ -109,7 +96,7 @@ public class SpecializationIndexController : ControllerBase
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Index delete threw an exception");
+            logger.LogError(ex, "Index delete threw an exception");
 
             return this.StatusCode(500, $"Failed to delete index for id '{indexId}'.");
         }
@@ -124,12 +111,12 @@ public class SpecializationIndexController : ControllerBase
     {
         try
         {
-            await this._qSpecializationIndexService.OrderSpecializations(qSpecializationOrder);
+            await qSpecializationIndexService.OrderSpecializations(qSpecializationOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)
         {
-            this._logger.LogError(ex, "Index swap order threw an exception");
+            logger.LogError(ex, "Index swap order threw an exception");
 
             return this.StatusCode(500, $"Failed to order specializations: {ex.Message}.");
         }
