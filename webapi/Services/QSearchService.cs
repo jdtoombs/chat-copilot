@@ -10,6 +10,7 @@ using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -24,7 +25,7 @@ public class QSearchService : IQSearchService
     private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
     public QSearchService(
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
+        IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         SpecializationRepository specializationSourceRepository,
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,

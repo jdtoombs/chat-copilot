@@ -42,7 +42,7 @@ public class SpecializationController : ControllerBase
     {
         this._logger = logger;
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            specializationOptions.Value,
+            specializationOptions,
             qOpenAIDeploymentService,
             qSpecializationIndexService
         );

@@ -36,7 +36,7 @@ public class SearchController : ControllerBase
     {
         this._logger = logger;
         this._qSearchService = new QSearchService(
-            specializationOptions.Value,
+            specializationOptions,
             specializationSourceRepository,
             specializationIndexRepository,
             openAIDeploymentRepository,

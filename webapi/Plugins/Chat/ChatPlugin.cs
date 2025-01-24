@@ -151,7 +151,7 @@ public class ChatPlugin
             logger
         );
         this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions.Value,
+            qAzureOpenAIChatOptions,
             qOpenAIDeploymentService,
             qSpecializationIndexService
         );
