@@ -12,10 +12,8 @@ using CopilotChat.WebApi.Utilities;
 
 namespace CopilotChat.WebApi.Services;
 
-public class UserFeedbackService(
-    ChatSessionRepository sessionRepository,
-    ChatMessageRepository messageRepository
-) : IUserFeedbackService
+public class UserFeedbackService(ChatSessionRepository sessionRepository, ChatMessageRepository messageRepository)
+    : IUserFeedbackService
 {
     /// <summary>
     /// Searches for user feedback items based on the provided filter criteria.
