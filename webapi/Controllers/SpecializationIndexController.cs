@@ -11,9 +11,9 @@ namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
 public class SpecializationIndexController(
-        ILogger<SpecializationIndexController> logger,
-        IQSpecializationIndexService qSpecializationIndexService
-    ) : ControllerBase
+    ILogger<SpecializationIndexController> logger,
+    IQSpecializationIndexService qSpecializationIndexService
+) : ControllerBase
 {
     [HttpGet]
     [Route("indexes")]
