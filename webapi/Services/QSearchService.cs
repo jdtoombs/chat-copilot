@@ -10,7 +10,6 @@ using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
-using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -22,24 +21,14 @@ public class QSearchService : IQSearchService
     private readonly HttpClient _httpClient;
     private readonly HttpClientHandler? _httpClientHandler;
     private readonly SpecializationRepository _specializationRepository;
-    private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
     public QSearchService(
-        IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository indexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSpecializationService qSpecializationService,
-        IQSpecializationIndexService qSpecializationIndexService,
-        IQBlobStorage qBlobStorage
+        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension
     )
     {
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions,
-            qOpenAIDeploymentService,
-            qSpecializationIndexService
-        );
+        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
         this._httpClient = new(this._httpClientHandler);
         this._specializationRepository = specializationSourceRepository;
