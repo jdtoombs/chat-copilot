@@ -461,30 +461,20 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
-    /// Add emailing services
+    /// Add proprietary services
     /// </summary>
-    public static IServiceCollection AddEmailService(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        // specialization services
+        services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();
+
+        // email services
         services.AddScoped<IEmailSender, EmailSender>();
 
-        return services;
-    }
-
-    /// <summary>
-    /// Add Single message service
-    /// </summary>
-    public static IServiceCollection AddSingleMessageCompletionService(this IServiceCollection services)
-    {
+        // completion services
         services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
 
-        return services;
-    }
-
-    /// <summary>
-    /// Add deployment services
-    /// </summary>
-    public static IServiceCollection AddDeploymentService(this IServiceCollection services)
-    {
+        // deployment services
         services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
 
         return services;

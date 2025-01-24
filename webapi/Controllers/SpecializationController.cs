@@ -41,7 +41,8 @@ public class SpecializationController : ControllerBase
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IOptions<PromptsOptions> promptsOptions,
-        IQOpenAIDeploymentService qOpenAIDeploymentService
+        IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQBlobStorage qBlobStorage
     )
     {
         this._logger = logger;
@@ -51,11 +52,13 @@ public class SpecializationController : ControllerBase
             specializationSourceRepository,
             indexRepository,
             openAIDeploymentRepository,
-            qOpenAIDeploymentService
+            qOpenAIDeploymentService,
+            qBlobStorage
         );
         this._qspecializationService = new QSpecializationService(
             specializationSourceRepository,
-            specializationOptions.Value
+            specializationOptions.Value,
+            qBlobStorage
         );
         this._promptOptions = promptsOptions.Value;
     }

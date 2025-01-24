@@ -46,12 +46,11 @@ public sealed class Program
             .Services.AddSingleton<ILogger>(sp => sp.GetRequiredService<ILogger<Program>>()) // some services require an un-templated ILogger
             .AddOptions(builder.Configuration)
             .AddPersistentChatStore()
+            .AddBlobStorage()
             .AddPlugins(builder.Configuration)
             .AddChatCopilotAuthentication(builder.Configuration)
             .AddChatCopilotAuthorization()
-            .AddEmailService()
-            .AddSingleMessageCompletionService()
-            .AddDeploymentService();
+            .AddServices();
 
         // Add SignalR as the real time relay service
         builder.Services.AddSignalR(hubOptions => hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(5));
