@@ -121,6 +121,7 @@ internal static class SemanticKernelExtensions
                 openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
                 qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>(),
                 qSearchDeploymentService: sp.GetRequiredService<IQSearchDeploymentService>(),
+                qSpecializationService: sp.GetRequiredService<IQSpecializationService>(),
                 qBlobStorage: sp.GetRequiredService<IQBlobStorage>()
             ),
             nameof(ChatPlugin)

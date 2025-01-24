@@ -484,6 +484,7 @@ public static class CopilotChatServiceExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         // specialization services
+        services.AddScoped<IQSpecializationService, QSpecializationService>();
         services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();
 
         // email services

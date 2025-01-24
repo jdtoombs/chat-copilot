@@ -30,6 +30,7 @@ public class SearchController : ControllerBase
         IOptions<QAzureOpenAIChatOptions> specializationOptions,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
         IQSearchDeploymentService qSearchDeploymentService,
+        IQSpecializationService qSpecializationService,
         IQBlobStorage qBlobStorage
     )
     {
@@ -41,6 +42,7 @@ public class SearchController : ControllerBase
             openAIDeploymentRepository,
             qOpenAIDeploymentService,
             qSearchDeploymentService,
+            qSpecializationService,
             qBlobStorage
         );
     }

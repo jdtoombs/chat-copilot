@@ -26,7 +26,7 @@ public class SpecializationController : ControllerBase
 {
     private readonly ILogger<SpecializationController> _logger;
 
-    private readonly QSpecializationService _qspecializationService;
+    private readonly IQSpecializationService _qspecializationService;
 
     private readonly QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
@@ -43,6 +43,7 @@ public class SpecializationController : ControllerBase
         IOptions<PromptsOptions> promptsOptions,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
         IQSearchDeploymentService qSearchDeploymentService,
+        IQSpecializationService qSpecializationService,
         IQBlobStorage qBlobStorage
     )
     {
@@ -55,13 +56,10 @@ public class SpecializationController : ControllerBase
             openAIDeploymentRepository,
             qOpenAIDeploymentService,
             qSearchDeploymentService,
+            qSpecializationService,
             qBlobStorage
         );
-        this._qspecializationService = new QSpecializationService(
-            specializationSourceRepository,
-            specializationOptions.Value,
-            qBlobStorage
-        );
+        this._qspecializationService = qSpecializationService;
         this._promptOptions = promptsOptions.Value;
     }
 
