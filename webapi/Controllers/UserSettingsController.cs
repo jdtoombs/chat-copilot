@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
-using System.Net.Http;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Models.Request;

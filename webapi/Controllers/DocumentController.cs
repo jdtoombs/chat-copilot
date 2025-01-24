@@ -159,11 +159,7 @@ public class DocumentController(
                 memoryClient.DeleteDocumentAsync(sourceIdString, promptOptions.Value.MemoryIndexName)
             );
 
-            await messageRelayHubContext.Clients.All.SendAsync(
-                DocumentDeletedClientCall,
-                source.Name,
-                authInfo.Name
-            );
+            await messageRelayHubContext.Clients.All.SendAsync(DocumentDeletedClientCall, source.Name, authInfo.Name);
         }
         catch (AggregateException ex)
         {
@@ -388,7 +384,9 @@ public class DocumentController(
         }
         else if (formFiles.Count() > documentMemoryOptions.Value.FileCountLimit)
         {
-            throw new ArgumentException($"Too many files uploaded. Max file count is {documentMemoryOptions.Value.FileCountLimit}.");
+            throw new ArgumentException(
+                $"Too many files uploaded. Max file count is {documentMemoryOptions.Value.FileCountLimit}."
+            );
         }
 
         // Loop through the uploaded files and validate them before importing.
@@ -479,7 +477,9 @@ public class DocumentController(
         }
         else if (fileReferences.Count() > documentMemoryOptions.Value.FileCountLimit)
         {
-            throw new ArgumentException($"Too many files requested. Max file count is {documentMemoryOptions.Value.FileCountLimit}.");
+            throw new ArgumentException(
+                $"Too many files requested. Max file count is {documentMemoryOptions.Value.FileCountLimit}."
+            );
         }
 
         // Loop through the uploaded files and validate them before importing.
