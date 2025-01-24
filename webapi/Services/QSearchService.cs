@@ -29,6 +29,7 @@ public class QSearchService : IQSearchService
         SpecializationIndexRepository indexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQSpecializationService qSpecializationService,
         IQBlobStorage qBlobStorage
     )
     {
@@ -38,6 +39,7 @@ public class QSearchService : IQSearchService
             indexRepository,
             openAIDeploymentRepository,
             qOpenAIDeploymentService,
+            qSpecializationService,
             qBlobStorage
         );
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
