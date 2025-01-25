@@ -484,6 +484,9 @@ public static class CopilotChatServiceExtensions
         // user feedback services
         services.AddScoped<IUserFeedbackService, UserFeedbackService>();
 
+        // search services
+        services.AddScoped<IQSearchService, QSearchService>();
+
         return services;
     }
 
