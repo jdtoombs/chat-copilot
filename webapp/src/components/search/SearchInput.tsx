@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
-import { Button, Dropdown, makeStyles, Option, SearchBox } from '@fluentui/react-components';
+import { Button, Dropdown, makeStyles, Option, SearchBox, tokens } from '@fluentui/react-components';
 import { Dismiss20Regular, SendRegular } from '@fluentui/react-icons';
 import React, { useId, useState } from 'react';
 import { AlertType } from '../../libs/models/AlertType';
@@ -10,7 +10,7 @@ import { setSearch, setSelectedSearchItem } from '../../redux/features/search/se
 
 const useClasses = makeStyles({
     root: {
-        paddingTop: '2%',
+        paddingTop: tokens.spacingVerticalL,
     },
     keyWidth: {
         width: '20%',
@@ -24,6 +24,8 @@ const useClasses = makeStyles({
         '& .ui-box::after': {
             transformOrigin: 'left top',
         },
+        marginLeft: tokens.spacingHorizontalL,
+        marginRight: tokens.spacingHorizontalS,
     },
     flex: {
         display: 'flex',
@@ -116,7 +118,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
                         )}
                     </Dropdown>
                     <SearchBox
-                        placeholder="Search..."
+                        placeholder="Search Query"
                         className={classes.inputWidth}
                         value={value}
                         appearance="outline"
