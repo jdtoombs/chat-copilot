@@ -104,7 +104,7 @@ public class ChatPlugin
     /// <summary>
     /// Extension: AzureOpenAI Extension handler
     /// </summary>
-    private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
     // feature flag for user intent extraction
     private readonly bool _isUserIntentExtractionEnabled;
@@ -127,9 +127,11 @@ public class ChatPlugin
         IOptions<DocumentMemoryOptions> documentImportOptions,
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         IQSpecializationService qSpecializationService,
+        IQSpecializationIndexService qSpecializationIndexService,
         SecretClient secretClient,
         ILogger logger,
         IQBlobStorage qBlobStorage,
+        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension,
         AzureContentSafety? contentSafety = null,
         bool isUserIntentExtractionEnabled = true
     ) // Parameter for feature flag
@@ -150,16 +152,7 @@ public class ChatPlugin
             memoryClient,
             logger
         );
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions.Value,
-            specializationSourceRepository,
-            specializationIndexRepository,
-            openAIDeploymentRepository,
-            qOpenAIDeploymentService,
-            qSearchDeploymentService,
-            qSpecializationService,
-            qBlobStorage
-        );
+        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
     }

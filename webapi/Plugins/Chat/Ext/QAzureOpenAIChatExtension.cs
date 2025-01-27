@@ -5,65 +5,37 @@ using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Services;
-using CopilotChat.WebApi.Storage;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Plugins.Chat.Ext;
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 /// <summary>
 /// Chat extension class to support Azure search indexes for bot response.
 /// </summary>
-public class QAzureOpenAIChatExtension
+public class QAzureOpenAIChatExtension(
+    IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
+    IQOpenAIDeploymentService qOpenAIDeploymentService,
+    IQSearchDeploymentService qSearchDeploymentService,
+    IQSpecializationIndexService qSpecializationIndexService
+) : IQAzureOpenAIChatExtension
 {
     /// <summary>
     /// Default specialization key.
     /// </summary>
-    public string DefaultSpecialization { get; } = "general";
+    private string DefaultSpecialization { get; } = "general";
 
     /// <summary>
     /// Name of the key which carries the specialization
     /// </summary>
     public string ContextKey { get; } = "specialization";
 
-    /// <summary>
-    /// Chat Extension Azure OpenAI options
-    /// </summary>
-    private readonly QAzureOpenAIChatOptions _qAzureOpenAIChatOptions;
-
-    /// <summary>
-    /// Specialization data Service.
-    /// </summary>
-    private readonly IQSpecializationService _qSpecializationService;
-
-    private readonly QSpecializationIndexService _qSpecializationIndexService;
-
-    private readonly IQOpenAIDeploymentService _qOpenAIDeploymentService;
-
-    private readonly IQSearchDeploymentService _qSearchDeploymentService;
-
-    public QAzureOpenAIChatExtension(
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository indexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSearchDeploymentService qSearchDeploymentService,
-        IQSpecializationService qSpecializationService,
-        IQBlobStorage qBlobStorage
-    )
+    private bool isEnabled(string? specializationId)
     {
-        this._qAzureOpenAIChatOptions = qAzureOpenAIChatOptions;
-        this._qSpecializationService = qSpecializationService;
-        this._qSpecializationIndexService = new QSpecializationIndexService(indexRepository);
-        this._qOpenAIDeploymentService = qOpenAIDeploymentService;
-        this._qSearchDeploymentService = qSearchDeploymentService;
+        return qAzureOpenAIChatOptions.Value.Enabled && specializationId != this.DefaultSpecialization;
     }
 
-    public bool isEnabled(string? specializationId)
-    {
-        return this._qAzureOpenAIChatOptions.Enabled && specializationId != this.DefaultSpecialization;
-    }
-
-#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     public async Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization)
     {
         if (
@@ -75,7 +47,7 @@ public class QAzureOpenAIChatExtension
             return null;
         }
 
-        var qSpecializationIndex = await this._qSpecializationIndexService.GetIndexAsync(specialization.IndexId);
+        var qSpecializationIndex = await qSpecializationIndexService.GetIndexAsync(specialization.IndexId);
         if (qSpecializationIndex == null)
         {
             return null;
@@ -84,10 +56,10 @@ public class QAzureOpenAIChatExtension
         // var aiSearchDeploymentConnection = this._qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(
         //     c => c.Name == qSpecializationIndex.AISearchDeploymentConnection
         // );
-        var aiSearchDeploymentConnection = await this._qSearchDeploymentService.GetSearchDeploymentAsync(
+        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
             qSpecializationIndex.AISearchDeploymentId
         );
-        var aiSearchDeploymentApiKey = await this._qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(
+        var aiSearchDeploymentApiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(
             aiSearchDeploymentConnection
         );
         if (aiSearchDeploymentConnection == null)
@@ -95,10 +67,10 @@ public class QAzureOpenAIChatExtension
             throw new InvalidOperationException("Configuration error: AI Search Deployment Connection is missing.");
         }
 
-        var openAIDeploymentConnection = await this._qOpenAIDeploymentService.GetDeployment(
+        var openAIDeploymentConnection = await qOpenAIDeploymentService.GetDeployment(
             specialization.OpenAIDeploymentId ?? ""
         );
-        var openAIDeploymentApiKey = await this._qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(
+        var openAIDeploymentApiKey = await qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(
             openAIDeploymentConnection
         );
         if (
@@ -136,9 +108,8 @@ public class QAzureOpenAIChatExtension
             ),
         };
     }
-#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-    public Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
+    private Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
     {
         return new Uri(
             connectionEndpoint,
@@ -150,24 +121,15 @@ public class QAzureOpenAIChatExtension
         string indexId
     )
     {
-        var specializationIndex = await this._qSpecializationIndexService.GetIndexAsync(indexId);
+        var specializationIndex = await qSpecializationIndexService.GetIndexAsync(indexId);
         if (specializationIndex == null)
         {
             return (null, null, null);
         }
-        var aiSearchDeploymentConnection = await this._qSearchDeploymentService.GetSearchDeploymentAsync(
+        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
             specializationIndex.AISearchDeploymentId
         );
-        var apiKey = await this._qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
+        var apiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
         return (specializationIndex.Name, apiKey, aiSearchDeploymentConnection?.Endpoint?.ToString());
-    }
-
-    /// <summary>
-    /// Get the default chat completion deployment.
-    /// </summary>
-#pragma warning disable CA1024
-    public string GetDefaultChatCompletionDeployment()
-    {
-        return this._qAzureOpenAIChatOptions.DefaultModel;
     }
 }

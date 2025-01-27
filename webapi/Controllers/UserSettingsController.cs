@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
-using System.Net.Http;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Models.Request;
@@ -19,23 +18,11 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling loading and updating chat users settings
 /// </summary>
 [ApiController]
-public class UserSettingsController : ControllerBase
+public class UserSettingsController(
+    ILogger<UserSettingsController> logger,
+    IOptions<QAzureOpenAIChatOptions> chatOptions
+) : ControllerBase
 {
-    private readonly ILogger<UserSettingsController> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IOptions<QAzureOpenAIChatOptions> _chatOptions;
-
-    public UserSettingsController(
-        ILogger<UserSettingsController> logger,
-        IOptions<QAzureOpenAIChatOptions> chatOptions,
-        IHttpClientFactory httpClientFactory
-    )
-    {
-        this._logger = logger;
-        this._httpClientFactory = httpClientFactory;
-        this._chatOptions = chatOptions;
-    }
-
     /// <summary>
     /// Returns the users settings
     /// </summary>
@@ -54,7 +41,7 @@ public class UserSettingsController : ControllerBase
         [FromServices] IAuthInfo authInfo
     )
     {
-        this._logger.LogDebug("Settings request received.");
+        logger.LogDebug("Settings request received.");
 
         var userId = authInfo.UserId;
         ChatUser? user = null;
@@ -69,7 +56,7 @@ public class UserSettingsController : ControllerBase
             new LoadSettingsResponse
             {
                 settings = user.settings,
-                adminGroupId = this._chatOptions.Value.AdminGroupMembershipId,
+                adminGroupId = chatOptions.Value.AdminGroupMembershipId,
             }
         );
     }
@@ -93,7 +80,7 @@ public class UserSettingsController : ControllerBase
         [FromBody] UpdateSettings request
     )
     {
-        this._logger.LogDebug("Settings update received.");
+        logger.LogDebug("Settings update received.");
 
         var userId = authInfo.UserId;
         ChatUser? user = null;

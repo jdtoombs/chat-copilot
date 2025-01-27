@@ -21,29 +21,14 @@ public class QSearchService : IQSearchService
     private readonly HttpClient _httpClient;
     private readonly HttpClientHandler? _httpClientHandler;
     private readonly SpecializationRepository _specializationRepository;
-    private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
     public QSearchService(
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
         SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository indexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSearchDeploymentService qSearchDeploymentService,
-        IQSpecializationService qSpecializationService,
-        IQBlobStorage qBlobStorage
+        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension
     )
     {
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions,
-            specializationSourceRepository,
-            indexRepository,
-            openAIDeploymentRepository,
-            qOpenAIDeploymentService,
-            qSearchDeploymentService,
-            qSpecializationService,
-            qBlobStorage
-        );
+        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
         this._httpClient = new(this._httpClientHandler);
         this._specializationRepository = specializationSourceRepository;
@@ -86,7 +71,6 @@ public class QSearchService : IQSearchService
     {
         if (searchResponse != null)
         {
-#pragma warning disable CS8601 // Possible null reference assignment.
             var groupedByfilename = searchResponse
                 .values.Where(res => res.highlights != null)
                 .GroupBy(value => value.filename)
@@ -105,7 +89,6 @@ public class QSearchService : IQSearchService
                         )
                         .ToArray(),
                 });
-#pragma warning restore CS8601 // Possible null reference assignment.
             return new QSearchResult { count = searchResponse.Count, values = groupedByfilename };
         }
         return new QSearchResult();

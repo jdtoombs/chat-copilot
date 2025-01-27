@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace CopilotChat.WebApi.Controllers;
 
@@ -22,29 +21,12 @@ namespace CopilotChat.WebApi.Controllers;
 /// 3. Managing participants in a chat session.
 /// </summary>
 [ApiController]
-public class ChatParticipantController : ControllerBase
+public class ChatParticipantController(
+    ChatParticipantRepository chatParticipantRepository,
+    ChatSessionRepository chatSessionRepository
+) : ControllerBase
 {
     private const string UserJoinedClientCall = "UserJoined";
-    private readonly ILogger<ChatParticipantController> _logger;
-    private readonly ChatParticipantRepository _chatParticipantRepository;
-    private readonly ChatSessionRepository _chatSessionRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChatParticipantController"/> class.
-    /// </summary>
-    /// <param name="logger">The logger.</param>
-    /// <param name="chatParticipantRepository">The chat participant repository.</param>
-    /// <param name="chatSessionRepository">The chat session repository.</param>
-    public ChatParticipantController(
-        ILogger<ChatParticipantController> logger,
-        ChatParticipantRepository chatParticipantRepository,
-        ChatSessionRepository chatSessionRepository
-    )
-    {
-        this._logger = logger;
-        this._chatParticipantRepository = chatParticipantRepository;
-        this._chatSessionRepository = chatSessionRepository;
-    }
 
     /// <summary>
     /// Join the logged in user to a chat session given a chat ID.
@@ -66,19 +48,19 @@ public class ChatParticipantController : ControllerBase
         string userId = authInfo.UserId;
 
         // Make sure the chat session exists.
-        if (!await this._chatSessionRepository.TryFindByIdAsync(chatId.ToString()))
+        if (!await chatSessionRepository.TryFindByIdAsync(chatId.ToString()))
         {
             return this.BadRequest("Chat session does not exist.");
         }
 
         // Make sure the user is not already in the chat session.
-        if (await this._chatParticipantRepository.IsUserInChatAsync(userId, chatId.ToString()))
+        if (await chatParticipantRepository.IsUserInChatAsync(userId, chatId.ToString()))
         {
             return this.Conflict("User is already in the chat session.");
         }
 
         var chatParticipant = new ChatParticipant(userId, chatId.ToString());
-        await this._chatParticipantRepository.CreateAsync(chatParticipant);
+        await chatParticipantRepository.CreateAsync(chatParticipant);
 
         // Broadcast the user joined event to all the connected clients.
         // Note that the client who initiated the request may not have joined the group.
@@ -99,12 +81,12 @@ public class ChatParticipantController : ControllerBase
     public async Task<IActionResult> GetAllParticipantsAsync(Guid chatId)
     {
         // Make sure the chat session exists.
-        if (!await this._chatSessionRepository.TryFindByIdAsync(chatId.ToString()))
+        if (!await chatSessionRepository.TryFindByIdAsync(chatId.ToString()))
         {
             return this.NotFound("Chat session does not exist.");
         }
 
-        var chatParticipants = await this._chatParticipantRepository.FindByChatIdAsync(chatId.ToString());
+        var chatParticipants = await chatParticipantRepository.FindByChatIdAsync(chatId.ToString());
 
         return this.Ok(chatParticipants);
     }

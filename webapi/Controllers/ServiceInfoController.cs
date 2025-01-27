@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 
@@ -21,37 +20,15 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for returning information on the service.
 /// </summary>
 [ApiController]
-public class ServiceInfoController : ControllerBase
+public class ServiceInfoController(
+    IConfiguration configuration,
+    IOptions<KernelMemoryConfig> memoryOptions,
+    IOptions<ChatAuthenticationOptions> chatAuthenticationOption,
+    IOptions<FrontendOptions> frontendOptions,
+    IDictionary<string, Plugin> availablePlugins,
+    IOptions<ContentSafetyOptions> contentSafetyOptions
+) : ControllerBase
 {
-    private readonly ILogger<ServiceInfoController> _logger;
-
-    private readonly IConfiguration Configuration;
-
-    private readonly KernelMemoryConfig memoryOptions;
-    private readonly ChatAuthenticationOptions _chatAuthenticationOptions;
-    private readonly FrontendOptions _frontendOptions;
-    private readonly IEnumerable<Plugin> availablePlugins;
-    private readonly ContentSafetyOptions _contentSafetyOptions;
-
-    public ServiceInfoController(
-        ILogger<ServiceInfoController> logger,
-        IConfiguration configuration,
-        IOptions<KernelMemoryConfig> memoryOptions,
-        IOptions<ChatAuthenticationOptions> chatAuthenticationOptions,
-        IOptions<FrontendOptions> frontendOptions,
-        IDictionary<string, Plugin> availablePlugins,
-        IOptions<ContentSafetyOptions> contentSafetyOptions
-    )
-    {
-        this._logger = logger;
-        this.Configuration = configuration;
-        this.memoryOptions = memoryOptions.Value;
-        this._chatAuthenticationOptions = chatAuthenticationOptions.Value;
-        this._frontendOptions = frontendOptions.Value;
-        this.availablePlugins = this.SanitizePlugins(availablePlugins);
-        this._contentSafetyOptions = contentSafetyOptions.Value;
-    }
-
     /// <summary>
     /// Return information on running service.
     /// </summary>
@@ -65,11 +42,11 @@ public class ServiceInfoController : ControllerBase
             MemoryStore = new MemoryStoreInfoResponse()
             {
                 Types = Enum.GetNames(typeof(MemoryStoreType)),
-                SelectedType = this.memoryOptions.GetMemoryStoreType(this.Configuration).ToString(),
+                SelectedType = memoryOptions.Value.GetMemoryStoreType(configuration).ToString(),
             },
-            AvailablePlugins = this.availablePlugins,
+            AvailablePlugins = this.SanitizePlugins(availablePlugins),
             Version = GetAssemblyFileVersion(),
-            IsContentSafetyEnabled = this._contentSafetyOptions.Enabled,
+            IsContentSafetyEnabled = contentSafetyOptions.Value.Enabled,
         };
 
         return this.Ok(response);
@@ -86,22 +63,22 @@ public class ServiceInfoController : ControllerBase
     {
         string authorityUriString = string.Empty;
         if (
-            !string.IsNullOrEmpty(this._chatAuthenticationOptions.AzureAd!.Instance)
-            && !string.IsNullOrEmpty(this._chatAuthenticationOptions.AzureAd!.TenantId)
+            !string.IsNullOrEmpty(chatAuthenticationOption.Value.AzureAd!.Instance)
+            && !string.IsNullOrEmpty(chatAuthenticationOption.Value.AzureAd!.TenantId)
         )
         {
-            var authorityUri = new Uri(this._chatAuthenticationOptions.AzureAd!.Instance);
-            authorityUri = new Uri(authorityUri, this._chatAuthenticationOptions.AzureAd!.TenantId);
+            var authorityUri = new Uri(chatAuthenticationOption.Value.AzureAd!.Instance);
+            authorityUri = new Uri(authorityUri, chatAuthenticationOption.Value.AzureAd!.TenantId);
             authorityUriString = authorityUri.ToString();
         }
 
         var config = new FrontendAuthConfig
         {
-            AuthType = this._chatAuthenticationOptions.Type.ToString(),
+            AuthType = chatAuthenticationOption.Value.Type.ToString(),
             AadAuthority = authorityUriString,
-            AadClientId = this._frontendOptions.AadClientId,
+            AadClientId = frontendOptions.Value.AadClientId,
             AadApiScope =
-                $"api://{this._chatAuthenticationOptions.AzureAd!.ClientId}/{this._chatAuthenticationOptions.AzureAd!.Scopes}",
+                $"api://{chatAuthenticationOption.Value.AzureAd!.ClientId}/{chatAuthenticationOption.Value.AzureAd!.Scopes}",
         };
 
         return this.Ok(config);

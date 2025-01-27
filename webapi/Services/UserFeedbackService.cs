@@ -12,17 +12,9 @@ using CopilotChat.WebApi.Utilities;
 
 namespace CopilotChat.WebApi.Services;
 
-public class UserFeedbackService : IUserFeedbackService
+public class UserFeedbackService(ChatSessionRepository sessionRepository, ChatMessageRepository messageRepository)
+    : IUserFeedbackService
 {
-    private ChatSessionRepository _sessionRepository;
-    private ChatMessageRepository _messageRepository;
-
-    public UserFeedbackService(ChatSessionRepository sessionRepository, ChatMessageRepository messageRepository)
-    {
-        this._sessionRepository = sessionRepository;
-        this._messageRepository = messageRepository;
-    }
-
     /// <summary>
     /// Searches for user feedback items based on the provided filter criteria.
     /// </summary>
@@ -31,10 +23,10 @@ public class UserFeedbackService : IUserFeedbackService
     public async Task<UserFeedbackResult> Search(UserFeedbackFilter filter)
     {
         Expression<Func<CopilotChatMessage, bool>> messagePredicate = this.BuildMessagesQueryPredicate(filter);
-        var chatMessages = await this._messageRepository.QueryEntitiesAsync(messagePredicate, filter.SortBy);
+        var chatMessages = await messageRepository.QueryEntitiesAsync(messagePredicate, filter.SortBy);
 
         Expression<Func<ChatSession, bool>> sessionPredicate = this.BuildSessionsQueryPredicate(filter, chatMessages);
-        var chatSessions = await this._sessionRepository.QueryEntitiesAsync(sessionPredicate);
+        var chatSessions = await sessionRepository.QueryEntitiesAsync(sessionPredicate);
 
         var userFeedbackResult = new UserFeedbackResult();
         foreach (var chatMessage in chatMessages)

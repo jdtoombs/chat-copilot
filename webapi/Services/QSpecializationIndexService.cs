@@ -8,23 +8,16 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QSpecializationIndexService : IQSpecializationIndexService
+public class QSpecializationIndexService(SpecializationIndexRepository indexRepository) : IQSpecializationIndexService
 {
-    private SpecializationIndexRepository _indexRepository;
-
-    public QSpecializationIndexService(SpecializationIndexRepository indexRepository)
-    {
-        this._indexRepository = indexRepository;
-    }
-
     public Task<IEnumerable<SpecializationIndex>> GetAllIndexes()
     {
-        return this._indexRepository.GetAllIndexesAsync();
+        return indexRepository.GetAllIndexesAsync();
     }
 
     public Task<SpecializationIndex> GetIndexAsync(string id)
     {
-        return this._indexRepository.FindByIdAsync(id);
+        return indexRepository.FindByIdAsync(id);
     }
 
     public async Task<SpecializationIndex> SaveIndex(QSpecializationIndexCreate index)
@@ -38,14 +31,14 @@ public class QSpecializationIndexService : IQSpecializationIndexService
             index.EmbeddingDeployment,
             index.Order ?? 0
         );
-        await this._indexRepository.CreateAsync(indexInsert);
+        await indexRepository.CreateAsync(indexInsert);
 
         return indexInsert;
     }
 
     public async Task<SpecializationIndex?> UpdateIndex(Guid indexId, QSpecializationIndexBase qIndexMutate)
     {
-        var indexToEdit = await this._indexRepository.FindByIdAsync(indexId.ToString());
+        var indexToEdit = await indexRepository.FindByIdAsync(indexId.ToString());
         if (indexToEdit == null)
         {
             return null;
@@ -60,18 +53,18 @@ public class QSpecializationIndexService : IQSpecializationIndexService
         indexToEdit.EmbeddingDeployment = qIndexMutate.EmbeddingDeployment ?? indexToEdit.EmbeddingDeployment;
         indexToEdit.Order = qIndexMutate.Order ?? indexToEdit.Order;
 
-        await this._indexRepository.UpsertAsync(indexToEdit);
+        await indexRepository.UpsertAsync(indexToEdit);
         return indexToEdit;
     }
 
     public async Task<SpecializationIndex?> DeleteIndex(Guid indexId)
     {
-        var indexToDelete = await this._indexRepository.FindByIdAsync(indexId.ToString());
+        var indexToDelete = await indexRepository.FindByIdAsync(indexId.ToString());
         if (indexToDelete == null)
         {
             return null;
         }
-        await this._indexRepository.DeleteAsync(indexToDelete);
+        await indexRepository.DeleteAsync(indexToDelete);
         return indexToDelete;
     }
 
@@ -96,7 +89,7 @@ public class QSpecializationIndexService : IQSpecializationIndexService
             {
                 // Update the order
                 specialization.Order = newOrder;
-                upsertTasks.Add(this._indexRepository.UpsertAsync(specialization));
+                upsertTasks.Add(indexRepository.UpsertAsync(specialization));
             }
         }
         await Task.WhenAll(upsertTasks);
