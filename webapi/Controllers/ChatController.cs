@@ -41,41 +41,21 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling chat messages and responses.
 /// </summary>
 [ApiController]
-public class ChatController : ControllerBase, IDisposable
+public class ChatController(
+    ILogger<ChatController> logger,
+    IHttpClientFactory httpClientFactory,
+    ITelemetryService telemetryService,
+    IOptions<MsGraphOboPluginOptions> msGraphOboPluginOptions,
+    IOptions<PromptsOptions> promptsOptions,
+    IDictionary<string, Plugin> plugins
+) : ControllerBase, IDisposable
 {
-    private readonly ILogger<ChatController> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly List<IDisposable> _disposables;
-    private readonly ITelemetryService _telemetryService;
-    private readonly ServiceOptions _serviceOptions;
-    private readonly MsGraphOboPluginOptions _msGraphOboPluginOptions;
-    private readonly PromptsOptions _promptsOptions;
-    private readonly IDictionary<string, Plugin> _plugins;
+    private readonly List<IDisposable> _disposables = new();
 
     private const string ChatPluginName = nameof(ChatPlugin);
     private const string ChatFunctionName = "Chat";
     private const string SilentChatFunctionName = "ChatSilent";
     private const string GeneratingResponseClientCall = "ReceiveBotResponseStatus";
-
-    public ChatController(
-        ILogger<ChatController> logger,
-        IHttpClientFactory httpClientFactory,
-        ITelemetryService telemetryService,
-        IOptions<ServiceOptions> serviceOptions,
-        IOptions<MsGraphOboPluginOptions> msGraphOboPluginOptions,
-        IOptions<PromptsOptions> promptsOptions,
-        IDictionary<string, Plugin> plugins
-    )
-    {
-        this._logger = logger;
-        this._httpClientFactory = httpClientFactory;
-        this._telemetryService = telemetryService;
-        this._disposables = new List<IDisposable>();
-        this._serviceOptions = serviceOptions.Value;
-        this._msGraphOboPluginOptions = msGraphOboPluginOptions.Value;
-        this._promptsOptions = promptsOptions.Value;
-        this._plugins = plugins;
-    }
 
     /// <summary>
     /// Invokes the chat function to get a response from the bot.
@@ -110,7 +90,7 @@ public class ChatController : ControllerBase, IDisposable
         [FromQuery] bool silent = false
     )
     {
-        this._logger.LogDebug("Chat message received.");
+        logger.LogDebug("Chat message received.");
 
         string chatIdString = chatId.ToString();
 
@@ -143,14 +123,14 @@ public class ChatController : ControllerBase, IDisposable
         FunctionResult? result = null;
         try
         {
-            // using CancellationTokenSource? cts = this._serviceOptions.TimeoutLimitInS is not null
+            // using CancellationTokenSource? cts = serviceOptions.TimeoutLimitInS is not null
             //     // Create a cancellation token source with the timeout if specified
-            //     ? new CancellationTokenSource(TimeSpan.FromSeconds((double)this._serviceOptions.TimeoutLimitInS))
+            //     ? new CancellationTokenSource(TimeSpan.FromSeconds((double)serviceOptions.TimeoutLimitInS))
             //     : null;
             // Commented out the above since we want the auto binded cancellation token instead of this timeout token.
             // We don't even define the timeoutlimit anywhere so this was just resulting in an empty token anyways.
             result = await kernel.InvokeAsync(chatFunction!, contextVariables, cancellationToken: requestAbortedToken);
-            this._telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, true);
+            telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, true);
         }
         catch (Exception ex)
         {
@@ -162,7 +142,7 @@ public class ChatController : ControllerBase, IDisposable
             )
             {
                 // Log the timeout and return a 504 response
-                this._logger.LogError("The {FunctionName} operation was cancelled.", ChatFunction);
+                logger.LogError("The {FunctionName} operation was cancelled.", ChatFunction);
                 return this.StatusCode(StatusCodes.Status504GatewayTimeout, $"The chat {ChatFunction} was cancelled.");
             }
 
@@ -171,11 +151,11 @@ public class ChatController : ControllerBase, IDisposable
                 && ex.Message.Contains("Service request failed.", System.StringComparison.OrdinalIgnoreCase)
             )
             {
-                this._logger.LogError("Something went wrong while the AI chat service processed the request.");
+                logger.LogError("Something went wrong while the AI chat service processed the request.");
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Service request failed.");
             }
 
-            this._telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, false);
+            telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, false);
 
             throw;
         }
@@ -272,7 +252,7 @@ public class ChatController : ControllerBase, IDisposable
 
     private async Task RegisterGithubPlugin(Kernel kernel, string GithubAuthHeader)
     {
-        this._logger.LogInformation("Enabling GitHub plugin.");
+        logger.LogInformation("Enabling GitHub plugin.");
         BearerAuthenticationProvider authenticationProvider = new(() => Task.FromResult(GithubAuthHeader));
 #pragma warning disable SKEXP0040 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         await kernel.ImportPluginFromOpenApiAsync(
@@ -285,7 +265,7 @@ public class ChatController : ControllerBase, IDisposable
 
     private async Task RegisterJiraPlugin(Kernel kernel, string JiraAuthHeader, KernelArguments variables)
     {
-        this._logger.LogInformation("Registering Jira plugin");
+        logger.LogInformation("Registering Jira plugin");
         var authenticationProvider = new BasicAuthenticationProvider(() =>
         {
             return Task.FromResult(JiraAuthHeader);
@@ -309,7 +289,7 @@ public class ChatController : ControllerBase, IDisposable
 
     private Task RegisterMicrosoftGraphPlugins(Kernel kernel, string GraphAuthHeader)
     {
-        this._logger.LogInformation("Enabling Microsoft Graph plugin(s).");
+        logger.LogInformation("Enabling Microsoft Graph plugin(s).");
         BearerAuthenticationProvider authenticationProvider = new(() => Task.FromResult(GraphAuthHeader));
         GraphServiceClient graphServiceClient = this.CreateGraphServiceClient(
             authenticationProvider.GraphClientAuthenticateRequestAsync
@@ -323,14 +303,14 @@ public class ChatController : ControllerBase, IDisposable
 
     private Task RegisterMicrosoftGraphOBOPlugins(Kernel kernel, string GraphOboAuthHeader)
     {
-        this._logger.LogInformation("Enabling Microsoft Graph OBO plugin(s).");
+        logger.LogInformation("Enabling Microsoft Graph OBO plugin(s).");
         kernel.ImportPluginFromObject(
             new MsGraphOboPlugin(
                 GraphOboAuthHeader,
-                this._httpClientFactory,
-                this._msGraphOboPluginOptions,
-                this._promptsOptions.FunctionCallingTokenLimit,
-                this._logger
+                httpClientFactory,
+                msGraphOboPluginOptions.Value,
+                promptsOptions.Value.FunctionCallingTokenLimit,
+                logger
             ),
             "msGraphObo"
         );
@@ -352,7 +332,7 @@ public class ChatController : ControllerBase, IDisposable
                 if (authHeaders.TryGetValue(plugin.AuthHeaderTag.ToUpperInvariant(), out string? PluginAuthValue))
                 {
                     // Register the ChatGPT plugin with the kernel.
-                    this._logger.LogInformation("Enabling {0} plugin.", plugin.NameForHuman);
+                    logger.LogInformation("Enabling {0} plugin.", plugin.NameForHuman);
 
                     // TODO: [Issue #44] Support other forms of auth. Currently, we only support user PAT or no auth.
                     var requiresAuth = !plugin.AuthType.Equals("none", StringComparison.OrdinalIgnoreCase);
@@ -369,7 +349,7 @@ public class ChatController : ControllerBase, IDisposable
                         PluginUtils.GetPluginManifestUri(plugin.ManifestDomain),
                         new OpenApiFunctionExecutionParameters
                         {
-                            HttpClient = this._httpClientFactory.CreateClient(),
+                            HttpClient = httpClientFactory.CreateClient(),
                             IgnoreNonCompliantErrors = true,
                             AuthCallback = requiresAuth ? authCallback : null,
                         }
@@ -380,7 +360,7 @@ public class ChatController : ControllerBase, IDisposable
         }
         else
         {
-            this._logger.LogDebug("Failed to deserialize custom plugin details: {0}", customPluginsString);
+            logger.LogDebug("Failed to deserialize custom plugin details: {0}", customPluginsString);
         }
     }
 
@@ -392,7 +372,7 @@ public class ChatController : ControllerBase, IDisposable
         AuthenticateRequestAsyncDelegate authenticateRequestAsyncDelegate
     )
     {
-        MsGraphClientLoggingHandler graphLoggingHandler = new(this._logger);
+        MsGraphClientLoggingHandler graphLoggingHandler = new(logger);
         this._disposables.Add(graphLoggingHandler);
 
         IList<DelegatingHandler> graphMiddlewareHandlers = GraphClientFactory.CreateDefaultHandlers(
@@ -411,9 +391,9 @@ public class ChatController : ControllerBase, IDisposable
     {
         foreach (string enabledPlugin in enabledPlugins)
         {
-            if (this._plugins.TryGetValue(enabledPlugin, out Plugin? plugin))
+            if (plugins.TryGetValue(enabledPlugin, out Plugin? plugin))
             {
-                this._logger.LogDebug("Enabling hosted plugin {0}.", plugin.Name);
+                logger.LogDebug("Enabling hosted plugin {0}.", plugin.Name);
 
                 Task authCallback(HttpRequestMessage request, CancellationToken ___ = default)
                 {
@@ -429,7 +409,7 @@ public class ChatController : ControllerBase, IDisposable
                     PluginUtils.GetPluginManifestUri(plugin.ManifestDomain),
                     new OpenApiFunctionExecutionParameters
                     {
-                        HttpClient = this._httpClientFactory.CreateClient(),
+                        HttpClient = httpClientFactory.CreateClient(),
                         IgnoreNonCompliantErrors = true,
                         AuthCallback = authCallback,
                     }
@@ -438,7 +418,7 @@ public class ChatController : ControllerBase, IDisposable
             }
             else
             {
-                this._logger.LogWarning("Failed to find plugin {0}.", enabledPlugin);
+                logger.LogWarning("Failed to find plugin {0}.", enabledPlugin);
             }
         }
 

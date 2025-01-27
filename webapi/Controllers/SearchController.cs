@@ -2,13 +2,9 @@
 
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
-using CopilotChat.WebApi.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Controllers;
 
@@ -16,37 +12,8 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling search.
 /// </summary>
 [ApiController]
-public class SearchController : ControllerBase
+public class SearchController(IQSearchService qSearchService) : ControllerBase
 {
-    private readonly ILogger<SearchController> _logger;
-
-    private readonly QSearchService _qSearchService;
-
-    public SearchController(
-        ILogger<SearchController> logger,
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository specializationIndexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
-        IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSpecializationService qSpecializationService,
-        IQSpecializationIndexService qSpecializationIndexService,
-        IQBlobStorage qBlobStorage
-    )
-    {
-        this._logger = logger;
-        this._qSearchService = new QSearchService(
-            specializationOptions.Value,
-            specializationSourceRepository,
-            specializationIndexRepository,
-            openAIDeploymentRepository,
-            qOpenAIDeploymentService,
-            qSpecializationService,
-            qSpecializationIndexService,
-            qBlobStorage
-        );
-    }
-
     /// <summary>
     /// Invokes the Azure search function to get a results.
     /// </summary>
@@ -62,7 +29,7 @@ public class SearchController : ControllerBase
     public async Task<IActionResult> GetMatchesAsync([FromBody] QSearchParameters searchParameters)
     {
         //Scope: To implement filter to give more refined search functionality.
-        var response = await this._qSearchService.GetMatchesAsync(searchParameters);
+        var response = await qSearchService.GetMatchesAsync(searchParameters);
         if (response == null)
         {
             return this.StatusCode(500, "Specialization does not have an index to search.");

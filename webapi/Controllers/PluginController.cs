@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace CopilotChat.WebApi.Controllers;
 
@@ -22,26 +21,13 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for returning the service options to the client.
 /// </summary>
 [ApiController]
-public class PluginController : ControllerBase
+public class PluginController(
+    IHttpClientFactory httpClientFactory,
+    IDictionary<string, Plugin> availablePlugins,
+    ChatSessionRepository sessionRepository
+) : ControllerBase
 {
     private const string PluginStateChanged = "PluginStateChanged";
-    private readonly ILogger<PluginController> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IDictionary<string, Plugin> _availablePlugins;
-    private readonly ChatSessionRepository _sessionRepository;
-
-    public PluginController(
-        ILogger<PluginController> logger,
-        IHttpClientFactory httpClientFactory,
-        IDictionary<string, Plugin> availablePlugins,
-        ChatSessionRepository sessionRepository
-    )
-    {
-        this._logger = logger;
-        this._httpClientFactory = httpClientFactory;
-        this._availablePlugins = availablePlugins;
-        this._sessionRepository = sessionRepository;
-    }
 
     /// <summary>
     /// Fetches a plugin's manifest.
@@ -57,7 +43,7 @@ public class PluginController : ControllerBase
         // Need to set the user agent to avoid 403s from some sites.
         request.Headers.Add("User-Agent", "Semantic-Kernel");
 
-        using HttpClient client = this._httpClientFactory.CreateClient();
+        using HttpClient client = httpClientFactory.CreateClient();
         var response = await client.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
@@ -83,7 +69,7 @@ public class PluginController : ControllerBase
         bool enabled
     )
     {
-        if (!this._availablePlugins.ContainsKey(pluginName))
+        if (!availablePlugins.ContainsKey(pluginName))
         {
             return this.NotFound("Plugin not found.");
         }
@@ -91,7 +77,7 @@ public class PluginController : ControllerBase
         var chatIdString = chatId.ToString();
         ChatSession? chat = null;
 #pragma warning disable CA1508 // Avoid dead conditional code. It's giving out false positives on chat == null.
-        if (!(await this._sessionRepository.TryFindByIdAsync(chatIdString, callback: v => chat = v)) || chat == null)
+        if (!(await sessionRepository.TryFindByIdAsync(chatIdString, callback: v => chat = v)) || chat == null)
         {
             return this.NotFound("Chat not found.");
         }
@@ -105,7 +91,7 @@ public class PluginController : ControllerBase
             chat.EnabledPlugins.Remove(pluginName);
         }
 
-        await this._sessionRepository.UpsertAsync(chat);
+        await sessionRepository.UpsertAsync(chat);
         await messageRelayHubContext
             .Clients.Group(chatIdString)
             .SendAsync(PluginStateChanged, chatIdString, pluginName, enabled);

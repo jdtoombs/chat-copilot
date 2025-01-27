@@ -6,17 +6,20 @@ using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Services;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Plugins.Chat.Ext;
+
+#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 /// <summary>
 /// Chat extension class to support Azure search indexes for bot response.
 /// </summary>
 public class QAzureOpenAIChatExtension(
-    QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
+    IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     IQOpenAIDeploymentService qOpenAIDeploymentService,
     IQSpecializationIndexService qSpecializationIndexService
-)
+) : IQAzureOpenAIChatExtension
 {
     /// <summary>
     /// Default specialization key.
@@ -30,10 +33,9 @@ public class QAzureOpenAIChatExtension(
 
     private bool isEnabled(string? specializationId)
     {
-        return qAzureOpenAIChatOptions.Enabled && specializationId != this.DefaultSpecialization;
+        return qAzureOpenAIChatOptions.Value.Enabled && specializationId != this.DefaultSpecialization;
     }
 
-#pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     public async Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization)
     {
         if (
@@ -51,8 +53,8 @@ public class QAzureOpenAIChatExtension(
             return null;
         }
 
-        var aiSearchDeploymentConnection = qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(c =>
-            c.Name == qSpecializationIndex.AISearchDeploymentConnection
+        var aiSearchDeploymentConnection = qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(
+            c => c.Name == qSpecializationIndex.AISearchDeploymentConnection
         );
         if (aiSearchDeploymentConnection == null)
         {
@@ -94,7 +96,6 @@ public class QAzureOpenAIChatExtension(
             ),
         };
     }
-#pragma warning restore AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
     private Uri? GenerateEmbeddingEndpoint(Uri connectionEndpoint, SpecializationIndex qSpecializationIndex)
     {
@@ -106,7 +107,7 @@ public class QAzureOpenAIChatExtension(
 
     private QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
     {
-        return qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(connection =>
+        return qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(connection =>
             connection.Name == connectionName
         );
     }

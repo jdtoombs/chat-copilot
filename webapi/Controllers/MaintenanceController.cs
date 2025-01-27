@@ -5,7 +5,6 @@ using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Controllers;
@@ -14,21 +13,9 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller for reporting the status of chat migration.
 /// </summary>
 [ApiController]
-public class MaintenanceController : ControllerBase
+public class MaintenanceController(IOptions<ServiceOptions> serviceOptions) : ControllerBase
 {
     internal const string GlobalSiteMaintenance = "GlobalSiteMaintenance";
-
-    private readonly ILogger<MaintenanceController> _logger;
-    private readonly IOptions<ServiceOptions> _serviceOptions;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MaintenanceController"/> class.
-    /// </summary>
-    public MaintenanceController(ILogger<MaintenanceController> logger, IOptions<ServiceOptions> serviceOptions)
-    {
-        this._logger = logger;
-        this._serviceOptions = serviceOptions;
-    }
 
     /// <summary>
     /// Route for reporting the status of site maintenance.
@@ -41,7 +28,7 @@ public class MaintenanceController : ControllerBase
     {
         MaintenanceResult? result = null;
 
-        if (this._serviceOptions.Value.InMaintenance)
+        if (serviceOptions.Value.InMaintenance)
         {
             result = new MaintenanceResult(); // Default maintenance message
         }

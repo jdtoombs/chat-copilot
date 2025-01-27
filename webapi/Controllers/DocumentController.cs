@@ -31,53 +31,22 @@ namespace CopilotChat.WebApi.Controllers;
 /// This controller is responsible for contracts that are not possible to fulfill by kernel memory components.
 /// </remarks>
 [ApiController]
-public class DocumentController : ControllerBase
+public class DocumentController(
+    ILogger<DocumentController> logger,
+    IAuthInfo authInfo,
+    IOptions<DocumentMemoryOptions> documentMemoryOptions,
+    IOptions<PromptsOptions> promptOptions,
+    IOptions<ContentSafetyOptions> contentSafetyOptions,
+    ChatMemorySourceRepository sourceRepository,
+    ChatMessageRepository messageRepository,
+    ChatParticipantRepository participantRepository,
+    DocumentTypeProvider documentTypeProvider,
+    IContentSafetyService contentSafetyService
+) : ControllerBase
 {
     private const string GlobalDocumentUploadedClientCall = "GlobalDocumentUploaded";
     private const string DocumentDeletedClientCall = "DocumentDeleted";
     private const string ReceiveMessageClientCall = "ReceiveMessage";
-
-    private readonly ILogger<DocumentController> _logger;
-    private readonly PromptsOptions _promptOptions;
-    private readonly DocumentMemoryOptions _options;
-    private readonly ContentSafetyOptions _contentSafetyOptions;
-    private readonly ChatSessionRepository _sessionRepository;
-    private readonly ChatMemorySourceRepository _sourceRepository;
-    private readonly ChatMessageRepository _messageRepository;
-    private readonly ChatParticipantRepository _participantRepository;
-    private readonly DocumentTypeProvider _documentTypeProvider;
-    private readonly IAuthInfo _authInfo;
-    private readonly IContentSafetyService _contentSafetyService;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentImportController"/> class.
-    /// </summary>
-    public DocumentController(
-        ILogger<DocumentController> logger,
-        IAuthInfo authInfo,
-        IOptions<DocumentMemoryOptions> documentMemoryOptions,
-        IOptions<PromptsOptions> promptOptions,
-        IOptions<ContentSafetyOptions> contentSafetyOptions,
-        ChatSessionRepository sessionRepository,
-        ChatMemorySourceRepository sourceRepository,
-        ChatMessageRepository messageRepository,
-        ChatParticipantRepository participantRepository,
-        DocumentTypeProvider documentTypeProvider,
-        IContentSafetyService contentSafetyService
-    )
-    {
-        this._logger = logger;
-        this._options = documentMemoryOptions.Value;
-        this._promptOptions = promptOptions.Value;
-        this._contentSafetyOptions = contentSafetyOptions.Value;
-        this._sessionRepository = sessionRepository;
-        this._sourceRepository = sourceRepository;
-        this._messageRepository = messageRepository;
-        this._participantRepository = participantRepository;
-        this._documentTypeProvider = documentTypeProvider;
-        this._authInfo = authInfo;
-        this._contentSafetyService = contentSafetyService;
-    }
 
     /// <summary>
     /// Service API for importing a document.
@@ -176,7 +145,7 @@ public class DocumentController : ControllerBase
         var sourceIdString = sourceId.ToString();
 
         // Try to find and delete the source
-        MemorySource? source = await this._sourceRepository.FindByIdAsync(sourceIdString, chatIdString);
+        MemorySource? source = await sourceRepository.FindByIdAsync(sourceIdString, chatIdString);
         if (source == null)
         {
             return this.NotFound($"No document memory source found for id '{sourceId}' and partition '{chatId}'");
@@ -186,15 +155,11 @@ public class DocumentController : ControllerBase
         try
         {
             await Task.WhenAll(
-                this._sourceRepository.DeleteAsync(source),
-                memoryClient.DeleteDocumentAsync(sourceIdString, this._promptOptions.MemoryIndexName)
+                sourceRepository.DeleteAsync(source),
+                memoryClient.DeleteDocumentAsync(sourceIdString, promptOptions.Value.MemoryIndexName)
             );
 
-            await messageRelayHubContext.Clients.All.SendAsync(
-                DocumentDeletedClientCall,
-                source.Name,
-                this._authInfo.Name
-            );
+            await messageRelayHubContext.Clients.All.SendAsync(DocumentDeletedClientCall, source.Name, authInfo.Name);
         }
         catch (AggregateException ex)
         {
@@ -224,7 +189,7 @@ public class DocumentController : ControllerBase
             return this.BadRequest(ex.Message);
         }
 
-        this._logger.LogInformation("Importing {0} document(s)...", documentImportForm.FormFiles.Count());
+        logger.LogInformation("Importing {0} document(s)...", documentImportForm.FormFiles.Count());
 
         // Pre-create chat-message
         DocumentMessageContent documentMessageContent = new();
@@ -240,7 +205,7 @@ public class DocumentController : ControllerBase
 
         if (chatMessage == null)
         {
-            this._logger.LogWarning(
+            logger.LogWarning(
                 "Failed to create document upload message - {Content}",
                 documentMessageContent.ToString()
             );
@@ -253,12 +218,12 @@ public class DocumentController : ControllerBase
             // If chat message isn't created, it is still broadcast and visible in the documents tab.
             // The chat message won't, however, be displayed when the chat is freshly rendered.
 
-            var userId = this._authInfo.UserId;
+            var userId = authInfo.UserId;
             await messageRelayHubContext
                 .Clients.Group(chatId.ToString())
                 .SendAsync(ReceiveMessageClientCall, chatId, userId, chatMessage);
 
-            this._logger.LogInformation("Local upload chat message: {0}", chatMessage.ToString());
+            logger.LogInformation("Local upload chat message: {0}", chatMessage.ToString());
 
             return this.Ok(chatMessage);
         }
@@ -266,10 +231,10 @@ public class DocumentController : ControllerBase
         await messageRelayHubContext.Clients.All.SendAsync(
             GlobalDocumentUploadedClientCall,
             documentMessageContent.ToFormattedStringNamesOnly(),
-            this._authInfo.Name
+            authInfo.Name
         );
 
-        this._logger.LogInformation("Global upload chat message: {0}", chatMessage.ToString());
+        logger.LogInformation("Global upload chat message: {0}", chatMessage.ToString());
 
         return this.Ok(chatMessage);
     }
@@ -311,14 +276,14 @@ public class DocumentController : ControllerBase
 
     private async Task<ImportResult> ImportDocumentAsync(IFormFile formFile, IKernelMemory memoryClient, Guid chatId)
     {
-        this._logger.LogInformation("Importing document {0}", formFile.FileName);
+        logger.LogInformation("Importing document {0}", formFile.FileName);
 
         // Create memory source
         MemorySource memorySource =
             new(
                 chatId.ToString(),
                 formFile.FileName,
-                this._authInfo.UserId,
+                authInfo.UserId,
                 MemorySourceType.File,
                 formFile.Length,
                 hyperlink: null
@@ -326,7 +291,7 @@ public class DocumentController : ControllerBase
 
         if (!(await this.TryUpsertMemorySourceAsync(memorySource)))
         {
-            this._logger.LogDebug("Failed to upsert memory source for file {0}.", formFile.FileName);
+            logger.LogDebug("Failed to upsert memory source for file {0}.", formFile.FileName);
 
             return ImportResult.Fail;
         }
@@ -344,10 +309,10 @@ public class DocumentController : ControllerBase
             {
                 using var stream = formFile.OpenReadStream();
                 await memoryClient.StoreDocumentAsync(
-                    this._promptOptions.MemoryIndexName,
+                    promptOptions.Value.MemoryIndexName,
                     memorySource.Id,
                     chatId.ToString(),
-                    this._promptOptions.DocumentMemoryName,
+                    promptOptions.Value.DocumentMemoryName,
                     formFile.FileName,
                     stream
                 );
@@ -406,7 +371,7 @@ public class DocumentController : ControllerBase
     )
     {
         // Make sure the user has access to the chat session if the document is uploaded to a chat session.
-        if (scope == DocumentScopes.Chat && !(await this.UserHasAccessToChatAsync(this._authInfo.UserId, chatId)))
+        if (scope == DocumentScopes.Chat && !(await this.UserHasAccessToChatAsync(authInfo.UserId, chatId)))
         {
             throw new ArgumentException("User does not have access to the chat session.");
         }
@@ -417,9 +382,11 @@ public class DocumentController : ControllerBase
         {
             throw new ArgumentException("No files were uploaded.");
         }
-        else if (formFiles.Count() > this._options.FileCountLimit)
+        else if (formFiles.Count() > documentMemoryOptions.Value.FileCountLimit)
         {
-            throw new ArgumentException($"Too many files uploaded. Max file count is {this._options.FileCountLimit}.");
+            throw new ArgumentException(
+                $"Too many files uploaded. Max file count is {documentMemoryOptions.Value.FileCountLimit}."
+            );
         }
 
         // Loop through the uploaded files and validate them before importing.
@@ -430,21 +397,21 @@ public class DocumentController : ControllerBase
                 throw new ArgumentException($"File {formFile.FileName} is empty.");
             }
 
-            if (formFile.Length > this._options.FileSizeLimit)
+            if (formFile.Length > documentMemoryOptions.Value.FileSizeLimit)
             {
                 throw new ArgumentException($"File {formFile.FileName} size exceeds the limit.");
             }
 
             // Make sure the file type is supported.
             var fileType = Path.GetExtension(formFile.FileName);
-            if (!this._documentTypeProvider.IsSupported(fileType, out bool isSafetyTarget))
+            if (!documentTypeProvider.IsSupported(fileType, out bool isSafetyTarget))
             {
                 throw new ArgumentException($"Unsupported file type: {fileType}");
             }
 
             if (isSafetyTarget && documentImportForm.UseContentSafety)
             {
-                if (!this._contentSafetyOptions.Enabled)
+                if (!contentSafetyOptions.Value.Enabled)
                 {
                     throw new ArgumentException(
                         "Unable to analyze image. Content Safety is currently disabled in the backend."
@@ -455,15 +422,15 @@ public class DocumentController : ControllerBase
                 try
                 {
                     // Call the content safety controller to analyze the image
-                    var imageAnalysisResponse = await this._contentSafetyService.ImageAnalysisAsync(formFile, default);
-                    violations = this._contentSafetyService.ParseViolatedCategories(
+                    var imageAnalysisResponse = await contentSafetyService.ImageAnalysisAsync(formFile, default);
+                    violations = contentSafetyService.ParseViolatedCategories(
                         imageAnalysisResponse,
-                        this._contentSafetyOptions.ViolationThreshold
+                        contentSafetyOptions.Value.ViolationThreshold
                     );
                 }
                 catch (Exception ex) when (!ex.IsCriticalException())
                 {
-                    this._logger.LogError(
+                    logger.LogError(
                         ex,
                         "Failed to analyze image {0} with Content Safety. Details: {{1}}",
                         formFile.FileName,
@@ -508,9 +475,11 @@ public class DocumentController : ControllerBase
         {
             throw new ArgumentException("No files identified.");
         }
-        else if (fileReferences.Count() > this._options.FileCountLimit)
+        else if (fileReferences.Count() > documentMemoryOptions.Value.FileCountLimit)
         {
-            throw new ArgumentException($"Too many files requested. Max file count is {this._options.FileCountLimit}.");
+            throw new ArgumentException(
+                $"Too many files requested. Max file count is {documentMemoryOptions.Value.FileCountLimit}."
+            );
         }
 
         // Loop through the uploaded files and validate them before importing.
@@ -532,7 +501,7 @@ public class DocumentController : ControllerBase
     {
         try
         {
-            await this._sourceRepository.UpsertAsync(memorySource);
+            await sourceRepository.UpsertAsync(memorySource);
             return true;
         }
         catch (Exception ex) when (ex is not SystemException)
@@ -550,7 +519,7 @@ public class DocumentController : ControllerBase
     {
         try
         {
-            await this._sourceRepository.DeleteAsync(memorySource);
+            await sourceRepository.DeleteAsync(memorySource);
             return true;
         }
         catch (Exception ex) when (ex is ArgumentOutOfRangeException)
@@ -568,7 +537,7 @@ public class DocumentController : ControllerBase
     {
         try
         {
-            await this._sourceRepository.UpsertAsync(memorySource);
+            await sourceRepository.UpsertAsync(memorySource);
             return true;
         }
         catch (Exception ex) when (ex is ArgumentOutOfRangeException)
@@ -589,15 +558,15 @@ public class DocumentController : ControllerBase
     )
     {
         var chatMessage = CopilotChatMessage.CreateDocumentMessage(
-            this._authInfo.UserId,
-            this._authInfo.Name, // User name
+            authInfo.UserId,
+            authInfo.Name, // User name
             chatId.ToString(),
             messageContent
         );
 
         try
         {
-            await this._messageRepository.CreateAsync(chatMessage);
+            await messageRepository.CreateAsync(chatMessage);
             return chatMessage;
         }
         catch (Exception ex) when (ex is ArgumentOutOfRangeException)
@@ -632,7 +601,7 @@ public class DocumentController : ControllerBase
     /// <returns>A boolean indicating whether the user has access to the chat session.</returns>
     private async Task<bool> UserHasAccessToChatAsync(string userId, Guid chatId)
     {
-        return await this._participantRepository.IsUserInChatAsync(userId, chatId.ToString());
+        return await participantRepository.IsUserInChatAsync(userId, chatId.ToString());
     }
 
     #endregion
