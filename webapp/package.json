@@ -20,7 +20,7 @@
         "@fluentui/react-components": "^9.57.0",
         "@fluentui/react-datepicker-compat": "^0.4.60",
         "@fluentui/react-icons": "^2.0.249",
-        "@mdxeditor/editor": "^3.20.0",
+        "@mdxeditor/editor": "^3.21.0",
         "@microsoft/microsoft-graph-client": "^3.0.7",
         "@microsoft/signalr": "^8.0.7",
         "@playwright/test": "^1.49.1",
