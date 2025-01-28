@@ -13,8 +13,8 @@ public class QSpecializationIndexCreate : QSpecializationIndexBase
     [JsonPropertyName("queryType")]
     public new required string QueryType { get; set; }
 
-    [JsonPropertyName("aiSearchDeploymentConnection")]
-    public new required string AISearchDeploymentConnection { get; set; }
+    [JsonPropertyName("aiSearchDeploymentId")]
+    public new required string AISearchDeploymentId { get; set; }
 
     [JsonPropertyName("openAIDeploymentConnection")]
     public new required string OpenAIDeploymentConnection { get; set; }

@@ -17,7 +17,7 @@ public class SpecializationIndex : IStorageEntity
 
     public string QueryType { get; set; }
 
-    public string AISearchDeploymentConnection { get; set; }
+    public string AISearchDeploymentId { get; set; }
 
     public string OpenAIDeploymentConnection { get; set; }
 
@@ -29,7 +29,7 @@ public class SpecializationIndex : IStorageEntity
         string Name,
         string Label,
         string QueryType,
-        string AISearchDeploymentConnection,
+        string AISearchDeploymentId,
         string OpenAIDeploymentConnection,
         string EmbeddingDeployment,
         int Order
@@ -39,7 +39,7 @@ public class SpecializationIndex : IStorageEntity
         this.Name = Name;
         this.Label = Label;
         this.QueryType = QueryType;
-        this.AISearchDeploymentConnection = AISearchDeploymentConnection;
+        this.AISearchDeploymentId = AISearchDeploymentId;
         this.OpenAIDeploymentConnection = OpenAIDeploymentConnection;
         this.EmbeddingDeployment = EmbeddingDeployment;
         this.Order = Order;

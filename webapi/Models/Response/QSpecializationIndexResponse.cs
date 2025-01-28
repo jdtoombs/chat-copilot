@@ -17,8 +17,8 @@ public class QSpecializationIndexResponse
     [JsonPropertyName("queryType")]
     public string QueryType { get; set; } = string.Empty;
 
-    [JsonPropertyName("aiSearchDeploymentConnection")]
-    public string AISearchDeploymentConnection { get; set; } = string.Empty;
+    [JsonPropertyName("aiSearchDeploymentId")]
+    public string AISearchDeploymentId { get; set; } = string.Empty;
 
     [JsonPropertyName("openAIDeploymentConnection")]
     public string OpenAIDeploymentConnection { get; set; } = string.Empty;
@@ -32,7 +32,7 @@ public class QSpecializationIndexResponse
         this.Label = index.Label;
         this.QueryType = index.QueryType;
         this.Name = index.Name;
-        this.AISearchDeploymentConnection = index.AISearchDeploymentConnection;
+        this.AISearchDeploymentId = index.AISearchDeploymentId;
         this.OpenAIDeploymentConnection = index.OpenAIDeploymentConnection;
         this.EmbeddingDeployment = index.EmbeddingDeployment;
     }
