@@ -279,15 +279,14 @@ public class DocumentController(
         logger.LogInformation("Importing document {0}", formFile.FileName);
 
         // Create memory source
-        MemorySource memorySource =
-            new(
-                chatId.ToString(),
-                formFile.FileName,
-                authInfo.UserId,
-                MemorySourceType.File,
-                formFile.Length,
-                hyperlink: null
-            );
+        MemorySource memorySource = new(
+            chatId.ToString(),
+            formFile.FileName,
+            authInfo.UserId,
+            MemorySourceType.File,
+            formFile.Length,
+            hyperlink: null
+        );
 
         if (!(await this.TryUpsertMemorySourceAsync(memorySource)))
         {
