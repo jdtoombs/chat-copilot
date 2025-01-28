@@ -32,8 +32,10 @@ public enum UserFeedback
 /// </summary>
 public class CopilotChatMessage : IStorageEntity
 {
-    private static readonly JsonSerializerOptions SerializerSettings =
-        new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    private static readonly JsonSerializerOptions SerializerSettings = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
 
     /// <summary>
     /// Role of the author of a chat message.
