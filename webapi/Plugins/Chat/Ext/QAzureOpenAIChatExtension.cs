@@ -53,9 +53,6 @@ public class QAzureOpenAIChatExtension(
             return null;
         }
 
-        // var aiSearchDeploymentConnection = this._qAzureOpenAIChatOptions.AISearchDeploymentConnections.FirstOrDefault(
-        //     c => c.Name == qSpecializationIndex.AISearchDeploymentConnection
-        // );
         var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
             qSpecializationIndex.AISearchDeploymentId
         );
