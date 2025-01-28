@@ -65,35 +65,34 @@ public class QSpecializationService(
 
         var deserializedSuggestions = JsonConvert.DeserializeObject<List<string>>(qSpecializationMutate.Suggestions);
 
-        Specialization specializationSource =
-            new(
-                Label: qSpecializationMutate.Label,
-                Name: qSpecializationMutate.Name,
-                Description: qSpecializationMutate.Description,
-                RoleInformation: qSpecializationMutate.RoleInformation,
-                InitialChatMessage: qSpecializationMutate.InitialChatMessage,
-                OpenAIDeploymentId: qSpecializationMutate.OpenAIDeploymentId,
-                CompletionDeploymentName: qSpecializationMutate.CompletionDeploymentName,
-                IndexId: qSpecializationMutate.IndexId,
-                IsDefault: qSpecializationMutate.IsDefault,
-                RestrictResultScope: qSpecializationMutate.IndexId != null
-                    ? qSpecializationMutate.RestrictResultScope
-                    : null,
-                Strictness: qSpecializationMutate.IndexId != null ? qSpecializationMutate.Strictness : null,
-                DocumentCount: qSpecializationMutate.IndexId != null ? qSpecializationMutate.DocumentCount : null,
-                PastMessagesIncludedCount: qSpecializationMutate.IndexId != null
-                    ? qSpecializationMutate.PastMessagesIncludedCount
-                    : null,
-                MaxResponseTokenLimit: qSpecializationMutate.IndexId != null
-                    ? qSpecializationMutate.MaxResponseTokenLimit
-                    : null,
-                ImageFilePath: imageFilePath,
-                IconFilePath: iconFilePath,
-                GroupMemberships: qSpecializationMutate.GroupMemberships.Split(','),
-                Order: qSpecializationMutate.Order,
-                Suggestions: deserializedSuggestions != null ? deserializedSuggestions : new List<string>(),
-                CanGenImages: qSpecializationMutate.CanGenImages
-            );
+        Specialization specializationSource = new(
+            Label: qSpecializationMutate.Label,
+            Name: qSpecializationMutate.Name,
+            Description: qSpecializationMutate.Description,
+            RoleInformation: qSpecializationMutate.RoleInformation,
+            InitialChatMessage: qSpecializationMutate.InitialChatMessage,
+            OpenAIDeploymentId: qSpecializationMutate.OpenAIDeploymentId,
+            CompletionDeploymentName: qSpecializationMutate.CompletionDeploymentName,
+            IndexId: qSpecializationMutate.IndexId,
+            IsDefault: qSpecializationMutate.IsDefault,
+            RestrictResultScope: qSpecializationMutate.IndexId != null
+                ? qSpecializationMutate.RestrictResultScope
+                : null,
+            Strictness: qSpecializationMutate.IndexId != null ? qSpecializationMutate.Strictness : null,
+            DocumentCount: qSpecializationMutate.IndexId != null ? qSpecializationMutate.DocumentCount : null,
+            PastMessagesIncludedCount: qSpecializationMutate.IndexId != null
+                ? qSpecializationMutate.PastMessagesIncludedCount
+                : null,
+            MaxResponseTokenLimit: qSpecializationMutate.IndexId != null
+                ? qSpecializationMutate.MaxResponseTokenLimit
+                : null,
+            ImageFilePath: imageFilePath,
+            IconFilePath: iconFilePath,
+            GroupMemberships: qSpecializationMutate.GroupMemberships.Split(','),
+            Order: qSpecializationMutate.Order,
+            Suggestions: deserializedSuggestions != null ? deserializedSuggestions : new List<string>(),
+            CanGenImages: qSpecializationMutate.CanGenImages
+        );
 
         await specializationSourceRepository.CreateAsync(specializationSource);
 

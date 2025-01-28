@@ -20,16 +20,15 @@ public static class TokenUtils
     /// Semantic dependencies of ChatPlugin.
     ///  If you add a new semantic dependency, please add it here.
     /// </summary>
-    internal static readonly Dictionary<string, string> semanticFunctions =
-        new()
-        {
-            { "SystemAudienceExtraction", "audienceExtraction" },
-            { "SystemIntentExtraction", "userIntentExtraction" },
-            { "SystemMetaPrompt", "metaPromptTemplate" },
-            { "SystemCompletion", "responseCompletion" },
-            { "SystemCognitive_WorkingMemory", "workingMemoryExtraction" },
-            { "SystemCognitive_LongTermMemory", "longTermMemoryExtraction" },
-        };
+    internal static readonly Dictionary<string, string> semanticFunctions = new()
+    {
+        { "SystemAudienceExtraction", "audienceExtraction" },
+        { "SystemIntentExtraction", "userIntentExtraction" },
+        { "SystemMetaPrompt", "metaPromptTemplate" },
+        { "SystemCompletion", "responseCompletion" },
+        { "SystemCognitive_WorkingMemory", "workingMemoryExtraction" },
+        { "SystemCognitive_LongTermMemory", "longTermMemoryExtraction" },
+    };
 
     /// <summary>
     /// Gets dictionary containing empty token usage totals.
