@@ -12,7 +12,6 @@ using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Plugins.Utils;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
@@ -34,60 +33,22 @@ namespace CopilotChat.WebApi.Controllers;
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
 [ApiController]
-public class ChatHistoryController : ControllerBase
+public class ChatHistoryController(
+    ILogger<ChatHistoryController> logger,
+    IKernelMemory memoryClient,
+    ChatSessionRepository sessionRepository,
+    ChatMessageRepository messageRepository,
+    ChatParticipantRepository participantRepository,
+    ChatMemorySourceRepository sourceRepository,
+    IOptions<PromptsOptions> promptOptions,
+    IQSpecializationService qSpecializationService,
+    IAuthInfo authInfo
+) : ControllerBase
 {
     private const string ChatEditedClientCall = "ChatEdited";
     private const string ChatDeletedClientCall = "ChatDeleted";
     private const string ChatHistoryDeletedClientCall = "ChatHistoryDeleted";
     private const string GetChatRoute = "GetChatRoute";
-
-    private readonly ILogger<ChatHistoryController> _logger;
-    private readonly IKernelMemory _memoryClient;
-    private readonly ChatSessionRepository _sessionRepository;
-    private readonly ChatMessageRepository _messageRepository;
-    private readonly ChatParticipantRepository _participantRepository;
-    private readonly ChatMemorySourceRepository _sourceRepository;
-    private readonly PromptsOptions _promptOptions;
-    private readonly QSpecializationService _qSpecializationService;
-    private readonly IAuthInfo _authInfo;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChatHistoryController"/> class.
-    /// </summary>
-    /// <param name="logger">The logger.</param>
-    /// <param name="memoryClient">Memory client.</param>
-    /// <param name="sessionRepository">The chat session repository.</param>
-    /// <param name="messageRepository">The chat message repository.</param>
-    /// <param name="participantRepository">The chat participant repository.</param>
-    /// <param name="sourceRepository">The chat memory resource repository.</param>
-    /// <param name="promptsOptions">The prompts options.</param>
-    /// <param name="authInfo">The auth info for the current request.</param>
-    public ChatHistoryController(
-        ILogger<ChatHistoryController> logger,
-        IKernelMemory memoryClient,
-        ChatSessionRepository sessionRepository,
-        ChatMessageRepository messageRepository,
-        ChatParticipantRepository participantRepository,
-        ChatMemorySourceRepository sourceRepository,
-        SpecializationRepository specializationSourceRepository,
-        IOptions<PromptsOptions> promptsOptions,
-        IOptions<QAzureOpenAIChatOptions> specializationOptions,
-        IAuthInfo authInfo
-    )
-    {
-        this._logger = logger;
-        this._memoryClient = memoryClient;
-        this._sessionRepository = sessionRepository;
-        this._messageRepository = messageRepository;
-        this._participantRepository = participantRepository;
-        this._sourceRepository = sourceRepository;
-        this._promptOptions = promptsOptions.Value;
-        this._qSpecializationService = new QSpecializationService(
-            specializationSourceRepository,
-            specializationOptions.Value
-        );
-        this._authInfo = authInfo;
-    }
 
     /// <summary>
     /// Create a new chat session and populate the session with the initial bot message.
@@ -106,18 +67,18 @@ public class ChatHistoryController : ControllerBase
             return this.BadRequest("Chat session parameters cannot be null.");
         }
 
-        var specialization = await this._qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
+        var specialization = await qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
 
-        var systemDescription = this._promptOptions.SystemDescription;
+        var systemDescription = promptOptions.Value.SystemDescription;
         var newChat = new ChatSession(
             chatParameters.Title,
-            specialization?.RoleInformation ?? this._promptOptions.SystemPersona,
+            specialization?.RoleInformation ?? promptOptions.Value.SystemPersona,
             chatParameters.specializationId,
             chatParameters.Id
         );
-        await this._sessionRepository.CreateAsync(newChat);
+        await sessionRepository.CreateAsync(newChat);
         var initialMessage = string.IsNullOrEmpty(specialization?.InitialChatMessage)
-            ? this._promptOptions.InitialBotMessage
+            ? promptOptions.Value.InitialBotMessage
             : specialization.InitialChatMessage;
 
         // Create initial bot message
@@ -128,13 +89,13 @@ public class ChatHistoryController : ControllerBase
             null,
             TokenUtils.EmptyTokenUsages()
         );
-        await this._messageRepository.CreateAsync(chatMessage);
+        await messageRepository.CreateAsync(chatMessage);
 
         // Add the user to the chat session
-        await this._participantRepository.CreateAsync(new ChatParticipant(this._authInfo.UserId, newChat.Id));
+        await participantRepository.CreateAsync(new ChatParticipant(authInfo.UserId, newChat.Id));
 
         var sanitizedChatId = RequestUtils.GetSanitizedParameter(newChat.Id);
-        this._logger.LogDebug("Created chat session with id {0}.", sanitizedChatId);
+        logger.LogDebug("Created chat session with id {0}.", sanitizedChatId);
 
         return this.CreatedAtRoute(
             GetChatRoute,
@@ -156,7 +117,7 @@ public class ChatHistoryController : ControllerBase
     public async Task<IActionResult> GetChatSessionByIdAsync(Guid chatId)
     {
         ChatSession? chat = null;
-        if (await this._sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
+        if (await sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
         {
             return this.Ok(chat);
         }
@@ -176,9 +137,9 @@ public class ChatHistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllChatSessionsAsync()
     {
-        var chatParticipants = await this._participantRepository.FindByUserIdAsync(this._authInfo.UserId);
+        var chatParticipants = await participantRepository.FindByUserIdAsync(authInfo.UserId);
 
-        var chats = await this._sessionRepository.FindByIdsAsync(chatParticipants.Select(cp => cp.ChatId));
+        var chats = await sessionRepository.FindByIdsAsync(chatParticipants.Select(cp => cp.ChatId));
 
         return this.Ok(chats);
     }
@@ -202,7 +163,7 @@ public class ChatHistoryController : ControllerBase
         [FromQuery] int count = -1
     )
     {
-        var chatMessages = await this._messageRepository.FindByChatIdAsync(chatId.ToString(), null, skip, count);
+        var chatMessages = await messageRepository.FindByChatIdAsync(chatId.ToString(), null, skip, count);
         if (!chatMessages.Any())
         {
             return this.NotFound($"No messages found for chat id '{chatId}'.");
@@ -235,7 +196,7 @@ public class ChatHistoryController : ControllerBase
         [FromBody] RateChatMessageBody body
     )
     {
-        var chatMessage = await this._messageRepository.FindByMessageIdAsync(chatId.ToString(), messageId.ToString());
+        var chatMessage = await messageRepository.FindByMessageIdAsync(chatId.ToString(), messageId.ToString());
         if (chatMessage == null)
         {
             return this.NotFound($"No message found for message id '{messageId}'.");
@@ -246,7 +207,7 @@ public class ChatHistoryController : ControllerBase
             false => Models.Storage.UserFeedback.Negative,
             null => null,
         };
-        await this._messageRepository.UpsertAsync(chatMessage);
+        await messageRepository.UpsertAsync(chatMessage);
 
         return this.Ok(chatMessage);
     }
@@ -268,12 +229,12 @@ public class ChatHistoryController : ControllerBase
     )
     {
         ChatSession? chat = null;
-        if (await this._sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
+        if (await sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
         {
             chat!.Title = chatParameters.Title ?? chat!.Title;
             chat!.SystemDescription = chatParameters.SystemDescription ?? chat!.SafeSystemDescription;
             chat!.MemoryBalance = chatParameters.MemoryBalance ?? chat!.MemoryBalance;
-            await this._sessionRepository.UpsertAsync(chat);
+            await sessionRepository.UpsertAsync(chat);
             await messageRelayHubContext.Clients.Group(chatId.ToString()).SendAsync(ChatEditedClientCall, chat);
 
             return this.Ok(chat);
@@ -300,21 +261,21 @@ public class ChatHistoryController : ControllerBase
     )
     {
         ChatSession? chat = null;
-        if (await this._sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
+        if (await sessionRepository.TryFindByIdAsync(chatId.ToString(), callback: v => chat = v))
         {
             if (chatParameters.SpecializationId != "general")
             {
-                Specialization specializationSource = await this._qSpecializationService.GetSpecializationAsync(
+                Specialization specializationSource = await qSpecializationService.GetSpecializationAsync(
                     chatParameters.SpecializationId
                 );
                 chat!.SystemDescription = specializationSource.RoleInformation;
             }
             else
             {
-                chat!.SystemDescription = this._promptOptions.SystemDescription;
+                chat!.SystemDescription = promptOptions.Value.SystemDescription;
             }
             chat!.specializationId = chatParameters.SpecializationId;
-            await this._sessionRepository.UpsertAsync(chat);
+            await sessionRepository.UpsertAsync(chat);
             await messageRelayHubContext.Clients.Group(chatId.ToString()).SendAsync(ChatEditedClientCall, chat);
 
             return this.Ok(chat);
@@ -335,11 +296,11 @@ public class ChatHistoryController : ControllerBase
     [Authorize(Policy = AuthPolicyName.RequireChatParticipant)]
     public async Task<ActionResult<IEnumerable<MemorySource>>> GetSourcesAsync(Guid chatId)
     {
-        this._logger.LogInformation("Get imported sources of chat session {0}", chatId);
+        logger.LogInformation("Get imported sources of chat session {0}", chatId);
 
-        if (await this._sessionRepository.TryFindByIdAsync(chatId.ToString()))
+        if (await sessionRepository.TryFindByIdAsync(chatId.ToString()))
         {
-            IEnumerable<MemorySource> sources = await this._sourceRepository.FindByChatIdAsync(chatId.ToString());
+            IEnumerable<MemorySource> sources = await sourceRepository.FindByChatIdAsync(chatId.ToString());
 
             return this.Ok(sources);
         }
@@ -369,7 +330,7 @@ public class ChatHistoryController : ControllerBase
         try
         {
             // Make sure the chat session exists
-            chatToDelete = await this._sessionRepository.FindByIdAsync(chatIdString);
+            chatToDelete = await sessionRepository.FindByIdAsync(chatIdString);
         }
         catch (KeyNotFoundException)
         {
@@ -379,23 +340,18 @@ public class ChatHistoryController : ControllerBase
         // Delete any resources associated with the chat session.
 
         //await this.DeleteChatResourcesAsync(chatIdString, cancellationToken);
-        var chatParticipants = await this._participantRepository.FindByChatIdAsync(chatIdString);
-        var currentUser = chatParticipants.First((p) => p.UserId == this._authInfo.UserId);
+        var chatParticipants = await participantRepository.FindByChatIdAsync(chatIdString);
+        var currentUser = chatParticipants.First((p) => p.UserId == authInfo.UserId);
         if (currentUser == null)
         {
             return this.NotFound("Current user is not in the selected chat session."); //We should never really hit this due to the auth middleware.
         }
-        await this._participantRepository.DeleteAsync(currentUser);
+        await participantRepository.DeleteAsync(currentUser);
         // Delete chat session and broadcast update to all participants.
-        // await this._sessionRepository.DeleteAsync(chatToDelete);
+        // await sessionRepository.DeleteAsync(chatToDelete);
         await messageRelayHubContext // Even though we aren't truly deleting the chat anymore, the frontend should still operate as if we were.
             .Clients.Group(chatIdString)
-            .SendAsync(
-                ChatDeletedClientCall,
-                chatIdString,
-                this._authInfo.UserId,
-                cancellationToken: cancellationToken
-            );
+            .SendAsync(ChatDeletedClientCall, chatIdString, authInfo.UserId, cancellationToken: cancellationToken);
 
         return this.NoContent();
     }
@@ -412,7 +368,7 @@ public class ChatHistoryController : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var removedParticipants = await this._participantRepository.RemoveAllParticipantsForUser(this._authInfo.UserId);
+        var removedParticipants = await participantRepository.RemoveAllParticipantsForUser(authInfo.UserId);
         var chatSessionsToRemove = removedParticipants.Select((p) => p.ChatId);
 
         return this.Ok(chatSessionsToRemove);
@@ -440,7 +396,7 @@ public class ChatHistoryController : ControllerBase
         try
         {
             // Make sure the chat session exists
-            chat = await this._sessionRepository.FindByIdAsync(chatIdString);
+            chat = await sessionRepository.FindByIdAsync(chatIdString);
         }
         catch (KeyNotFoundException)
         {
@@ -451,24 +407,24 @@ public class ChatHistoryController : ControllerBase
         try
         {
             // Create and store the tasks for deleting chat messages.
-            var messages = await this._messageRepository.FindByChatIdAsync(chatIdString);
+            var messages = await messageRepository.FindByChatIdAsync(chatIdString);
 
             var deleteTasks = new List<Task>();
             foreach (var message in messages)
             {
-                deleteTasks.Add(this._messageRepository.DeleteAsync(message));
+                deleteTasks.Add(messageRepository.DeleteAsync(message));
             }
             await Task.WhenAll(deleteTasks.ToArray());
 
             // Create deleted chat history bot message
             var chatMessage = CopilotChatMessage.CreateBotResponseMessage(
                 chat.Id,
-                this._promptOptions.ChatHistoryDeletedMessage,
+                promptOptions.Value.ChatHistoryDeletedMessage,
                 string.Empty,
                 null,
                 TokenUtils.EmptyTokenUsages()
             );
-            await this._messageRepository.CreateAsync(chatMessage);
+            await messageRepository.CreateAsync(chatMessage);
 
             await messageRelayHubContext
                 .Clients.Group(chatIdString)
@@ -497,29 +453,29 @@ public class ChatHistoryController : ControllerBase
         var cleanupTasks = new List<Task>();
 
         // Create and store the tasks for deleting all users tied to the chat.
-        var participants = await this._participantRepository.FindByChatIdAsync(chatId);
+        var participants = await participantRepository.FindByChatIdAsync(chatId);
         foreach (var participant in participants)
         {
-            cleanupTasks.Add(this._participantRepository.DeleteAsync(participant));
+            cleanupTasks.Add(participantRepository.DeleteAsync(participant));
         }
 
         // Create and store the tasks for deleting chat messages.
-        var messages = await this._messageRepository.FindByChatIdAsync(chatId);
+        var messages = await messageRepository.FindByChatIdAsync(chatId);
         foreach (var message in messages)
         {
-            cleanupTasks.Add(this._messageRepository.DeleteAsync(message));
+            cleanupTasks.Add(messageRepository.DeleteAsync(message));
         }
 
         // Create and store the tasks for deleting memory sources.
-        var sources = await this._sourceRepository.FindByChatIdAsync(chatId, false);
+        var sources = await sourceRepository.FindByChatIdAsync(chatId, false);
         foreach (var source in sources)
         {
-            cleanupTasks.Add(this._sourceRepository.DeleteAsync(source));
+            cleanupTasks.Add(sourceRepository.DeleteAsync(source));
         }
 
         // Create and store the tasks for deleting semantic memories.
         cleanupTasks.Add(
-            this._memoryClient.RemoveChatMemoriesAsync(this._promptOptions.MemoryIndexName, chatId, cancellationToken)
+            memoryClient.RemoveChatMemoriesAsync(promptOptions.Value.MemoryIndexName, chatId, cancellationToken)
         );
 
         // Create a task that represents the completion of all cleanupTasks
@@ -539,7 +495,7 @@ public class ChatHistoryController : ControllerBase
             {
                 foreach (var innerEx in aggregationTask.Exception.InnerExceptions)
                 {
-                    this._logger.LogInformation("Failed to delete an entity of chat {0}: {1}", chatId, innerEx.Message);
+                    logger.LogInformation("Failed to delete an entity of chat {0}: {1}", chatId, innerEx.Message);
                 }
 
                 throw aggregationTask.Exception;

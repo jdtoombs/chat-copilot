@@ -119,7 +119,12 @@ internal static class SemanticKernelExtensions
                 contentSafety: sp.GetService<AzureContentSafety>(),
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
                 openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
-                qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>()
+                qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>(),
+                qSearchDeploymentService: sp.GetRequiredService<IQSearchDeploymentService>(),
+                qSpecializationService: sp.GetRequiredService<IQSpecializationService>(),
+                qSpecializationIndexService: sp.GetRequiredService<IQSpecializationIndexService>(),
+                qAzureOpenAIChatExtension: sp.GetRequiredService<IQAzureOpenAIChatExtension>(),
+                qBlobStorage: sp.GetRequiredService<IQBlobStorage>()
             ),
             nameof(ChatPlugin)
         );

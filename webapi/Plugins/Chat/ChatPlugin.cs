@@ -77,7 +77,7 @@ public class ChatPlugin
     /// <summary>
     /// The QSpecializationService used for managing specializations.
     /// </summary>
-    private readonly QSpecializationService _qSpecializationService;
+    private readonly IQSpecializationService _qSpecializationService;
 
     private readonly IQOpenAIDeploymentService _qOpenAIDeploymentService;
 
@@ -104,7 +104,7 @@ public class ChatPlugin
     /// <summary>
     /// Extension: AzureOpenAI Extension handler
     /// </summary>
-    private QAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
 
     // feature flag for user intent extraction
     private readonly bool _isUserIntentExtractionEnabled;
@@ -121,12 +121,17 @@ public class ChatPlugin
         SpecializationIndexRepository specializationIndexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
         IQOpenAIDeploymentService qOpenAIDeploymentService,
+        IQSearchDeploymentService qSearchDeploymentService,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
+        IQSpecializationService qSpecializationService,
+        IQSpecializationIndexService qSpecializationIndexService,
         SecretClient secretClient,
         ILogger logger,
+        IQBlobStorage qBlobStorage,
+        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension,
         AzureContentSafety? contentSafety = null,
         bool isUserIntentExtractionEnabled = true
     ) // Parameter for feature flag
@@ -139,10 +144,7 @@ public class ChatPlugin
         this._messageRelayHubContext = messageRelayHubContext;
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
-        this._qSpecializationService = new QSpecializationService(
-            specializationSourceRepository,
-            qAzureOpenAIChatOptions.Value
-        );
+        this._qSpecializationService = qSpecializationService;
         this._qOpenAIDeploymentService = qOpenAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
@@ -150,13 +152,7 @@ public class ChatPlugin
             memoryClient,
             logger
         );
-        this._qAzureOpenAIChatExtension = new QAzureOpenAIChatExtension(
-            qAzureOpenAIChatOptions.Value,
-            specializationSourceRepository,
-            specializationIndexRepository,
-            openAIDeploymentRepository,
-            qOpenAIDeploymentService
-        );
+        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
     }

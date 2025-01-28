@@ -204,6 +204,7 @@ public static class CopilotChatServiceExtensions
         IStorageContext<ChatUser> chatUserStorageContext;
         IStorageContext<SpecializationIndex> specializationIndexStorageContext;
         IStorageContext<OpenAIDeployment> openAIDeploymentStorageContext;
+        IStorageContext<AISearchDeployment> aiSearchDeploymentStorageContext;
 
         ChatStoreOptions chatStoreConfig = services
             .BuildServiceProvider()
@@ -222,6 +223,7 @@ public static class CopilotChatServiceExtensions
                 chatUserStorageContext = new VolatileContext<ChatUser>();
                 specializationIndexStorageContext = new VolatileContext<SpecializationIndex>();
                 openAIDeploymentStorageContext = new VolatileContext<OpenAIDeployment>();
+                aiSearchDeploymentStorageContext = new VolatileContext<AISearchDeployment>();
                 break;
             }
 
@@ -300,6 +302,14 @@ public static class CopilotChatServiceExtensions
                         )
                     )
                 );
+                aiSearchDeploymentStorageContext = new FileSystemContext<AISearchDeployment>(
+                    new FileInfo(
+                        Path.Combine(
+                            directory,
+                            $"{Path.GetFileNameWithoutExtension(fullPath)}_aiSearchDeployments{Path.GetExtension(fullPath)}"
+                        )
+                    )
+                );
                 break;
             }
 
@@ -350,6 +360,11 @@ public static class CopilotChatServiceExtensions
                     chatStoreConfig.Cosmos.Database,
                     chatStoreConfig.Cosmos.OpenAIDeploymentContainer
                 );
+                aiSearchDeploymentStorageContext = new CosmosDbContext<AISearchDeployment>(
+                    chatStoreConfig.Cosmos.ConnectionString,
+                    chatStoreConfig.Cosmos.Database,
+                    chatStoreConfig.Cosmos.AISearchDeploymentContainer
+                );
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 break;
             }
@@ -373,6 +388,9 @@ public static class CopilotChatServiceExtensions
         );
         services.AddSingleton<OpenAIDeploymentRepository>(
             new OpenAIDeploymentRepository(openAIDeploymentStorageContext)
+        );
+        services.AddSingleton<AISearchDeploymentRepository>(
+            new AISearchDeploymentRepository(aiSearchDeploymentStorageContext)
         );
 
         return services;
@@ -461,21 +479,32 @@ public static class CopilotChatServiceExtensions
     }
 
     /// <summary>
-    /// Add emailing services
+    /// Add proprietary services
     /// </summary>
-    public static IServiceCollection AddEmailService(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        // chat extension services
+        services.AddScoped<IQAzureOpenAIChatExtension, QAzureOpenAIChatExtension>();
+
+        // specialization services
+        services.AddScoped<IQSpecializationService, QSpecializationService>();
+        services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();
+
+        // email services
         services.AddScoped<IEmailSender, EmailSender>();
 
-        return services;
-    }
+        // completion services
+        services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
 
-    /// <summary>
-    /// Add deployment services
-    /// </summary>
-    public static IServiceCollection AddDeploymentService(this IServiceCollection services)
-    {
+        // deployment services
         services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
+        services.AddScoped<IQSearchDeploymentService, QAISearchDeploymentService>();
+
+        // user feedback services
+        services.AddScoped<IUserFeedbackService, UserFeedbackService>();
+
+        // search services
+        services.AddScoped<IQSearchService, QSearchService>();
 
         return services;
     }

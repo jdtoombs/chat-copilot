@@ -23,31 +23,12 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller for retrieving kernel memory data of chat sessions.
 /// </summary>
 [ApiController]
-public class ChatMemoryController : ControllerBase
+public class ChatMemoryController(
+    ILogger<ChatMemoryController> logger,
+    IOptions<PromptsOptions> promptsOptions,
+    ChatSessionRepository chatSessionRepository
+) : ControllerBase
 {
-    private readonly ILogger<ChatMemoryController> _logger;
-
-    private readonly PromptsOptions _promptOptions;
-
-    private readonly ChatSessionRepository _chatSessionRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChatMemoryController"/> class.
-    /// </summary>
-    /// <param name="logger">The logger.</param>
-    /// <param name="promptsOptions">The prompts options.</param>
-    /// <param name="chatSessionRepository">The chat session repository.</param>
-    public ChatMemoryController(
-        ILogger<ChatMemoryController> logger,
-        IOptions<PromptsOptions> promptsOptions,
-        ChatSessionRepository chatSessionRepository
-    )
-    {
-        this._logger = logger;
-        this._promptOptions = promptsOptions.Value;
-        this._chatSessionRepository = chatSessionRepository;
-    }
-
     /// <summary>
     /// Gets the kernel memory for the chat session.
     /// </summary>
@@ -71,16 +52,16 @@ public class ChatMemoryController : ControllerBase
         var sanitizedMemoryType = RequestUtils.GetSanitizedParameter(type);
 
         // Map the requested memoryType to the memory store container name
-        if (!this._promptOptions.TryGetMemoryContainerName(type, out string memoryContainerName))
+        if (!promptsOptions.Value.TryGetMemoryContainerName(type, out string memoryContainerName))
         {
-            this._logger.LogWarning("Memory type: {0} is invalid.", sanitizedMemoryType);
+            logger.LogWarning("Memory type: {0} is invalid.", sanitizedMemoryType);
             return this.BadRequest($"Memory type: {sanitizedMemoryType} is invalid.");
         }
 
         // Make sure the chat session exists.
-        if (!await this._chatSessionRepository.TryFindByIdAsync(chatId))
+        if (!await chatSessionRepository.TryFindByIdAsync(chatId))
         {
-            this._logger.LogWarning("Chat session: {0} does not exist.", sanitizedChatId);
+            logger.LogWarning("Chat session: {0} does not exist.", sanitizedChatId);
             return this.BadRequest($"Chat session: {sanitizedChatId} does not exist.");
         }
 
@@ -96,7 +77,7 @@ public class ChatMemoryController : ControllerBase
             filter.ByTag("memory", memoryContainerName);
 
             var searchResult = await memoryClient.SearchMemoryAsync(
-                this._promptOptions.MemoryIndexName,
+                promptsOptions.Value.MemoryIndexName,
                 "*",
                 relevanceThreshold: 0,
                 resultCount: 1,
@@ -112,7 +93,7 @@ public class ChatMemoryController : ControllerBase
         catch (Exception connectorException) when (!connectorException.IsCriticalException())
         {
             // A store exception might be thrown if the collection does not exist, depending on the memory store connector.
-            this._logger.LogError(connectorException, "Cannot search collection {0}", memoryContainerName);
+            logger.LogError(connectorException, "Cannot search collection {0}", memoryContainerName);
         }
 
         return this.Ok(memories);
