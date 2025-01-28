@@ -17,6 +17,7 @@ import {
     Tooltip,
 } from '@fluentui/react-components';
 import { Info20Regular } from '@fluentui/react-icons';
+import '@mdxeditor/editor/style.css';
 import React, { useEffect, useId, useMemo, useState } from 'react';
 import { useSpecialization } from '../../../libs/hooks';
 import { AlertType } from '../../../libs/models/AlertType';
@@ -27,15 +28,15 @@ import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
 import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import FieldArray from '../../shared/FieldArray';
 import { Row } from '../../shared/Row';
-import '@mdxeditor/editor/style.css';
 //import { useCellValue, usePublisher } from '@mdxeditor/editor';
 
-import { AuthHelper } from '../../../libs/auth/AuthHelper';
-import { IAsk } from '../../../libs/semantic-kernel/model/Ask';
-import { ChatMessageType } from '../../../libs/models/ChatMessage';
-import { SingleCompletionService } from '../../../libs/services/SingleCompletionService';
 import { useMsal } from '@azure/msal-react';
+import { AuthHelper } from '../../../libs/auth/AuthHelper';
+import { ChatMessageType } from '../../../libs/models/ChatMessage';
+import { IAsk } from '../../../libs/semantic-kernel/model/Ask';
 import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
+import { SingleCompletionService } from '../../../libs/services/SingleCompletionService';
+import { extractJsonArray } from '../../../libs/utils/HelperMethods';
 import MarkDownEditor from './MarkDownEditor';
 
 interface ISpecializationFile {
@@ -137,6 +138,8 @@ export const SpecializationManager: React.FC = () => {
         );
         return formatted;
     }, [chatCompletionDeployments]);
+
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
     const [editMode, setEditMode] = useState(false);
     const defaultSpecializationId = specializations.find((spec) => spec.isDefault)?.id;
@@ -532,6 +535,17 @@ export const SpecializationManager: React.FC = () => {
         return noChatMessageService.getBotResponseNoChat(ask, authToken);
     };
 
+    const getAutoSuggestions = async (): Promise<IAskResult> => {
+        const autoSpecPrompt =
+            'Provide four topics related to the current dataset, format them as questions, and return the response as a JSON array.';
+        const ask: IAsk = {
+            input: autoSpecPrompt,
+        };
+        const noChatMessageService = new SingleCompletionService();
+        const authToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+        return noChatMessageService.getBotResponseNoChat(ask, authToken, selectedId);
+    };
+
     const AIFormat = async (): Promise<void> => {
         try {
             const markdownResponse = await getMarkdown();
@@ -540,7 +554,32 @@ export const SpecializationManager: React.FC = () => {
             console.error('Error in AIFormat:', error);
         }
     };
-    const handleClick = () => {
+
+    const handleClickAutoSuggestions = () => {
+        setIsLoadingSuggestions(true);
+        getAutoSuggestions()
+            .then((response) => {
+                let arraySuggestions = extractJsonArray(response.value); //First try to convert from the raw string.
+                if (!arraySuggestions.length) {
+                    //Sometimes the bot will reply with other text and json wrapped in ```json ... ```
+                    //so we can try that if the first attempt didn't give us anything.
+                    const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
+                    const match = regex.exec(response.value);
+                    if (match) {
+                        arraySuggestions = extractJsonArray(match[1]);
+                    }
+                }
+                setSuggestions(arraySuggestions);
+            })
+            .catch(() => {
+                console.error('Suggestions retrieval failed.');
+            })
+            .finally(() => {
+                setIsLoadingSuggestions(false);
+            });
+    };
+
+    const handleClickFormatWithAI = () => {
         AIFormat().catch((error) => {
             console.error('Error in AIFormat:', error);
         });
@@ -770,7 +809,7 @@ export const SpecializationManager: React.FC = () => {
                         Chat Context<span style={{ color: 'red' }}>*</span>
                     </label>
                     <label
-                        onClick={handleClick}
+                        onClick={handleClickFormatWithAI}
                         style={{
                             cursor: 'pointer',
                             color: 'blue',
@@ -823,9 +862,22 @@ export const SpecializationManager: React.FC = () => {
                         setInitialChatMessage(data.value);
                     }}
                 />
-                <label htmlFor="initialMessage">
-                    Initial Chat Suggestions<span className={classes.required}>*</span>
-                </label>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label htmlFor="initialMessage">
+                        Initial Chat Suggestions<span className={classes.required}>*</span>
+                    </label>
+                    <label
+                        onClick={handleClickAutoSuggestions}
+                        style={{
+                            cursor: 'pointer',
+                            color: 'blue',
+                            marginLeft: '10px',
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        {isLoadingSuggestions ? 'Loading...' : `(Format With AI)`}
+                    </label>
+                </div>
                 <FieldArray
                     values={suggestions}
                     maxItems={4}

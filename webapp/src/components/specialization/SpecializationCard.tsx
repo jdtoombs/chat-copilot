@@ -21,7 +21,6 @@ import { addAlert } from '../../redux/features/app/appSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
-    updateConversationGeneratedSuggestions,
 } from '../../redux/features/conversations/conversationsSlice';
 
 const useStyles = makeStyles({
@@ -108,19 +107,7 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                 dispatch(
                     addAlert({ message: 'Unable to select the specified specialization.', type: AlertType.Error }),
                 );
-            })
-            .then(() =>
-                chat
-                    .getSuggestions({ chatId: selectedId, specializationId: specialization.id })
-                    .then((response) => {
-                        dispatch(
-                            updateConversationGeneratedSuggestions({ id: selectedId, chatSuggestionMessage: response }),
-                        );
-                    })
-                    .catch((reason) => {
-                        console.error(`Failed to retrieve suggestions: ${reason}`);
-                    }),
-            );
+            });
     };
 
     const truncate = (str: string) => {

@@ -20,7 +20,6 @@ import { FeatureKeys } from '../../redux/features/app/AppState';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
-    updateConversationGeneratedSuggestions,
 } from '../../redux/features/conversations/conversationsSlice';
 import { ChatRoom } from './ChatRoom';
 import { ChatMenu } from './controls/ChatMenu';
@@ -120,17 +119,6 @@ export const ChatWindow: React.FC = () => {
                     }),
                 );
             });
-            if (chatSpecialization.suggestions.length < 1) {
-                chat.getSuggestions({ chatId: newChatId, specializationId: chatSpecialization.id })
-                    .then((response) => {
-                        dispatch(
-                            updateConversationGeneratedSuggestions({ id: newChatId, chatSuggestionMessage: response }),
-                        );
-                    })
-                    .catch((reason) => {
-                        console.error(`Failed to retrieve suggestions: ${reason}`);
-                    });
-            }
         }
     };
 
