@@ -21,8 +21,13 @@ namespace CopilotChat.WebApi.Extensions;
 /// </summary>
 internal static class ISemanticMemoryClientExtensions
 {
-    private static readonly List<string> pipelineSteps =
-        new() { "extract", "partition", "gen_embeddings", "save_records" };
+    private static readonly List<string> pipelineSteps = new()
+    {
+        "extract",
+        "partition",
+        "gen_embeddings",
+        "save_records",
+    };
 
     /// <summary>
     /// Inject <see cref="IKernelMemory"/>.

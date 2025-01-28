@@ -4,7 +4,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "[csharp]": {
-    "editor.defaultFormatter": "ms-dotnettools.csharp",
+    "editor.defaultFormatter": "csharpier.csharpier-vscode",
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit"
     }
