@@ -160,12 +160,11 @@ public class ChatController(
             throw;
         }
 
-        AskResult chatAskResult =
-            new()
-            {
-                Value = result.ToString() ?? string.Empty,
-                Variables = contextVariables.Select(v => new KeyValuePair<string, object?>(v.Key, v.Value)),
-            };
+        AskResult chatAskResult = new()
+        {
+            Value = result.ToString() ?? string.Empty,
+            Variables = contextVariables.Select(v => new KeyValuePair<string, object?>(v.Key, v.Value)),
+        };
 
         chat.LastUpdatedTimestamp = DateTimeOffset.Now;
         await chatSessionRepository.UpsertAsync(chat);

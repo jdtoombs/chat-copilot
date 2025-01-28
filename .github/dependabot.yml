@@ -21,6 +21,11 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+  - package-ecosystem: "nuget"
+    directory: "integration-tests"
+    schedule:
+      interval: "weekly"
+      day: "monday"
 
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
