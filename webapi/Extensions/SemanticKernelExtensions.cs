@@ -120,6 +120,7 @@ internal static class SemanticKernelExtensions
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
                 openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
                 qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>(),
+                qSearchDeploymentService: sp.GetRequiredService<IQSearchDeploymentService>(),
                 qSpecializationService: sp.GetRequiredService<IQSpecializationService>(),
                 qSpecializationIndexService: sp.GetRequiredService<IQSpecializationIndexService>(),
                 qAzureOpenAIChatExtension: sp.GetRequiredService<IQAzureOpenAIChatExtension>(),

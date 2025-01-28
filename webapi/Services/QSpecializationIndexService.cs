@@ -26,7 +26,7 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
             index.Name,
             index.Label,
             index.QueryType,
-            index.AISearchDeploymentConnection,
+            index.AISearchDeploymentId,
             index.OpenAIDeploymentConnection,
             index.EmbeddingDeployment,
             index.Order ?? 0
@@ -47,8 +47,7 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
         indexToEdit.Name = qIndexMutate.Name ?? indexToEdit.Name;
         indexToEdit.Label = qIndexMutate.Label ?? indexToEdit.Label;
         indexToEdit.QueryType = qIndexMutate.QueryType ?? indexToEdit.QueryType;
-        indexToEdit.AISearchDeploymentConnection =
-            qIndexMutate.AISearchDeploymentConnection ?? indexToEdit.AISearchDeploymentConnection;
+        indexToEdit.AISearchDeploymentId = qIndexMutate.AISearchDeploymentId ?? indexToEdit.AISearchDeploymentId;
         indexToEdit.OpenAIDeploymentConnection =
             qIndexMutate.OpenAIDeploymentConnection ?? indexToEdit.OpenAIDeploymentConnection;
         indexToEdit.EmbeddingDeployment = qIndexMutate.EmbeddingDeployment ?? indexToEdit.EmbeddingDeployment;

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
 using CopilotChat.WebApi.Models.Storage;
@@ -18,6 +17,7 @@ namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 public class QAzureOpenAIChatExtension(
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     IQOpenAIDeploymentService qOpenAIDeploymentService,
+    IQSearchDeploymentService qSearchDeploymentService,
     IQSpecializationIndexService qSpecializationIndexService
 ) : IQAzureOpenAIChatExtension
 {
@@ -53,8 +53,11 @@ public class QAzureOpenAIChatExtension(
             return null;
         }
 
-        var aiSearchDeploymentConnection = qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(
-            c => c.Name == qSpecializationIndex.AISearchDeploymentConnection
+        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
+            qSpecializationIndex.AISearchDeploymentId
+        );
+        var aiSearchDeploymentApiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(
+            aiSearchDeploymentConnection
         );
         if (aiSearchDeploymentConnection == null)
         {
@@ -62,10 +65,16 @@ public class QAzureOpenAIChatExtension(
         }
 
         var openAIDeploymentConnection = await qOpenAIDeploymentService.GetDeployment(
-            specialization?.OpenAIDeploymentId ?? ""
+            specialization.OpenAIDeploymentId ?? ""
         );
-        var apiKey = await qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(openAIDeploymentConnection);
-        if (openAIDeploymentConnection == null || openAIDeploymentConnection.Endpoint == null || apiKey == null)
+        var openAIDeploymentApiKey = await qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(
+            openAIDeploymentConnection
+        );
+        if (
+            openAIDeploymentConnection == null
+            || openAIDeploymentConnection.Endpoint == null
+            || openAIDeploymentApiKey == null
+        )
         {
             throw new InvalidOperationException("Configuration error: OpenAI Deployment Connection is missing.");
         }
@@ -77,7 +86,7 @@ public class QAzureOpenAIChatExtension(
         return new AzureSearchChatDataSource
         {
             IndexName = qSpecializationIndex.Name,
-            Endpoint = aiSearchDeploymentConnection.Endpoint,
+            Endpoint = new Uri(aiSearchDeploymentConnection.Endpoint),
             Strictness = specialization.Strictness,
             FieldMappings = new DataSourceFieldMappings
             {
@@ -89,10 +98,10 @@ public class QAzureOpenAIChatExtension(
             QueryType = new DataSourceQueryType(qSpecializationIndex.QueryType),
             InScope = specialization.RestrictResultScope,
             TopNDocuments = specialization.DocumentCount,
-            Authentication = DataSourceAuthentication.FromApiKey(aiSearchDeploymentConnection.APIKey),
+            Authentication = DataSourceAuthentication.FromApiKey(aiSearchDeploymentApiKey),
             VectorizationSource = DataSourceVectorizer.FromEndpoint(
                 embeddingEndpoint,
-                DataSourceAuthentication.FromApiKey(apiKey)
+                DataSourceAuthentication.FromApiKey(openAIDeploymentApiKey)
             ),
         };
     }
@@ -105,13 +114,6 @@ public class QAzureOpenAIChatExtension(
         );
     }
 
-    private QAzureOpenAIChatOptions.AISearchDeploymentConnection? GetAISearchDeploymentConnection(string connectionName)
-    {
-        return qAzureOpenAIChatOptions.Value.AISearchDeploymentConnections.FirstOrDefault(connection =>
-            connection.Name == connectionName
-        );
-    }
-
     public async Task<(string? indexName, string? ApiKey, string? Endpoint)> GetAISearchDeploymentConnectionDetails(
         string indexId
     )
@@ -121,13 +123,10 @@ public class QAzureOpenAIChatExtension(
         {
             return (null, null, null);
         }
-        var aiSearchDeploymentConnection = this.GetAISearchDeploymentConnection(
-            specializationIndex.AISearchDeploymentConnection
+        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
+            specializationIndex.AISearchDeploymentId
         );
-        return (
-            specializationIndex.Name,
-            aiSearchDeploymentConnection?.APIKey,
-            aiSearchDeploymentConnection?.Endpoint?.ToString()
-        );
+        var apiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
+        return (specializationIndex.Name, apiKey, aiSearchDeploymentConnection?.Endpoint?.ToString());
     }
 }
