@@ -1,5 +1,5 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
-
+#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 using System.Threading;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Storage;
@@ -28,9 +28,8 @@ public class SingleMessageCompletionService(Kernel kernel, IQAzureOpenAIChatExte
         if (specialization != null)
         {
             var dataSource = await qAzureOpenAIChatExtension.GetAzureSearchChatDataSource(specialization);
-#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+
             promptSettings = new AzureOpenAIPromptExecutionSettings() { AzureChatDataSource = dataSource };
-#pragma warning restore SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         }
 
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
