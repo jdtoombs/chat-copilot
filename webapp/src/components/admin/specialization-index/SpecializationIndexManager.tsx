@@ -63,14 +63,14 @@ const useClasses = makeStyles({
 export const SpecializationIndexManager: React.FC = () => {
     const classes = useClasses();
     const indexes = useSpecializationIndex();
-    const { selectedIndexId, specializationIndexes, openAIDeployments } = useAppSelector(
+    const { selectedIndexId, specializationIndexes, openAIDeployments, aiSearchDeployments } = useAppSelector(
         (state: RootState) => state.admin,
     );
     const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [label, setLabel] = useState('');
     const [queryType, setQueryType] = useState('');
-    const [aiSearchDeploymentConnection, setAiSearchDeploymentConnection] = useState('');
+    const [aiSearchDeploymentId, setAiSearchDeploymentId] = useState('');
     const [openAIDeploymentConnection, setOpenAIDeploymentConnection] = useState('');
     const [embeddingDeployment, setEmbeddingDeployment] = useState('');
     const [editMode, setEditMode] = useState(false);
@@ -82,7 +82,7 @@ export const SpecializationIndexManager: React.FC = () => {
         !!name &&
         !!label &&
         !!queryType &&
-        !!aiSearchDeploymentConnection &&
+        !!aiSearchDeploymentId &&
         !!openAIDeploymentConnection &&
         !!embeddingDeployment;
 
@@ -92,7 +92,7 @@ export const SpecializationIndexManager: React.FC = () => {
             name,
             label,
             queryType,
-            aiSearchDeploymentConnection,
+            aiSearchDeploymentId,
             openAIDeploymentConnection,
             embeddingDeployment,
             order: editMode ? order : specializationIndexes.length,
@@ -112,7 +112,7 @@ export const SpecializationIndexManager: React.FC = () => {
             id: '',
             label: '',
             queryType: '',
-            aiSearchDeploymentConnection: '',
+            aiSearchDeploymentId: '',
             openAIDeploymentConnection: '',
             embeddingDeployment: '',
             order: 0,
@@ -129,7 +129,7 @@ export const SpecializationIndexManager: React.FC = () => {
         setName(index.name);
         setLabel(index.label);
         setQueryType(index.queryType);
-        setAiSearchDeploymentConnection(index.aiSearchDeploymentConnection);
+        setAiSearchDeploymentId(index.aiSearchDeploymentId);
         setOpenAIDeploymentConnection(index.openAIDeploymentConnection);
         setEmbeddingDeployment(index.embeddingDeployment);
         setOrder(index.order);
@@ -149,7 +149,7 @@ export const SpecializationIndexManager: React.FC = () => {
                 id: '',
                 label: '',
                 queryType: '',
-                aiSearchDeploymentConnection: '',
+                aiSearchDeploymentId: '',
                 openAIDeploymentConnection: '',
                 embeddingDeployment: '',
                 order: 0,
@@ -206,14 +206,21 @@ export const SpecializationIndexManager: React.FC = () => {
                 <label htmlFor="aiSearchDeploymentConnection">
                     Search Deployment Connection<span className={classes.required}>*</span>
                 </label>
-                <Input
+                <Dropdown
+                    clearable
                     id="aiSearchDeploymentConnection"
-                    required
-                    value={aiSearchDeploymentConnection}
-                    onChange={(_event, data) => {
-                        setAiSearchDeploymentConnection(data.value);
+                    aria-labelledby={aiSearchDeploymentId}
+                    onOptionSelect={(_control, data) => {
+                        setAiSearchDeploymentId(data.optionValue ?? '');
                     }}
-                />
+                    value={aiSearchDeployments.find((a) => a.id == aiSearchDeploymentId)?.name ?? ''}
+                >
+                    {aiSearchDeployments.map((deployment) => (
+                        <Option key={deployment.id} value={deployment.id}>
+                            {deployment.name}
+                        </Option>
+                    ))}
+                </Dropdown>
                 <label htmlFor="openAIDeploymentConnection">
                     Open AI Deployment Connection<span className={classes.required}>*</span>
                 </label>

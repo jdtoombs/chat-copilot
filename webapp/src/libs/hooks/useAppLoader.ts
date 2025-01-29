@@ -11,6 +11,7 @@ import { AuthHelper } from '../auth/AuthHelper';
 import { UserSettingsResponse } from '../models/UserSettings';
 import { GraphService } from '../services/GraphService';
 import { maxBy } from '../utils/HelperMethods';
+import { useAISearchDeployment } from './useAISearchDeployment';
 import { useChat } from './useChat';
 import { useFile } from './useFile';
 import { useOpenAIDeployments } from './useOpenAIDeployment';
@@ -33,6 +34,7 @@ export const useAppLoader = (): [AppState, Dispatch<SetStateAction<AppState>>] =
     const specialization = useSpecialization();
     const specializationIndexes = useSpecializationIndex();
     const deployments = useOpenAIDeployments();
+    const searchDeployments = useAISearchDeployment();
     const settings = useSettings();
     const chat = useChat();
     const file = useFile();
@@ -135,6 +137,7 @@ export const useAppLoader = (): [AppState, Dispatch<SetStateAction<AppState>>] =
                 specializationIndexes.loadSpecializationIndexes(),
                 deployments.loadOpenAIDeployments(),
                 file.getContentSafetyStatus(),
+                searchDeployments.loadAISearchDeployments(),
             ]);
 
             // Load the chats and inject the specializations
