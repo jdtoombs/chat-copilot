@@ -21,7 +21,7 @@ export class SpecializationIndexService extends BaseService {
 
         formData.append('name', body.name);
         formData.append('queryType', body.queryType);
-        formData.append('aiSearchDeploymentConnection', body.aiSearchDeploymentConnection);
+        formData.append('aiSearchDeploymentId', body.aiSearchDeploymentId);
         formData.append('openAIDeploymentConnection', body.openAIDeploymentConnection);
         formData.append('embeddingDeployment', body.embeddingDeployment);
         formData.append('label', body.label);
@@ -38,7 +38,7 @@ export class SpecializationIndexService extends BaseService {
 
         formData.append('name', body.name);
         formData.append('queryType', body.queryType);
-        formData.append('aiSearchDeploymentConnection', body.aiSearchDeploymentConnection);
+        formData.append('aiSearchDeploymentId', body.aiSearchDeploymentId);
         formData.append('openAIDeploymentConnection', body.openAIDeploymentConnection);
         formData.append('embeddingDeployment', body.embeddingDeployment);
         formData.append('label', body.label);

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IAISearchDeployment } from '../../../libs/models/AISearchDeployment';
 import { IOpenAIDeployment } from '../../../libs/models/OpenAIDeployment';
 import { ISpecialization } from '../../../libs/models/Specialization';
 import { ISpecializationIndex } from '../../../libs/models/SpecializationIndex';
@@ -21,6 +22,9 @@ export const adminSlice = createSlice({
         setOpenAIDeployments: (state: AdminState, action: PayloadAction<IOpenAIDeployment[]>) => {
             state.openAIDeployments = action.payload;
         },
+        setAISearchDeployments: (state: AdminState, action: PayloadAction<IAISearchDeployment[]>) => {
+            state.aiSearchDeployments = action.payload;
+        },
         setAdminSelected: (state: AdminState, action: PayloadAction<AdminScreen>) => {
             state.selectedAdminScreen = action.payload;
         },
@@ -33,6 +37,9 @@ export const adminSlice = createSlice({
         setSelectedOpenAIDeploymentKey: (state: AdminState, action: PayloadAction<string>) => {
             state.selectedOpenAIDeploymentId = action.payload;
         },
+        setSelectedAISearchDeploymentKey: (state: AdminState, action: PayloadAction<string>) => {
+            state.selectedAISearchDeploymentId = action.payload;
+        },
         addSpecialization: (state: AdminState, action: PayloadAction<ISpecialization>) => {
             state.specializations.push(action.payload);
         },
@@ -41,6 +48,9 @@ export const adminSlice = createSlice({
         },
         addOpenAIDeployment: (state: AdminState, action: PayloadAction<IOpenAIDeployment>) => {
             state.openAIDeployments.push(action.payload);
+        },
+        addAISearchDeployment: (state: AdminState, action: PayloadAction<IAISearchDeployment>) => {
+            state.aiSearchDeployments.push(action.payload);
         },
         editSpecialization: (state: AdminState, action: PayloadAction<ISpecialization>) => {
             const specializations = state.specializations;
@@ -64,6 +74,14 @@ export const adminSlice = createSlice({
             state.openAIDeployments = updatedDeployments;
             state.openAIDeployments.push(action.payload);
         },
+        editAISearchDeployment: (state: AdminState, action: PayloadAction<IAISearchDeployment>) => {
+            const aiSearchDeployment = state.aiSearchDeployments;
+            const updatedDeployments = aiSearchDeployment.filter(
+                (dep: IAISearchDeployment) => dep.id != action.payload.id,
+            );
+            state.aiSearchDeployments = updatedDeployments;
+            state.aiSearchDeployments.push(action.payload);
+        },
         removeSpecialization: (state: AdminState, action: PayloadAction<string>) => {
             const specializations = state.specializations;
             const selectedKey = action.payload;
@@ -83,6 +101,12 @@ export const adminSlice = createSlice({
             const selectedKey = action.payload;
             const updatedDeployments = deployments.filter((index: IOpenAIDeployment) => index.id !== selectedKey);
             state.openAIDeployments = updatedDeployments;
+        },
+        removeAISearchDeployment: (state: AdminState, action: PayloadAction<string>) => {
+            const deployments = state.aiSearchDeployments;
+            const selectedKey = action.payload;
+            const updatedDeployments = deployments.filter((index: IAISearchDeployment) => index.id !== selectedKey);
+            state.aiSearchDeployments = updatedDeployments;
         },
     },
 });
@@ -105,6 +129,11 @@ export const {
     removeSpecializationIndex,
     removeOpenAIDeployment,
     setSelectedOpenAIDeploymentKey,
+    setAISearchDeployments,
+    addAISearchDeployment,
+    editAISearchDeployment,
+    removeAISearchDeployment,
+    setSelectedAISearchDeploymentKey,
 } = adminSlice.actions;
 
 export default adminSlice.reducer;

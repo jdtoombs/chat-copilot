@@ -3,7 +3,7 @@ export interface ISpecializationIndex {
     name: string;
     label: string;
     queryType: string;
-    aiSearchDeploymentConnection: string;
+    aiSearchDeploymentId: string;
     openAIDeploymentConnection: string;
     embeddingDeployment: string;
     order: number;

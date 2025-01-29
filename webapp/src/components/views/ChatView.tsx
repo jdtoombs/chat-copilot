@@ -3,6 +3,8 @@ import { FC } from 'react';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { AdminScreen } from '../../redux/features/admin/AdminState';
+import { AISearchList } from '../admin/ai-search-deployments/AISearchList';
+import { AISearchManager } from '../admin/ai-search-deployments/AISearchManager';
 import { OpenAIList } from '../admin/open-ai-deployments/OpenAIList';
 import { OpenAIManager } from '../admin/open-ai-deployments/OpenAIManager';
 import { AdminWindow } from '../admin/shared/AdminWindow';
@@ -64,6 +66,14 @@ export const ChatView: FC = () => {
                     <OpenAIList />
                     <AdminWindow>
                         <OpenAIManager />
+                    </AdminWindow>
+                </>
+            )}
+            {selectedAdminScreen === AdminScreen.AISEARCHDEPLOYMENT && (
+                <>
+                    <AISearchList />
+                    <AdminWindow>
+                        <AISearchManager />
                     </AdminWindow>
                 </>
             )}

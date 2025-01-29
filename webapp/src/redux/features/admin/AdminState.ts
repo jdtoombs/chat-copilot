@@ -1,3 +1,4 @@
+import { IAISearchDeployment } from '../../../libs/models/AISearchDeployment';
 import { IOpenAIDeployment } from '../../../libs/models/OpenAIDeployment';
 import { ISpecialization } from '../../../libs/models/Specialization';
 import { ISpecializationIndex } from '../../../libs/models/SpecializationIndex';
@@ -10,6 +11,7 @@ export enum AdminScreen {
     INDEX,
     FEEDBACK,
     OPENAIDEPLOYMENT,
+    AISEARCHDEPLOYMENT,
 }
 
 export interface AdminState {
@@ -18,9 +20,11 @@ export interface AdminState {
     specializations: ISpecialization[];
     specializationIndexes: ISpecializationIndex[];
     openAIDeployments: IOpenAIDeployment[];
+    aiSearchDeployments: IAISearchDeployment[];
     selectedId: string;
     selectedIndexId: string;
     selectedOpenAIDeploymentId: string;
+    selectedAISearchDeploymentId: string;
 }
 export const Specializations = [
     {
@@ -58,4 +62,6 @@ export const initialState: AdminState = {
     selectedId: '',
     selectedIndexId: '',
     selectedOpenAIDeploymentId: '',
+    aiSearchDeployments: [],
+    selectedAISearchDeploymentId: '',
 };
