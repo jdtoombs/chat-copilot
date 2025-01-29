@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -14,5 +15,5 @@ public interface ISingleMessageCompletionService
     /// <param name="userPrompt">The user's prompt to process.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task representing the asynchronous operation, containing the response string.</returns>
-    Task<string> GetResponse(string userPrompt, CancellationToken cancellationToken);
+    Task<string> GetResponse(string userPrompt, Specialization? specialization, CancellationToken cancellationToken);
 }

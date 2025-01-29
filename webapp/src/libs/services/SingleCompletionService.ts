@@ -14,10 +14,15 @@ export class SingleCompletionService extends BaseService {
      * @param accessToken valid access token
      * @param enabledPlugins plugins, if any
      */
-    public getBotResponseNoChat = async (ask: IAsk, accessToken: string): Promise<IAskResult> => {
+    public getBotResponseNoChat = async (
+        ask: IAsk,
+        accessToken: string,
+        specializationId?: string,
+    ): Promise<IAskResult> => {
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: '/completions/chats',
+                commandPath: `/completions/chats`,
+                query: new URLSearchParams({ specializationId: specializationId ?? '' }),
                 method: 'POST',
                 body: ask,
             },

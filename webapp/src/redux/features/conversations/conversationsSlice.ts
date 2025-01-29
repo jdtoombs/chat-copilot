@@ -3,14 +3,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IChatMessage } from '../../../libs/models/ChatMessage';
 import { IChatUser } from '../../../libs/models/ChatUser';
-import { IAskResult } from '../../../libs/semantic-kernel/model/AskResult';
 import { ChatState } from './ChatState';
 import {
     ConversationInputChange,
     Conversations,
     ConversationSpecializationChange,
     ConversationsState,
-    ConversationSuggestionsChange,
     ConversationSystemDescriptionChange,
     ConversationTitleChange,
     ConversationUpdateTimestampChange,
@@ -246,12 +244,6 @@ export const conversationsSlice = createSlice({
                 );
             }
         },
-        updateConversationGeneratedSuggestions: (
-            state: ConversationsState,
-            action: PayloadAction<ConversationSuggestionsChange>,
-        ) => {
-            setConversationGeneratedSuggestions(state, action.payload.id, action.payload.chatSuggestionMessage);
-        },
         setChatMessagesLoading: (state: ConversationsState, action: PayloadAction<MessageLoadingStatusChange>) => {
             state.conversations[action.payload.id].loadingMessages = action.payload.isLoading;
         },
@@ -277,54 +269,6 @@ const updateUserTypingState = (state: ConversationsState, userId: string, chatId
     }
 };
 
-/**
- * Small helper function for attempting to convert a JSON formatted string to a JS string array.
- * Returns an empty array instead of throwing if anything fails.
- * @param str JSON string
- * @returns {string[]}
- */
-const extractJsonArray = (str: string) => {
-    try {
-        const parsed = JSON.parse(str) as unknown;
-        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
-            return parsed;
-        } else {
-            return [];
-        }
-    } catch (e) {
-        return [];
-    }
-};
-
-/**
- * setConversationSuggestions - After asking the bot for some suggested chat topics, this function
- * will attempt to parse the answer as a JSON array and convert it to a valid JS string array object
- * which will be stored in the conversation state.
- *
- * @param state current conversation state
- * @param chatId current chatId guid
- * @param chatMessage the chat message we got in response from the chatbot
- */
-const setConversationGeneratedSuggestions = (state: ConversationsState, chatId: string, chatMessage: IAskResult) => {
-    const conversation = state.conversations[chatId];
-    let arraySuggestions: string[] = [];
-    const response = chatMessage.variables.find((a) => a.key === 'input');
-    if (!response) {
-        return;
-    }
-    arraySuggestions = extractJsonArray(response.value); //First try to convert from the raw string.
-    if (!arraySuggestions.length) {
-        //Sometimes the bot will reply with other text and json wrapped in ```json ... ```
-        //so we can try that if the first attempt didn't give us anything.
-        const regex = /```json\s*(\[[\s\S]*?\])\s*```/g;
-        const match = regex.exec(response.value);
-        if (match) {
-            arraySuggestions = extractJsonArray(match[1]);
-        }
-    }
-    conversation.generatedSuggestions = arraySuggestions;
-};
-
 export const {
     setConversations,
     editConversationTitle,
@@ -346,7 +290,6 @@ export const {
     disableConversation,
     updatePluginState,
     editConversationSpecialization,
-    updateConversationGeneratedSuggestions,
     deleteConversationHistory,
     editConversationLastUpdate,
     setChatMessagesLoading,
