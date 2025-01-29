@@ -21,7 +21,7 @@ export class SingleCompletionService extends BaseService {
     ): Promise<IAskResult> => {
         const result = await this.getResponseAsync<IAskResult>(
             {
-                commandPath: `/completions/chats?specializationId`,
+                commandPath: `/completions/chats`,
                 query: new URLSearchParams({ specializationId: specializationId ?? '' }),
                 method: 'POST',
                 body: ask,
