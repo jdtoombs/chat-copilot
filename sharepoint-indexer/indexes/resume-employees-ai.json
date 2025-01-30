@@ -63,6 +63,30 @@
       "dimensions": 1536,
       "vectorSearchProfile": "contentVector_profile",
       "synonymMaps": []
+    },
+    {
+      "name": "filepath",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
+    },
+    {
+      "name": "uri",
+      "type": "Edm.String",
+      "searchable": false,
+      "filterable": false,
+      "retrievable": true,
+      "stored": true,
+      "sortable": false,
+      "facetable": false,
+      "key": false,
+      "synonymMaps": []
     }
   ],
   "scoringProfiles": [],
