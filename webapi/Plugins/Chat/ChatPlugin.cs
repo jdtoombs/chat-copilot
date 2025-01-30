@@ -1083,7 +1083,8 @@ public class ChatPlugin
                                     Link = link,
                                     SourceName = sourceName,
                                     Snippet = citation.Content,
-                                    SourceContentType = CitationUtils.GetContentType(link),
+                                    SourceContentType =
+                                        link != null ? CitationUtils.GetContentType(link) : "application/octet-stream",
                                 }
                             );
                         }
