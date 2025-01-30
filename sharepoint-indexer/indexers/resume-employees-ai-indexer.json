@@ -5,7 +5,7 @@
   "skillsetName": "skillset-with-projection-employees-resume",
   "targetIndexName": "resume-employees-ai",
   "disabled": null,
-  "schedule": null,
+  "schedule": { "interval" : "PT24H" },
   "parameters": {
     "batchSize": null,
     "maxFailedItems": null,

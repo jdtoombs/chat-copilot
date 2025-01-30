@@ -5,7 +5,7 @@
   "skillsetName": "skillset-with-projection-contractors-resume",
   "targetIndexName": "resume-contractors-ai",
   "disabled": null,
-  "schedule": null,
+  "schedule": { "interval" : "PT24H" },
   "parameters": {
     "batchSize": null,
     "maxFailedItems": null,
