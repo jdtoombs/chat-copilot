@@ -5,7 +5,7 @@
   "skillsetName": "skillset-with-projection-proposals-ai",
   "targetIndexName": "proposals-ai",
   "disabled": null,
-  "schedule": null,
+  "schedule": { "interval" : "PT24H" },
   "parameters": {
     "batchSize": null,
     "maxFailedItems": null,
