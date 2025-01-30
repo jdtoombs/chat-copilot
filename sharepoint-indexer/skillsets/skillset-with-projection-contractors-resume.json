@@ -72,6 +72,16 @@
             "name": "title",
             "source": "/document/title",
             "inputs": []
+          },
+          {
+            "name": "filepath",
+            "source": "/document/filepath",
+            "inputs": []
+          },
+          {
+            "name": "uri",
+            "source": "/document/uri",
+            "inputs": []
           }
         ]
       }

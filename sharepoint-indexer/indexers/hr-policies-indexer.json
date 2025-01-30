@@ -35,6 +35,11 @@
       "sourceFieldName": "metadata_spo_item_path",
       "targetFieldName": "filepath",
       "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_spo_item_weburi",
+      "targetFieldName": "uri",
+      "mappingFunction": null
     }
   ],
   "outputFieldMappings": [],
