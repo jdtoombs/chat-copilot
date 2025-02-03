@@ -2,9 +2,6 @@
 
 namespace CopilotChat.WebApi.Services;
 
-/// <summary>
-/// Send email messages via simple mail transfer protocol.
-/// </summary>
 public class EmailSender : IEmailSender
 {
     private SmtpClient Client;
@@ -14,16 +11,10 @@ public class EmailSender : IEmailSender
         this.Client = new SmtpClient();
     }
 
-    /// <summary>
-    /// Sends an email to the specified address.
-    /// </summary>
-    /// <param name="sender">Originating email address</param>
-    /// <param name="recipient">Destination email address</param>
-    /// <param name="subject">Email subject line</param>
-    /// <param name="body">Email content</param>
     public void Send(string sender, string recipient, string subject, string body)
     {
         using var message = new MailMessage(sender, recipient, subject, body);
+        message.ReplyToList.Add(new MailAddress(recipient));
 
         this.Client.Send(message);
     }
