@@ -140,6 +140,7 @@ export const SpecializationManager: React.FC = () => {
     }, [chatCompletionDeployments]);
 
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const [isLoadingContextFormatting, setIsLoadingContextFormatting] = useState(false);
 
     const [editMode, setEditMode] = useState(false);
     const defaultSpecializationId = specializations.find((spec) => spec.isDefault)?.id;
@@ -546,15 +547,6 @@ export const SpecializationManager: React.FC = () => {
         return noChatMessageService.getBotResponseNoChat(ask, authToken, selectedId);
     };
 
-    const AIFormat = async (): Promise<void> => {
-        try {
-            const markdownResponse = await getMarkdown();
-            setRoleInformation(markdownResponse.value);
-        } catch (error) {
-            console.error('Error in AIFormat:', error);
-        }
-    };
-
     const handleClickAutoSuggestions = () => {
         setIsLoadingSuggestions(true);
         getAutoSuggestions()
@@ -580,9 +572,17 @@ export const SpecializationManager: React.FC = () => {
     };
 
     const handleClickFormatWithAI = () => {
-        AIFormat().catch((error) => {
-            console.error('Error in AIFormat:', error);
-        });
+        setIsLoadingContextFormatting(true);
+        getMarkdown()
+            .then((response) => {
+                setRoleInformation(response.value);
+            })
+            .catch((e: Error) => {
+                console.error(`Could not retrieve markdown from completions service. ${e.message}`);
+            })
+            .finally(() => {
+                setIsLoadingContextFormatting(false);
+            });
     };
 
     return (
@@ -809,7 +809,7 @@ export const SpecializationManager: React.FC = () => {
                         Chat Context<span style={{ color: 'red' }}>*</span>
                     </label>
                     <label
-                        onClick={handleClickFormatWithAI}
+                        onClick={isLoadingContextFormatting ? undefined : handleClickFormatWithAI}
                         style={{
                             cursor: 'pointer',
                             color: 'blue',
@@ -817,7 +817,7 @@ export const SpecializationManager: React.FC = () => {
                             textDecoration: 'underline',
                         }}
                     >
-                        (Format With AI)
+                        {isLoadingContextFormatting ? 'Loading...' : `(Format With AI)`}
                     </label>
                 </div>
 
@@ -867,7 +867,7 @@ export const SpecializationManager: React.FC = () => {
                         Initial Chat Suggestions<span className={classes.required}>*</span>
                     </label>
                     <label
-                        onClick={handleClickAutoSuggestions}
+                        onClick={isLoadingSuggestions ? undefined : handleClickAutoSuggestions}
                         style={{
                             cursor: 'pointer',
                             color: 'blue',
@@ -875,7 +875,7 @@ export const SpecializationManager: React.FC = () => {
                             textDecoration: 'underline',
                         }}
                     >
-                        {isLoadingSuggestions ? 'Loading...' : `(Format With AI)`}
+                        {isLoadingSuggestions ? 'Loading...' : `(Create With AI)`}
                     </label>
                 </div>
                 <FieldArray
