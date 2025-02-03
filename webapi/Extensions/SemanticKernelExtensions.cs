@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
+using CopilotChat.WebApi.Plugins;
 using CopilotChat.WebApi.Plugins.Chat;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
@@ -184,6 +185,9 @@ internal static class SemanticKernelExtensions
 
         // Time plugin
         kernel.ImportPluginFromObject(new TimePlugin(), nameof(TimePlugin));
+
+        // Email plugin
+        kernel.ImportPluginFromObject(new EmailPlugin(sp.GetRequiredService<IEmailSender>()), nameof(EmailPlugin));
 
         return Task.CompletedTask;
     }
