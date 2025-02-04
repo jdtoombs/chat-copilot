@@ -12,6 +12,8 @@ export enum AdminScreen {
     FEEDBACK,
     OPENAIDEPLOYMENT,
     AISEARCHDEPLOYMENT,
+    SEARCH,
+    ADMIN,
 }
 
 export interface AdminState {

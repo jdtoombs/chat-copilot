@@ -7,7 +7,7 @@ import { AISearchList } from '../admin/ai-search-deployments/AISearchList';
 import { AISearchManager } from '../admin/ai-search-deployments/AISearchManager';
 import { OpenAIList } from '../admin/open-ai-deployments/OpenAIList';
 import { OpenAIManager } from '../admin/open-ai-deployments/OpenAIManager';
-import { AdminWindow } from '../admin/shared/AdminWindow';
+import { AdminScreenWrapper } from '../admin/shared/AdminScreenWrapper';
 import { SpecializationIndexList } from '../admin/specialization-index/SpecializationIndexList';
 import { SpecializationIndexManager } from '../admin/specialization-index/SpecializationIndexManager';
 import { SpecializationList } from '../admin/specialization/SpecializationList';
@@ -29,54 +29,36 @@ const useClasses = makeStyles({
 
 export const ChatView: FC = () => {
     const classes = useClasses();
-    const { selectedId } = useAppSelector((state: RootState) => state.conversations);
-    const { selected } = useAppSelector((state: RootState) => state.search);
     const { selectedAdminScreen } = useAppSelector((state: RootState) => state.admin);
-
+    const renderCurrentScreen = (screen: AdminScreen): JSX.Element => {
+        switch (screen) {
+            case AdminScreen.NONE:
+                return <ChatWindow />;
+            case AdminScreen.SEARCH:
+                return <SearchWindow />;
+            case AdminScreen.SPECIALIZATION:
+                return <AdminScreenWrapper sidebar={<SpecializationList />} adminScreen={<SpecializationManager />} />;
+            case AdminScreen.INDEX:
+                return (
+                    <AdminScreenWrapper
+                        sidebar={<SpecializationIndexList />}
+                        adminScreen={<SpecializationIndexManager />}
+                    />
+                );
+            case AdminScreen.AISEARCHDEPLOYMENT:
+                return <AdminScreenWrapper sidebar={<AISearchList />} adminScreen={<AISearchManager />} />;
+            case AdminScreen.OPENAIDEPLOYMENT:
+                return <AdminScreenWrapper sidebar={<OpenAIList />} adminScreen={<OpenAIManager />} />;
+            case AdminScreen.FEEDBACK:
+                return <AdminScreenWrapper adminScreen={<UserFeedbackManager />} />;
+            default:
+                return <></>;
+        }
+    };
     return (
         <div className={classes.container}>
             <ChatType />
-            {selectedAdminScreen === AdminScreen.SPECIALIZATION && (
-                <>
-                    <SpecializationList />
-                    <AdminWindow>
-                        <SpecializationManager />
-                    </AdminWindow>
-                </>
-            )}
-            {selected && <SearchWindow />}
-            {selectedId !== '' && !selected && selectedAdminScreen === AdminScreen.NONE && <ChatWindow />}
-            {selectedAdminScreen === AdminScreen.INDEX && (
-                <>
-                    <SpecializationIndexList />
-                    <AdminWindow>
-                        <SpecializationIndexManager />
-                    </AdminWindow>
-                </>
-            )}
-            {selectedAdminScreen === AdminScreen.FEEDBACK && (
-                <>
-                    <AdminWindow>
-                        <UserFeedbackManager />
-                    </AdminWindow>
-                </>
-            )}
-            {selectedAdminScreen === AdminScreen.OPENAIDEPLOYMENT && (
-                <>
-                    <OpenAIList />
-                    <AdminWindow>
-                        <OpenAIManager />
-                    </AdminWindow>
-                </>
-            )}
-            {selectedAdminScreen === AdminScreen.AISEARCHDEPLOYMENT && (
-                <>
-                    <AISearchList />
-                    <AdminWindow>
-                        <AISearchManager />
-                    </AdminWindow>
-                </>
-            )}
+            {renderCurrentScreen(selectedAdminScreen)}
         </div>
     );
 };

@@ -13,10 +13,12 @@ import {
 import { Map16Regular } from '@fluentui/react-icons';
 import React from 'react';
 import { useChat } from '../../libs/hooks';
+import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
 import { FeatureKeys } from '../../redux/features/app/AppState';
+import { ChatState } from '../../redux/features/conversations/ChatState';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
@@ -76,18 +78,37 @@ const useClasses = makeStyles({
 
 export const ChatWindow: React.FC = () => {
     const classes = useClasses();
+    const chat = useChat();
+
+    const dispatch = useAppDispatch();
     const { features } = useAppSelector((state: RootState) => state.app);
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
-    const botResponseStatus = conversations[selectedId].botResponseStatus;
-    const conversationSpecialization = conversations[selectedId].specializationId;
-    const [selectedTab, setSelectedTab] = React.useState<TabValue>(ChatWindowTabEnum.CHAT);
-    const showShareBotMenu = features[FeatureKeys.BotAsDocs].enabled || features[FeatureKeys.MultiUserChat].enabled;
-    const chatName = conversations[selectedId].title;
-    const chat = useChat();
-    const dispatch = useAppDispatch();
     const { chatSpecialization, specializations } = useAppSelector((state: RootState) => state.admin);
+
+    const botResponseStatus = Object.hasOwn(conversations, selectedId)
+        ? conversations[selectedId].botResponseStatus
+        : undefined;
+    const conversationSpecialization = Object.hasOwn(conversations, selectedId)
+        ? conversations[selectedId].specializationId
+        : undefined;
+    const chatName = Object.hasOwn(conversations, selectedId) ? conversations[selectedId].title : '';
+
+    const showShareBotMenu = features[FeatureKeys.BotAsDocs].enabled || features[FeatureKeys.MultiUserChat].enabled;
+
+    const [selectedTab, setSelectedTab] = React.useState<TabValue>(ChatWindowTabEnum.CHAT);
+
     const onTabSelect: SelectTabEventHandler = (_event, data) => {
         setSelectedTab(data.value);
+    };
+
+    const resolveBotPfpSrc = (conversation?: ChatState, spec?: ISpecialization) => {
+        if (spec?.iconFilePath) {
+            return spec.iconFilePath;
+        } else if (conversation) {
+            return conversation.botProfilePicture;
+        } else {
+            return '';
+        }
     };
 
     // Set the chat specialization based on the conversation specialization, ensures UI is in sync with current selected chat
@@ -187,9 +208,7 @@ export const ChatWindow: React.FC = () => {
                         size="medium"
                         avatar={{
                             image: {
-                                src: chatSpecialization?.iconFilePath
-                                    ? chatSpecialization.iconFilePath
-                                    : conversations[selectedId].botProfilePicture,
+                                src: resolveBotPfpSrc(conversations[selectedId], chatSpecialization),
                             },
                         }}
                         presence={{ status: 'available' }}

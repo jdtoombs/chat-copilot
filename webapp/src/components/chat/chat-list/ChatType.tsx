@@ -1,18 +1,9 @@
-import {
-    makeStyles,
-    SelectTabEventHandler,
-    shorthands,
-    Tab,
-    TabList,
-    TabValue,
-    tokens,
-} from '@fluentui/react-components';
-import React, { FC, useEffect, useState } from 'react';
+import { makeStyles, SelectTabEventHandler, shorthands, Tab, TabList, tokens } from '@fluentui/react-components';
+import { FC, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
 import { RootState } from '../../../redux/app/store';
 import { setAdminSelected } from '../../../redux/features/admin/adminSlice';
 import { AdminScreen } from '../../../redux/features/admin/AdminState';
-import { setSearchSelected } from '../../../redux/features/search/searchSlice';
 import { Breakpoints } from '../../../styles';
 import { SearchList } from '../../search/search-list/SearchList';
 import { ChatList } from './ChatList';
@@ -39,96 +30,72 @@ const useClasses = makeStyles({
 export const ChatType: FC = () => {
     const classes = useClasses();
     const dispatch = useAppDispatch();
-    const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
+    const { selectedAdminScreen } = useAppSelector((state: RootState) => state.admin);
     const activeUserInfo = useAppSelector((state: RootState) => state.app.activeUserInfo);
-    const [selectedTab, setSelectedTab] = React.useState<TabValue>('chat');
-    const [selectedAdminSubTab, setSelectedAdminSubTab] = React.useState<TabValue>('specializations');
     const [hasAdmin, setHasAdmin] = useState(false);
+
     const onTabSelect: SelectTabEventHandler = (_event, data) => {
-        setSelectedTab(data.value);
+        dispatch(setAdminSelected(data.value as AdminScreen));
     };
+
+    const resolveMainTabValue = (screen: AdminScreen) => {
+        if ([AdminScreen.NONE, AdminScreen.SEARCH].includes(screen)) {
+            return screen;
+        } else {
+            return AdminScreen.ADMIN;
+        }
+    };
+
     useEffect(() => {
         if (activeUserInfo) {
             setHasAdmin(activeUserInfo.hasAdmin);
         }
     }, [activeUserInfo]);
 
-    useEffect(() => {
-        if (selectedTab === 'chat') {
-            dispatch(setAdminSelected(AdminScreen.NONE));
-        }
-        if (selectedTab === 'search') {
-            const selectedConversation = conversations[selectedId];
-            if (selectedConversation.specializationId) {
-                const chatSpecializationId = selectedConversation.specializationId;
-                void dispatch(setSearchSelected({ selected: true, specializationId: chatSpecializationId }));
-            } else {
-                dispatch(setSearchSelected({ selected: true, specializationId: '' }));
-            }
-            dispatch(setAdminSelected(AdminScreen.NONE));
-        } else if (selectedTab === 'admin') {
-            dispatch(setSearchSelected({ selected: false, specializationId: '' }));
-            if (selectedAdminSubTab === 'specializations') {
-                dispatch(setAdminSelected(AdminScreen.SPECIALIZATION));
-            } else if (selectedAdminSubTab === 'indexes') {
-                dispatch(setAdminSelected(AdminScreen.INDEX));
-            } else if (selectedAdminSubTab === 'userFeedback') {
-                dispatch(setAdminSelected(AdminScreen.FEEDBACK));
-            } else if (selectedAdminSubTab === 'openAIDeployments') {
-                dispatch(setAdminSelected(AdminScreen.OPENAIDEPLOYMENT));
-            } else if (selectedAdminSubTab === 'aiSearchDeployments') {
-                dispatch(setAdminSelected(AdminScreen.AISEARCHDEPLOYMENT));
-            }
-        } else {
-            dispatch(setSearchSelected({ selected: false, specializationId: '' }));
-            setAdminSelected(AdminScreen.NONE);
-        }
-    }, [selectedTab, selectedAdminSubTab, conversations, selectedId, dispatch]);
-
     return (
         <div className={classes.root}>
-            <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
-                <Tab data-testid="chatTab" id="chat" value="chat" aria-label="Chat Tab" title="Chat Tab">
+            <TabList selectedValue={resolveMainTabValue(selectedAdminScreen)} onTabSelect={onTabSelect}>
+                <Tab data-testid="chatTab" id="chat" value={AdminScreen.NONE} aria-label="Chat Tab" title="Chat Tab">
                     Chat
                 </Tab>
-                <Tab data-testid="searchTab" id="search" value="search" aria-label="Search Tab" title="Search Tab">
+                <Tab
+                    data-testid="searchTab"
+                    id="search"
+                    value={AdminScreen.SEARCH}
+                    aria-label="Search Tab"
+                    title="Search Tab"
+                >
                     Search
                 </Tab>
                 <Tab
                     disabled={!hasAdmin}
                     data-testid="adminTab"
                     id="admin"
-                    value="admin"
+                    value={AdminScreen.ADMIN}
                     aria-label="admin Tab"
                     title="Admin Tab"
                 >
                     Admin
                 </Tab>
             </TabList>
-            {selectedTab === 'chat' && <ChatList />}
-            {selectedTab === 'search' && <SearchList />}
-            {selectedTab === 'admin' && (
+            {selectedAdminScreen === AdminScreen.NONE && <ChatList />}
+            {selectedAdminScreen === AdminScreen.SEARCH && <SearchList />}
+            {![AdminScreen.NONE, AdminScreen.SEARCH].includes(selectedAdminScreen) && (
                 <div className={classes.innerTabs}>
-                    <TabList
-                        vertical
-                        selectedValue={selectedAdminSubTab}
-                        onTabSelect={(_event, data) => {
-                            setSelectedAdminSubTab(data.value);
-                        }}
-                    >
-                        <Tab id="specializations" value={'specializations'}>
+                    <TabList vertical selectedValue={selectedAdminScreen} onTabSelect={onTabSelect}>
+                        <Tab id="specializations" value={AdminScreen.SPECIALIZATION}>
                             Specializations
                         </Tab>
-                        <Tab id="indexes" value={'indexes'}>
+                        <Tab id="indexes" value={AdminScreen.INDEX}>
                             Indexes
                         </Tab>
-                        <Tab id="userFeedback" value={'userFeedback'}>
+                        <Tab id="userFeedback" value={AdminScreen.FEEDBACK}>
                             User Feedback
                         </Tab>
-                        <Tab id="openAIDeployments" value={'openAIDeployments'}>
+                        <Tab id="openAIDeployments" value={AdminScreen.OPENAIDEPLOYMENT}>
                             Open AI Deployments
                         </Tab>
-                        <Tab id="aiSearchDeployments" value={'aiSearchDeployments'}>
+                        <Tab id="aiSearchDeployments" value={AdminScreen.AISEARCHDEPLOYMENT}>
                             AI Search Deployments
                         </Tab>
                     </TabList>

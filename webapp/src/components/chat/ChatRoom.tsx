@@ -71,7 +71,10 @@ export const ChatRoom: React.FC = () => {
     const chat = useChat();
 
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
-    const messages = conversations[selectedId].messages;
+
+    const messages = useMemo(() => {
+        return Object.hasOwn(conversations, selectedId) ? conversations[selectedId].messages : [];
+    }, [selectedId, conversations]);
 
     const scrollViewTargetRef = React.useRef<HTMLDivElement>(null);
     const [shouldAutoScroll, setShouldAutoScroll] = React.useState(true);
@@ -131,6 +134,10 @@ export const ChatRoom: React.FC = () => {
     }, []);
 
     React.useEffect(() => {
+        if (!Object.hasOwn(conversations, selectedId)) {
+            return;
+        }
+
         if (Object.keys(messages).length <= 1 && !conversations[selectedId].loadingMessages) {
             setShowSuggestions(true);
         } else {
@@ -145,6 +152,10 @@ export const ChatRoom: React.FC = () => {
     }, [messages, selectedId, conversations, showSpecialization]);
 
     React.useEffect(() => {
+        if (!Object.hasOwn(conversations, selectedId)) {
+            return;
+        }
+
         const conversation = conversations[selectedId];
         const title = getFriendlyChatName(conversation);
 
@@ -169,6 +180,10 @@ export const ChatRoom: React.FC = () => {
         void chat.getResponse(messageBody);
         setShowSuggestions(false);
     };
+
+    if (!Object.hasOwn(conversations, selectedId)) {
+        return <></>;
+    }
 
     if (conversations[selectedId].hidden) {
         return (
