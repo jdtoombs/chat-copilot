@@ -17,7 +17,10 @@ environment = "test"
 tags = {
   client  = "Quartech"
   owner   = "david.camden@quartech.com" 
-  project = "Q-Pilot"
+  project = "Q-Pilot",
+  client-name = "Quartech",
+  project-name = "Q-Pilot",
+  developer-name = "Quartech"
 }
 
 kubernetes_azure_subscription_id = "55e460fd-3416-40f4-b548-a6cae492f532"
@@ -35,7 +38,8 @@ cosmosdb_sql_containers = [
   { name = "specialization", partition_key_path = "/id" },
   { name = "chatuser", partition_key_path = "/id" },
   { name = "specializationindex", partition_key_path = "/id" },
-  { name = "openaideployment", partition_key_path = "/id" }
+  { name = "openaideployment", partition_key_path = "/id" },
+  { name = "aisearchdeployment", partition_key_path = "/id" }
 ]
 
 openai_deployments = [

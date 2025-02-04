@@ -17,7 +17,10 @@ environment = "dev"
 tags = {
   client  = "Quartech"
   owner   = "david.camden@quartech.com" 
-  project = "Q-Pilot"
+  project = "Q-Pilot",
+  client-name = "Quartech",
+  project-name = "Q-Pilot",
+  developer-name = "Quartech"
 }
 
 kubernetes_azure_subscription_id = "55e460fd-3416-40f4-b548-a6cae492f532"

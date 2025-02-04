@@ -22,16 +22,19 @@ resource "azurerm_resource_group" "kv" {
   name     = "rg-${local.standard_name}-kv"
   location = var.location.name
   provider = azurerm.kubernetes
+  tags     = var.tags
 }
 
 resource "azurerm_resource_group" "cosmos" {
   name     = "rg-${local.standard_name}-cosmos"
   location = var.location.name
+  tags     = var.tags
 }
 
 resource "azurerm_resource_group" "storage" {
   name     = "rg-${local.standard_name}-storage"
   location = var.location.name
+  tags     = var.tags
 }
 
 resource "azurerm_resource_group" "openai" {
