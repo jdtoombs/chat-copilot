@@ -1430,10 +1430,10 @@
     "@griffel/react" "^1.5.22"
     "@swc/helpers" "^0.5.1"
 
-"@fluentui/react-icons@^2.0.237", "@fluentui/react-icons@^2.0.239", "@fluentui/react-icons@^2.0.245", "@fluentui/react-icons@^2.0.249":
-  version "2.0.249"
-  resolved "https://registry.npmjs.org/@fluentui/react-icons/-/react-icons-2.0.249.tgz"
-  integrity sha512-VcOCbqv3MxzMZdH6jyqpzsfyNV0cG5F4TKXnnXcJ/QVQcWsN2BU6NrCiwkZHKEjbOYbxwBTdBHq1gnR5qz4baw==
+"@fluentui/react-icons@^2.0.237", "@fluentui/react-icons@^2.0.239", "@fluentui/react-icons@^2.0.245", "@fluentui/react-icons@^2.0.274":
+  version "2.0.274"
+  resolved "https://registry.yarnpkg.com/@fluentui/react-icons/-/react-icons-2.0.274.tgz#b60180c9d4baa0423e85ea6a5193fe89b846b144"
+  integrity sha512-URmKlK8yS8f+RNsqi1pHBiL91V8RFBJlIBrPnsm8GcZsZv3vhA8k9jUinGyiMKgcsgcUulGPT/T7JUOLGEE+oQ==
   dependencies:
     "@griffel/react" "^1.0.0"
     tslib "^2.1.0"
@@ -8829,20 +8829,10 @@ tsconfck@^3.0.3:
   resolved "https://registry.yarnpkg.com/tsconfck/-/tsconfck-3.1.4.tgz#de01a15334962e2feb526824339b51be26712229"
   integrity sha512-kdqWFGVJqe+KGYvlSO9NIaWn9jT1Ny4oKVzAJsKii5eoE9snzTJzL4+MMVOMn+fikWGFmKEylcXL710V/kIPJQ==
 
-tslib@^2.0.0, tslib@^2.3.0:
+tslib@^2.0.0, tslib@^2.1.0, tslib@^2.2.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.4.0:
   version "2.8.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
-
-tslib@^2.1.0, tslib@^2.3.1, tslib@^2.4.0:
-  version "2.6.2"
-  resolved "https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz"
-  integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
-
-tslib@^2.2.0:
-  version "2.6.3"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.3.tgz#0438f810ad7a9edcde7a241c3d80db693c8cbfe0"
-  integrity sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
