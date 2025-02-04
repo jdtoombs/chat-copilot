@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Package Chat Copilot application for deployment to Azure
+Package Q-Pilot application for deployment to Azure
 #>
 
 param(

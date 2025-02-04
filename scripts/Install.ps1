@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Installs the requirements for running Chat Copilot.
+Installs the requirements for running Q-Pilot.
 #>
 
 if ($IsLinux) 

@@ -1,10 +1,10 @@
-# Chat Copilot backend web API service
+# Q-Pilot backend web API service
 
-This directory contains the source code for Chat Copilot's backend web API service. The front end web application component can be found in the [webapp/](../webapp/) directory.
+This directory contains the source code for Q-Pilot's backend web API service. The front end web application component can be found in the [webapp/](../webapp/) directory.
 
-## Running the Chat Copilot sample
+## Running the Q-Pilot sample
 
-To configure and run either the full Chat Copilot application or only the backend API, please view the [main instructions](../README.md#instructions).
+To configure and run either the full Q-Pilot application or only the backend API, please view the [main instructions](../README.md#instructions).
 
 # (Under Development)
 
@@ -83,7 +83,7 @@ Please refer to [here](../plugins/README.md) for more details.
 
 ## (Optional) Enabling Cosmos Chat Store.
 
-[Azure Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/introduction) can be used as a persistent chat store for Chat Copilot. Chat stores are used for storing chat sessions, participants, and messages.
+[Azure Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/introduction) can be used as a persistent chat store for Q-Pilot. Chat stores are used for storing chat sessions, participants, and messages.
 
 ### Prerequisites
 
@@ -104,7 +104,7 @@ In an effort to optimize performance, each container must be created with a spec
 By default, the service uses an in-memory volatile memory store that, when the service stops or restarts, forgets all memories.
 [Qdrant](https://github.com/qdrant/qdrant) is a persistent scalable vector search engine that can be deployed locally in a container or [at-scale in the cloud](https://github.com/Azure-Samples/qdrant-azure).
 
-To enable the Qdrant memory store, you must first deploy Qdrant locally and then configure the Chat Copilot API service to use it.
+To enable the Qdrant memory store, you must first deploy Qdrant locally and then configure the Q-Pilot API service to use it.
 
 ### 1. Configure your environment
 
@@ -132,7 +132,7 @@ Before you get started, make sure you have the following additional requirements
 
 ## (Optional) Enabling the Azure Cognitive Search Memory Store
 
-Azure Cognitive Search can be used as a persistent memory store for Chat Copilot.
+Azure Cognitive Search can be used as a persistent memory store for Q-Pilot.
 The service uses its [vector search](https://learn.microsoft.com/en-us/azure/search/vector-search-overview) capabilities.
 
 ## (Optional) Enable Application Insights telemetry
@@ -223,7 +223,7 @@ Then use a Time chart on the Visual tab.
 
 ### Adding Custom Plugins
 
-> Though plugins can contain both semantic and native functions, Chat Copilot currently only supports plugins of isolated types due to import limitations, so you must separate your plugins into respective folders for each.
+> Though plugins can contain both semantic and native functions, Q-Pilot currently only supports plugins of isolated types due to import limitations, so you must separate your plugins into respective folders for each.
 
 If you wish to load custom plugins into the kernel:
 
@@ -282,9 +282,9 @@ Alternatively,
 
 3. Change the respective directory option to use an absolute path or a different base path, but make sure that the files are accessible from that location.
 
-### Add Custom Setup to Chat Copilot's Kernel
+### Add Custom Setup to Q-Pilot's Kernel
 
-Chat Copilot's Semantic Kernel can be customized with additional plugins or settings by using a custom hook that performs any complimentary setup of the kernel. A custom hook is a delegate that takes an `IServiceProvider` and an `Kernel` as parameters and performs any desired actions on the kernel, such as registering additional plugins, setting kernel options, adding dependency injections, importing data, etc. To use a custom hook, you can pass it as an argument to the `AddKernelSetupHook` call in the `AddSemanticKernelServices` method of `SemanticKernelExtensions.cs`.
+Q-Pilot's Semantic Kernel can be customized with additional plugins or settings by using a custom hook that performs any complimentary setup of the kernel. A custom hook is a delegate that takes an `IServiceProvider` and an `Kernel` as parameters and performs any desired actions on the kernel, such as registering additional plugins, setting kernel options, adding dependency injections, importing data, etc. To use a custom hook, you can pass it as an argument to the `AddKernelSetupHook` call in the `AddSemanticKernelServices` method of `SemanticKernelExtensions.cs`.
 
 For example, the following code snippet shows how to create a custom hook that registers a plugin called MyPlugin and passes it to `AddKernelSetupHook`:
 

@@ -29,7 +29,7 @@ public record ImageAnalysisRequest([property: JsonPropertyName("image")] ImageCo
 /// </summary>
 public sealed class AzureContentSafety : IContentSafetyService
 {
-    private const string HttpUserAgent = "Chat Copilot";
+    private const string HttpUserAgent = "Q-Pilot";
 
     private readonly string _endpoint;
     private readonly HttpClient _httpClient;

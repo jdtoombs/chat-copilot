@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Builds and runs the Chat Copilot frontend.
+Builds and runs the Q-Pilot frontend.
 #>
 
 Join-Path "$PSScriptRoot" '../webapp' | Set-Location

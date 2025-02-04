@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Package Chat Copilot application for deployment to Azure
+# Package Q-Pilot application for deployment to Azure
 
 set -e
 

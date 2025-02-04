@@ -2,18 +2,18 @@
 
 > **IMPORTANT:** This sample is for educational purposes only and is not recommended for production deployments.
 
-Plugins are cool! They allow Chat Copilot to talk to the internet. Read more about plugins here [Understanding AI plugins in Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/ai-orchestration/plugins/?tabs=Csharp) and here [ChatGPT Plugins](https://platform.openai.com/docs/plugins/introduction).
+Plugins are cool! They allow Q-Pilot to talk to the internet. Read more about plugins here [Understanding AI plugins in Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/ai-orchestration/plugins/?tabs=Csharp) and here [ChatGPT Plugins](https://platform.openai.com/docs/plugins/introduction).
 
 ## Available Plugins
 
-> These plugins in this project can be optionally deployed with the Chat Copilot [WebApi](../webapi/README.md)
+> These plugins in this project can be optionally deployed with the Q-Pilot [WebApi](../webapi/README.md)
 
 - [WebSearcher](./web-searcher/README.md): A plugin that allows the chat bot to perform Bing search.
 - More to come. Stay tuned!
 
 ## Third Party plugins
 
-You can also configure Chat Copilot to use third party plugins.
+You can also configure Q-Pilot to use third party plugins.
 
 > All no-auth plugins will be supported.
 
@@ -23,7 +23,7 @@ You can also configure Chat Copilot to use third party plugins.
 
 Read more about plugin authentication here: [Plugin authentication](https://platform.openai.com/docs/plugins/authentication)
 
-## Plugin Configuration in Chat Copilot
+## Plugin Configuration in Q-Pilot
 
 ### Prerequisites
 

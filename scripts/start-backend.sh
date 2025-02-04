@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Builds and runs the Chat Copilot backend.
+# Builds and runs the Q-Pilot backend.
 
 set -e
 

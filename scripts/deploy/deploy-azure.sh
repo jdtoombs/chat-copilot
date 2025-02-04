@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Deploy Chat Copilot Azure resources.
+# Deploy Q-Pilot Azure resources.
 
 set -e
 

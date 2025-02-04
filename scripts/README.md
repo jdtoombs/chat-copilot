@@ -1,3 +1,5 @@
-# Chat Copilot setup scripts - Local deployment
+# Q-Pilot setup scripts - Local deployment
 
-To use these scripts, please follow the quick-start guide found [here](../README.md).
+These scripts are no longer updated to work with the latest code base. Please follow the quick-start guide found [here](../README.md) instead.
+
+TODO: Update scripts.

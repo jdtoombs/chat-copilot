@@ -12,7 +12,7 @@ using Xunit;
 namespace ChatCopilotIntegrationTests;
 
 /// <summary>
-/// Base class for Chat Copilot integration tests
+/// Base class for Q-Pilot integration tests
 /// </summary>
 [Trait("Category", "Integration Tests")]
 public abstract class ChatCopilotIntegrationTest : IDisposable

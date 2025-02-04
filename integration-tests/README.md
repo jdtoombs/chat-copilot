@@ -1,8 +1,8 @@
-﻿# Chat Copilot Integration Tests
+﻿# Q-Pilot Integration Tests
 
 ## Requirements
 
-1. A running instance of the Chat Copilot's [backend](../webapi/README.md).
+1. A running instance of the Q-Pilot's [backend](../webapi/README.md).
 
 ## Setup
 

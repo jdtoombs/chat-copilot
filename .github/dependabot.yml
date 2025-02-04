@@ -7,29 +7,18 @@ version: 2
 updates:
   # Maintain dependencies for nuget
   - package-ecosystem: "nuget"
-    directory: "webapi"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-  - package-ecosystem: "nuget"
-    directory: "memorypipeline"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-  - package-ecosystem: "nuget"
-    directory: "shared"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-  - package-ecosystem: "nuget"
-    directory: "integration-tests"
+    directories:
+      - "/webapi"
+      - "/memorypipeline"
+      - "/shared"
+      - "/integration-tests"
     schedule:
       interval: "weekly"
       day: "monday"
 
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
-    directory: "webapp"
+    directory: "/webapp"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -45,7 +34,9 @@ updates:
 
   # Maintain dependencies for terraform
   - package-ecosystem: "terraform" # See documentation for possible values
-    directory: "azure" # Location of package manifests
+    directories:
+      - "/azure/App"
+      - "/azure/State" # Location of package manifests
     schedule:
       interval: "weekly"
       day: "monday"

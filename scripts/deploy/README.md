@@ -1,6 +1,6 @@
-# Deploying Chat Copilot
+# Deploying Q-Pilot
 
-This document details how to deploy Chat Copilot's required resources to your Azure subscription.
+This document details how to deploy Q-Pilot's required resources to your Azure subscription.
 
 ## Things to know
 
@@ -11,7 +11,7 @@ This document details how to deploy Chat Copilot's required resources to your Az
 
 - `F1` and `D1` SKUs for the App Service Plans are not currently supported for this deployment in order to support private networking.
 
-- Chat Copilot deployments use Azure Active Directory for authentication. All endpoints (except `/healthz` and `/authInfo`) require authentication to access.
+- Q-Pilot deployments use Azure Active Directory for authentication. All endpoints (except `/healthz` and `/authInfo`) require authentication to access.
 
 # Configure your environment
 
@@ -63,9 +63,9 @@ You will need two Azure Active Directory (AAD) application registrations -- one 
 
       3. Set _Who can consent_ to _Admins and users_
 
-      4. Set _Admin consent display name_ and _User consent display name_ to `Access Chat Copilot as a user`
+      4. Set _Admin consent display name_ and _User consent display name_ to `Access Q-Pilot as a user`
 
-      5. Set _Admin consent description_ and _User consent description_ to `Allows the accesses to the Chat Copilot web API as a user`
+      5. Set _Admin consent description_ and _User consent description_ to `Allows the accesses to the Q-Pilot web API as a user`
 
    4. Add the web app frontend as an authorized client application
 
@@ -124,7 +124,7 @@ You can also deploy the infrastructure directly from the Azure Portal by clickin
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://aka.ms/sk-deploy-existing-azureopenai-portal)
 
-> This will automatically deploy the most recent release of Chat Copilot binaries ([link](https://github.com/microsoft/chat-copilot/releases)).
+> This will automatically deploy the most recent release of Q-Pilot binaries ([link](https://github.com/microsoft/chat-copilot/releases)).
 
 > To find the deployment name when using `Deploy to Azure`, look for a deployment in your resource group that starts with `Microsoft.Template`.
 
@@ -182,7 +182,7 @@ chmod +x ./deploy-plugins.sh
 
 > **_NOTE:_** This step can be skipped if the WebApi is NOT configured to run asynchronously for document processing. By default, the WebApi is configured to run asynchronously for document processing in deployment.
 
-> **_NOTE:_** This step can be skipped if the previous Azure Resources creation step succeeded without errors. The deployPackages = true setting in main.bicep ensures that the latest Chat Copilot memory pipeline is deployed.
+> **_NOTE:_** This step can be skipped if the previous Azure Resources creation step succeeded without errors. The deployPackages = true setting in main.bicep ensures that the latest Q-Pilot memory pipeline is deployed.
 
 To deploy the memorypipeline, build the deployment package first and deploy it to the Azure resources created above.
 
@@ -204,7 +204,7 @@ chmod +x ./deploy-memorypipeline.sh
 ./deploy-memorypipeline.sh --subscription {YOUR_SUBSCRIPTION_ID} --resource-group {YOUR_RESOURCE_GROUP_NAME} --deployment-name {YOUR_DEPLOYMENT_NAME}
 ```
 
-Your Chat Copilot application is now deployed!
+Your Q-Pilot application is now deployed!
 
 # Appendix
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace CopilotChat.WebApi.Options;
 
 /// <summary>
-/// Configuration options for the Chat Copilot service.
+/// Configuration options for the Q-Pilot service.
 /// </summary>
 public class ServiceOptions
 {

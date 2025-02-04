@@ -1,31 +1,21 @@
-﻿# Chat Copilot Memory Pipeline
-
-> **!IMPORTANT**
-> This sample is for educational purposes only and is not recommended for production deployments.
-
-> **IMPORTANT:** The pipeline will call Azure OpenAI/OpenAI which will use tokens that you may be billed for.
+﻿# Q-Pilot Memory Pipeline
 
 ## Introduction
 
 ### Memory
 
-One of the exciting features of the Chat Copilot App is its ability to store contextual information
+One of the exciting features of the Q-Pilot App is its ability to store contextual information
 to [memories](https://github.com/microsoft/semantic-kernel/blob/main/docs/EMBEDDINGS.md) and retrieve
 relevant information from memories to provide more meaningful answers to users through out the conversations.
 
 Memories can be generated from conversations as well as imported from external sources, such as documents.
-Importing documents enables Chat Copilot to have up-to-date knowledge of specific contexts, such as enterprise and personal data.
+Importing documents enables Q-Pilot to have up-to-date knowledge of specific contexts, such as enterprise and personal data.
 
-### Memory pipeline in Chat Copilot
+### Memory pipeline in Q-Pilot
 
-Chat copilot integrates [Kernel Memory](https://github.com/microsoft/kernel-memory) as the memory solution provider. The memory pipeline is designed to be run as an asynchronous service. If you are expecting to import big documents that can require minutes to process or planning to carry long conversations with the bot, then you can deploy the memory pipeline as a separate service along with the [chat copilot webapi](https://github.com/microsoft/chat-copilot/tree/main/webapi).
+Q-Pilot integrates [Kernel Memory](https://github.com/microsoft/kernel-memory) as the memory solution provider. The memory pipeline is designed to be run as an asynchronous service. If you are expecting to import big documents that can require minutes to process or planning to carry long conversations with the bot, then you can deploy the memory pipeline as a separate service.
 
 ### Configuration
-
-(Optional) Before you get started, make sure you have the following requirements in place:
-
-- [An Azure Subscription](https://azure.microsoft.com/en-us/free/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 #### Webapi
 

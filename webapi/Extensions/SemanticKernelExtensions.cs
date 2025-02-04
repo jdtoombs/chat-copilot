@@ -176,11 +176,11 @@ internal static class SemanticKernelExtensions
     }
 
     /// <summary>
-    /// Register functions with the main kernel responsible for handling Chat Copilot requests.
+    /// Register functions with the main kernel responsible for handling Q-Pilot requests.
     /// </summary>
     private static Task RegisterChatCopilotFunctionsAsync(IServiceProvider sp, Kernel kernel)
     {
-        // Chat Copilot functions
+        // Q-Pilot functions
         kernel.RegisterChatPlugin(sp);
 
         // Time plugin

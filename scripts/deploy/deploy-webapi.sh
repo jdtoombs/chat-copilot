@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploy Chat Copilot application to Azure
+# Deploy Q-Pilot application to Azure
 
 usage() {
     echo "Usage: $0 -d DEPLOYMENT_NAME -s SUBSCRIPTION -rg RESOURCE_GROUP [OPTIONS]"

@@ -1,6 +1,6 @@
 # Introduction
 
-This is the helm chart used for deploying Quartech Co-Pilot into a K8s environment.
+This is the helm chart used for deploying Quartech Q-Pilot into a K8s environment.
 
 # Getting Started
 

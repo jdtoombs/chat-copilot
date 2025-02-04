@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Configure user secrets, appsettings.Development.json, and webapp/.env for Chat Copilot.
+# Configure user secrets, appsettings.Development.json, and webapp/.env for Q-Pilot.
 
 set -e
 

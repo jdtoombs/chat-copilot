@@ -60,7 +60,7 @@ app.MapGet(
 // ********************************************************
 
 app.Logger.LogInformation(
-    "Starting Chat Copilot Memory pipeline service, .NET Env: {0}, Log Level: {1}",
+    "Starting Q-Pilot Memory pipeline service, .NET Env: {0}, Log Level: {1}",
     Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
     app.Logger.GetLogLevelName()
 );

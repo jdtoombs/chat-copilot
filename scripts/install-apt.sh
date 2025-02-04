@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Installs the requirements for running Chat Copilot.
+# Installs the requirements for running Q-Pilot.
 
 set -e
 
