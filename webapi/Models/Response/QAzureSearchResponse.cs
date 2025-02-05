@@ -32,9 +32,6 @@ public class QSearchValue
     public string filename { get; set; } = string.Empty;
 
     public string id { get; set; } = string.Empty;
-
-    [JsonPropertyName("meta_json_string")]
-    public string metaJsonString { get; set; } = string.Empty;
 }
 
 public class QSearchHighlight

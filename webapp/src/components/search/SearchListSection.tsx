@@ -55,11 +55,12 @@ export const SearchListSection: React.FC<ISearchListSectionProps> = ({ value, in
         setOpenItems([]);
     }, [entryPoints]);
     //const searchListItemId = useId();
+    const fileName = value.filename.match(/[^/]+$/)?.[0] ?? value.filename;
     return entryPoints.length > 0 ? (
         <div className={classes.root}>
             <Accordion onToggle={handleToggle} openItems={openItems} collapsible={true} multiple={true}>
                 <AccordionItem value={index}>
-                    <AccordionHeader>{value.filename}</AccordionHeader>
+                    <AccordionHeader>{fileName}</AccordionHeader>
                     {entryPoints.map((match, idx) => {
                         const label = match;
                         const id = idx;

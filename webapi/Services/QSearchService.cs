@@ -84,7 +84,15 @@ public class QSearchService : IQSearchService
                                     id = value.id,
                                     label = "Match-" + (index + 1),
                                     content = value.highlights.content,
-                                    metadata = JsonSerializer.Deserialize<QSearchMetadata>(value.metaJsonString),
+                                    metadata = new QSearchMetadata
+                                    {
+                                        pageCount = 0,
+                                        source = new QSearchMetadataSource
+                                        {
+                                            filename = value.filename,
+                                            url = value.url,
+                                        },
+                                    },
                                 }
                         )
                         .ToArray(),

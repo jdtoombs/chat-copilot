@@ -24,7 +24,7 @@ public record QAzureSearchRequest
 
     public string searchMode { get; } = "all";
 
-    public string select { get; } = "content, filepath, url, meta_json_string, id";
+    public string select { get; } = "content, filepath, url, id";
 
     public string highlightPreTag { get; } = "<mark>";
 

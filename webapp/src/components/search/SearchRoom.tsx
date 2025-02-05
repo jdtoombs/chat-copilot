@@ -2,6 +2,7 @@ import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import React, { useEffect } from 'react';
 import { useSearch } from '../../libs/hooks/useSearch';
 import { ISearchMetaData } from '../../libs/models/SearchResponse';
+import { isUrl } from '../../libs/utils/HelperMethods';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { SharedStyles } from '../../styles';
@@ -128,8 +129,17 @@ export const SearchRoom: React.FC = () => {
                             <div>
                                 <span>
                                     <b>URL</b>
+                                    {': '}
                                 </span>
-                                : <span>{metaData.source.url}</span>
+                                <span>
+                                    {isUrl(metaData.source.url) ? (
+                                        <a href={metaData.source.url} target="_blank" rel="noopener noreferrer">
+                                            {metaData.source.url}
+                                        </a>
+                                    ) : (
+                                        metaData.source.url
+                                    )}
+                                </span>
                             </div>
                         )}
                         {/* {metaData.page_number !== undefined && (

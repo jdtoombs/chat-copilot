@@ -20,7 +20,7 @@
   "fieldMappings": [
     {
       "sourceFieldName": "metadata_spo_site_library_item_id",
-      "targetFieldName": "chunk_id",
+      "targetFieldName": "id",
       "mappingFunction": {
         "name": "base64Encode",
         "parameters": null

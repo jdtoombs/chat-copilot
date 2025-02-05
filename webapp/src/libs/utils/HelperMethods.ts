@@ -37,4 +37,13 @@ const extractJsonArray = (str: string) => {
     }
 };
 
-export { extractJsonArray, getUUID, maxBy };
+const isUrl = (str: string) => {
+    try {
+        new URL(str);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+export { extractJsonArray, getUUID, isUrl, maxBy };

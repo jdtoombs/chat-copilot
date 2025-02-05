@@ -79,8 +79,8 @@
             "inputs": []
           },
           {
-            "name": "uri",
-            "source": "/document/uri",
+            "name": "url",
+            "source": "/document/url",
             "inputs": []
           }
         ]

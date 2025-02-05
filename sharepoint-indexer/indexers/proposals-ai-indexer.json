@@ -5,7 +5,10 @@
   "skillsetName": "skillset-with-projection-proposals-ai",
   "targetIndexName": "proposals-ai",
   "disabled": null,
-  "schedule": { "interval" : "PT24H" },
+  "schedule": {
+    "interval": "P1D",
+    "startTime": "2025-01-30T19:38:16.597Z"
+  },
   "parameters": {
     "batchSize": null,
     "maxFailedItems": null,
@@ -20,7 +23,7 @@
   "fieldMappings": [
     {
       "sourceFieldName": "metadata_spo_site_library_item_id",
-      "targetFieldName": "chunk_id",
+      "targetFieldName": "id",
       "mappingFunction": {
         "name": "base64Encode",
         "parameters": null
@@ -38,7 +41,7 @@
     },
     {
       "sourceFieldName": "metadata_spo_item_weburi",
-      "targetFieldName": "uri",
+      "targetFieldName": "url",
       "mappingFunction": null
     }
   ],
