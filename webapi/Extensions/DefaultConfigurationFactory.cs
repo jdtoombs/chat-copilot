@@ -1,19 +1,9 @@
-using System.Threading.Tasks;
-using CopilotChat.Shared;
+﻿using CopilotChat.Shared;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public class DefaultConfigurationFactory : IDefaultConfigurationFactory
+public class DefaultConfigurationFactory(IDefaultConfigurationAccessor accessor) : IDefaultConfigurationFactory
 {
-    private readonly Task<DefaultConfiguration> _defaultConfigurationTask;
-
-    public DefaultConfigurationFactory(IDefaultConfigurationAccessor accessor)
-    {
-        this._defaultConfigurationTask = accessor.CreateDefaultConfigurationAsync();
-    }
-
-    public DefaultConfiguration GetDefaultConfiguration()
-    {
-        return this._defaultConfigurationTask.GetAwaiter().GetResult();
-    }
+    public DefaultConfiguration GetDefaultConfiguration() =>
+        accessor.CreateDefaultConfigurationAsync().GetAwaiter().GetResult();
 }
