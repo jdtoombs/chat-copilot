@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Hubs;
+using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi;
 
@@ -60,7 +62,7 @@ public sealed class Program
             .Services.AddSingleton<IDefaultConfigurationAccessor, DefaultConfigurationAccessor>(sp =>
             {
                 return new DefaultConfigurationAccessor(
-                    builder.Configuration,
+                    sp.GetRequiredService<IOptions<QAzureOpenAIChatOptions>>(),
                     sp.GetRequiredService<ISecretClientAccessor>(),
                     sp.GetRequiredService<OpenAIDeploymentRepository>()
                 );

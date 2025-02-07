@@ -1,40 +1,28 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using CopilotChat.Shared;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Storage;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public class DefaultConfigurationAccessor : IDefaultConfigurationAccessor
+public class DefaultConfigurationAccessor(
+    IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
+    ISecretClientAccessor secretClient,
+    OpenAIDeploymentRepository deploymentRepository
+) : IDefaultConfigurationAccessor
 {
-    private readonly IConfiguration _configuration;
-    private readonly ISecretClientAccessor _secretClient;
-    private readonly OpenAIDeploymentRepository _deploymentRepository;
-
-    public DefaultConfigurationAccessor(
-        IConfiguration configuration,
-        ISecretClientAccessor secretClient,
-        OpenAIDeploymentRepository deploymentRepository
-    )
-    {
-        this._configuration = configuration;
-        this._secretClient = secretClient;
-        this._deploymentRepository = deploymentRepository;
-    }
-
     public async Task<DefaultConfiguration> CreateDefaultConfigurationAsync()
     {
-        var options =
-            this._configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>()
-            ?? new QAzureOpenAIChatOptions { Enabled = false };
+        var options = qAzureOpenAIChatOptions.Value;
+
         if (!options.Enabled)
         {
             throw new InvalidOperationException("Azure OpenAI Chat is not enabled.");
         }
-        var deployments = await this._deploymentRepository.GetAllDeploymentsAsync();
+        var deployments = await deploymentRepository.GetAllDeploymentsAsync();
         var defaultConnection = deployments
             .ToList()
             .FirstOrDefault(conn => conn.Name.Equals(options.DefaultConnection, StringComparison.OrdinalIgnoreCase));
@@ -44,7 +32,7 @@ public class DefaultConfigurationAccessor : IDefaultConfigurationAccessor
             throw new InvalidOperationException("Default connection not found. Please check the configuration.");
         }
 
-        var apiKey = await this._secretClient.GetSecretClient().GetSecretAsync(defaultConnection.SecretName);
+        var apiKey = await secretClient.GetSecretClient().GetSecretAsync(defaultConnection.SecretName);
         return new DefaultConfiguration(
             options.DefaultModel,
             options.DefaultEmbeddingModel,
