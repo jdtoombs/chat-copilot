@@ -1,4 +1,5 @@
 import { Body1, tokens } from '@fluentui/react-components';
+import Markdown from 'react-markdown';
 import { IChatMessage } from '../../libs/models/ChatMessage';
 
 /*
@@ -58,7 +59,7 @@ export function formatParagraphTextContent(messageContent = '') {
     return (
         <Body1>
             {messageContent.split('\n').map((paragraph, idx) => (
-                <p
+                <div
                     key={`paragraph-${idx}`}
                     style={
                         paragraph.includes('\r')
@@ -71,8 +72,8 @@ export function formatParagraphTextContent(messageContent = '') {
                               }
                     }
                 >
-                    {paragraph}
-                </p>
+                    <Markdown>{paragraph}</Markdown>
+                </div>
             ))}
         </Body1>
     );

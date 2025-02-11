@@ -56,11 +56,17 @@ enum AuthorRoles {
     Function = 'Function',
 }
 
+// Unsure if this interface is completely accurate, determined experimentally.
+interface ContextItem {
+    $type: string;
+    Text: string;
+}
+
 // The collection of context messages associated with this chat completions request.
 // See https://learn.microsoft.com/en-us/dotnet/api/azure.ai.openai.chatcompletionsoptions.messages?view=azure-dotnet-preview#azure-ai-openai-chatcompletionsoptions-messages.
 interface ContextMessage {
     Role: {
         Label: AuthorRoles;
     };
-    Content: string;
+    Items: ContextItem[];
 }

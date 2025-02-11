@@ -153,7 +153,7 @@ export const PromptDialog: React.FC<IPromptDialogProps> = ({ message }) => {
                                           return (
                                               <div key={`context-message-${index}`}>
                                                   <p>{`Role: ${contextMessage.Role.Label}`}</p>
-                                                  {formatParagraphTextContent(`Content: ${contextMessage.Content}`)}
+                                                  {contextMessage.Items[0]?.Text}
                                                   <Divider />
                                               </div>
                                           );
