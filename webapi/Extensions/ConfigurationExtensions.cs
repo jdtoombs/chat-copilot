@@ -2,7 +2,6 @@
 
 using System;
 using System.Reflection;
-using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -35,15 +34,6 @@ internal static class ConfigExtensions
                     optional: true,
                     reloadOnChange: true
                 );
-
-                // For settings from Key Vault, see https://learn.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-8.0
-                string? keyVaultUri = builderContext.Configuration["Service:KeyVault"];
-                if (!string.IsNullOrWhiteSpace(keyVaultUri))
-                {
-                    configBuilder.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
-
-                    // for more information on how to use DefaultAzureCredential, see https://learn.microsoft.com/en-us/dotnet/api/azure.identity.defaultazurecredential?view=azure-dotnet
-                }
             }
         );
 
