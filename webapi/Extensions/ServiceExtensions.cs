@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Reflection;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -67,6 +69,8 @@ public static class CopilotChatServiceExtensions
         AddOptions<MsGraphOboPluginOptions>(MsGraphOboPluginOptions.PropertyName);
 
         AddOptions<QAzureOpenAIChatOptions>(QAzureOpenAIChatOptions.PropertyName);
+
+        AddOptions<CommunicationOptions>(CommunicationOptions.PropertyName);
 
         return services;
 
@@ -492,6 +496,27 @@ public static class CopilotChatServiceExtensions
 
         // email services
         services.AddScoped<IEmailSender, EmailSender>();
+        services.AddScoped<SmtpClient>(sp =>
+        {
+            var chatAuthenticationOption = sp.GetRequiredService<IOptions<ChatAuthenticationOptions>>();
+            var communicationOption = sp.GetRequiredService<IOptions<CommunicationOptions>>();
+
+            var clientId = chatAuthenticationOption.Value.AzureAd?.ClientId;
+            var tenantId = chatAuthenticationOption.Value.AzureAd?.TenantId;
+
+            var communicationAppName = communicationOption.Value.AppName;
+
+            var smtpAuthUsername = $"{communicationAppName}|{clientId}|{tenantId}";
+            var smtpAuthPassword = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET");
+
+            string smtpHostUrl = "smtp.azurecomm.net";
+            return new SmtpClient(smtpHostUrl)
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(smtpAuthUsername, smtpAuthPassword),
+                EnableSsl = true,
+            };
+        });
 
         // completion services
         services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();

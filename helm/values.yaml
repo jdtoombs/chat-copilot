@@ -339,6 +339,11 @@ webapi:
         secretKeyRef:
           name: q-pilot-webapi-secret
           key: KernelMemory-Services-AzureBlobs-ConnectionString
+    - name: "Communication__AppName"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: Communication-App
     - name: "AZURE_CLIENT_SECRET"
       valueFrom:
         secretKeyRef:
@@ -402,6 +407,7 @@ webapi:
         KernelMemory-Services-AzureVision-Key,
         KernelMemory-Services-AzureVision-Endpoint,
         q-pilot-client-secret,
+        Communication-App,
         KernelMemory-Services-AzureBlobs-ConnectionString
       ]
 
