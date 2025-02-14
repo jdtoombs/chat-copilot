@@ -24,8 +24,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Plugins.Core;
+using Microsoft.SemanticKernel.TextToImage;
 
 namespace CopilotChat.WebApi.Extensions;
+
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 /// <summary>
 /// Extension methods for registering Semantic Kernel related services.
@@ -96,6 +99,22 @@ internal static class SemanticKernelExtensions
         // Add the hook to the service collection
         services.AddScoped<KernelSetupHook>(sp => hook);
         return services;
+    }
+
+    /// <summary>
+    /// Register the image plugin with the kernel.
+    /// </summary>
+    public static Kernel RegisterImagePlugin(this Kernel kernel, IServiceProvider sp)
+    {
+        var kernelServiceProvider = kernel.GetRequiredService<IServiceProvider>();
+
+        // Image plugin
+        kernel.ImportPluginFromObject(
+            new ImagePlugin(kernel, kernelServiceProvider.GetKeyedService<ITextToImageService>("dall-e-3")),
+            nameof(ImagePlugin)
+        );
+
+        return kernel;
     }
 
     /// <summary>
@@ -182,6 +201,9 @@ internal static class SemanticKernelExtensions
     {
         // Q-Pilot functions
         kernel.RegisterChatPlugin(sp);
+
+        // Image plugin
+        kernel.RegisterImagePlugin(sp);
 
         // Time plugin
         kernel.ImportPluginFromObject(new TimePlugin(), nameof(TimePlugin));
