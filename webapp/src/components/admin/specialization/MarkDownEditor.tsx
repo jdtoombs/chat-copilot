@@ -19,6 +19,7 @@ import {
     thematicBreakPlugin,
     InsertTable,
     BlockTypeSelect,
+    markdownShortcutPlugin,
 } from '@mdxeditor/editor';
 
 interface MDXEditorMethods {
@@ -77,8 +78,18 @@ const MarkDownEditor: React.FC<MarkDownEditorProps> = ({ roleInformation, setRol
                     headingsPlugin(),
                     quotePlugin(),
                     jsxPlugin(),
-                    codeMirrorPlugin(),
+                    codeMirrorPlugin({
+                        codeBlockLanguages: {
+                            js: 'JavaScript',
+                            css: 'CSS',
+                            txt: 'text',
+                            tsx: 'TypeScript',
+                            ts: 'TypeScript',
+                            md: 'MarkDown',
+                        },
+                    }),
                     thematicBreakPlugin(),
+                    markdownShortcutPlugin(),
                 ]}
                 onChange={(newMarkdown: string) => {
                     setRoleInformation(newMarkdown);
