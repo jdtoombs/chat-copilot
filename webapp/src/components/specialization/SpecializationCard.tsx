@@ -17,7 +17,7 @@ import { ISpecialization } from '../../libs/models/Specialization';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { setChatSpecialization } from '../../redux/features/admin/adminSlice';
-import { addAlert } from '../../redux/features/app/appSlice';
+import { addAlert, hideSpinner, showSpinner } from '../../redux/features/app/appSlice';
 import {
     editConversationSpecialization,
     editConversationSystemDescription,
@@ -88,6 +88,7 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
     const { specializations } = useAppSelector((state: RootState) => state.admin);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const onAddChat = () => {
+        dispatch(showSpinner());
         void chat
             .selectSpecializationAndBeginChat(specialization.id, selectedId)
             .then(() => {
@@ -107,6 +108,9 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
                 dispatch(
                     addAlert({ message: 'Unable to select the specified specialization.', type: AlertType.Error }),
                 );
+            })
+            .finally(() => {
+                dispatch(hideSpinner());
             });
     };
 
