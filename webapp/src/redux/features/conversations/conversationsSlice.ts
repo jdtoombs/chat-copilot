@@ -162,11 +162,9 @@ export const conversationsSlice = createSlice({
                 updatedContent?: string;
                 frontLoad?: boolean;
                 origin?: string;
-                isImage?: boolean;
             }>,
         ) => {
-            const { property, value, messageIdOrIndex, chatId, updatedContent, frontLoad, origin, isImage } =
-                action.payload;
+            const { property, value, messageIdOrIndex, chatId, updatedContent, frontLoad, origin } = action.payload;
             const conversation = state.conversations[chatId];
             if (origin === 'hubMessage' && !conversation.botResponseStatus) {
                 // Exit early if this happens. This means the message was queued but the user cancelled the request.
@@ -181,9 +179,6 @@ export const conversationsSlice = createSlice({
                 conversationMessage[property] = value;
                 if (updatedContent) {
                     conversationMessage.content = updatedContent;
-                }
-                if (isImage) {
-                    conversationMessage.isImage = isImage;
                 }
             }
 

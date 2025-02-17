@@ -160,7 +160,7 @@ const registerSignalREvents = (hubConnection: signalR.HubConnection, store: Stor
     );
 
     hubConnection.on(SignalRCallbackMethods.ReceiveMessageUpdate, (message: IChatMessage) => {
-        const { chatId, id: messageId, content, citations, isImage } = message;
+        const { chatId, id: messageId, content, citations } = message;
         // If tokenUsage is defined, that means full message content has already been streamed and updated from server. No need to update content again.
         store.dispatch({
             type: 'conversations/updateMessageProperty',
@@ -169,19 +169,6 @@ const registerSignalREvents = (hubConnection: signalR.HubConnection, store: Stor
                 messageIdOrIndex: messageId,
                 property: message.tokenUsage ? 'tokenUsage' : 'content',
                 value: message.tokenUsage ?? content,
-                frontLoad: true,
-                origin: 'hubMessage',
-            },
-        });
-
-        // Dispatch update for isImage property
-        store.dispatch({
-            type: 'conversations/updateMessageProperty',
-            payload: {
-                chatId,
-                messageIdOrIndex: messageId,
-                property: 'isImage',
-                value: isImage,
                 frontLoad: true,
                 origin: 'hubMessage',
             },

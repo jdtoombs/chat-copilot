@@ -63,7 +63,6 @@ export interface IChatMessage {
     authorRole: AuthorRoles;
     debug?: string;
     planState?: PlanState;
-    isImage?: boolean;
     userFeedback?: UserFeedback;
     tokenUsage?: TokenUsage;
 }
