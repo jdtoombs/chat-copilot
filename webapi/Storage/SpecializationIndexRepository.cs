@@ -4,17 +4,13 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-public class SpecializationIndexRepository : Repository<SpecializationIndex>
+public class SpecializationIndexRepository(IStorageContext<SpecializationIndex> storageContext)
+    : Repository<SpecializationIndex>(storageContext)
 {
-    public SpecializationIndexRepository(IStorageContext<SpecializationIndex> storageContext)
-        : base(storageContext) { }
-
     /// <summary>
     /// Retrieves all specializations.
     /// </summary>
     /// <returns>A list of specializations.</returns>
-    public Task<IEnumerable<SpecializationIndex>> GetAllIndexesAsync()
-    {
-        return base.StorageContext.QueryEntitiesAsync(e => true);
-    }
+    public Task<IEnumerable<SpecializationIndex>> GetAllIndexesAsync() =>
+        base.StorageContext.QueryEntitiesAsync(e => true);
 }

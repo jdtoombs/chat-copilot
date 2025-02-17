@@ -1,16 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-public class OpenAIDeploymentRepository : Repository<OpenAIDeployment>
+public class OpenAIDeploymentRepository(IStorageContext<OpenAIDeployment> storageContext)
+    : Repository<OpenAIDeployment>(storageContext)
 {
-    public OpenAIDeploymentRepository(IStorageContext<OpenAIDeployment> storageContext)
-        : base(storageContext) { }
-
-    public Task<IEnumerable<OpenAIDeployment>> GetAllDeploymentsAsync()
-    {
-        return base.StorageContext.QueryEntitiesAsync(e => true);
-    }
+    public Task<IEnumerable<OpenAIDeployment>> GetAllDeploymentsAsync() =>
+        base.StorageContext.QueryEntitiesAsync(e => true);
 }

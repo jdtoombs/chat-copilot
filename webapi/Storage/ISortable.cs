@@ -11,7 +11,7 @@ public interface ISortable<T, TSortOption>
 
 public interface ICopilotChatMessageSortable : ISortable<CopilotChatMessage, CopilotChatMessageSortOption?>
 {
-    IQueryable<CopilotChatMessage> Sort(
+    new IQueryable<CopilotChatMessage> Sort(
         IQueryable<CopilotChatMessage> queryable,
         CopilotChatMessageSortOption? sortOption
     );

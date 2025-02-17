@@ -11,15 +11,9 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for chat messages.
 /// </summary>
-public class ChatMessageRepository : CopilotChatMessageRepository
+public class ChatMessageRepository(ICopilotChatMessageStorageContext storageContext)
+    : CopilotChatMessageRepository(storageContext)
 {
-    /// <summary>
-    /// Initializes a new instance of the ChatMessageRepository class.
-    /// </summary>
-    /// <param name="storageContext">The storage context.</param>
-    public ChatMessageRepository(ICopilotChatMessageStorageContext storageContext)
-        : base(storageContext) { }
-
     /// <summary>
     /// Finds chat messages by chat id.
     /// </summary>
@@ -32,10 +26,7 @@ public class ChatMessageRepository : CopilotChatMessageRepository
         CopilotChatMessageSortOption? sortOption = null,
         int skip = 0,
         int count = -1
-    )
-    {
-        return base.QueryEntitiesAsync(e => e.ChatId == chatId, sortOption, skip, count);
-    }
+    ) => base.QueryEntitiesAsync(e => e.ChatId == chatId, sortOption, skip, count);
 
     /// <summary>
     /// Finds messages by id.
@@ -43,10 +34,8 @@ public class ChatMessageRepository : CopilotChatMessageRepository
     /// <param name="chatId">The chat id.</param>
     /// <param name="messageId">The message id.</param>
     /// <returns>The message if found</returns>
-    public Task<CopilotChatMessage> FindByMessageIdAsync(string chatId, string messageId)
-    {
-        return base.FindByIdAsync(messageId, chatId);
-    }
+    public Task<CopilotChatMessage> FindByMessageIdAsync(string chatId, string messageId) =>
+        base.FindByIdAsync(messageId, chatId);
 
     /// <summary>
     /// Finds the most recent chat message by chat id.

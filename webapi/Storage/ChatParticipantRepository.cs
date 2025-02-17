@@ -10,35 +10,25 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for chat sessions.
 /// </summary>
-public class ChatParticipantRepository : Repository<ChatParticipant>
+public class ChatParticipantRepository(IStorageContext<ChatParticipant> storageContext)
+    : Repository<ChatParticipant>(storageContext)
 {
-    /// <summary>
-    /// Initializes a new instance of the ChatParticipantRepository class.
-    /// </summary>
-    /// <param name="storageContext">The storage context.</param>
-    public ChatParticipantRepository(IStorageContext<ChatParticipant> storageContext)
-        : base(storageContext) { }
-
     /// <summary>
     /// Finds chat participants by user id.
     /// A user can be part of multiple chats, thus a user can have multiple chat participants.
     /// </summary>
     /// <param name="userId">The user id.</param>
     /// <returns>A list of chat participants of the same user id in different chat sessions.</returns>
-    public Task<IEnumerable<ChatParticipant>> FindByUserIdAsync(string userId)
-    {
-        return base.StorageContext.QueryEntitiesAsync(e => e.UserId == userId);
-    }
+    public Task<IEnumerable<ChatParticipant>> FindByUserIdAsync(string userId) =>
+        base.StorageContext.QueryEntitiesAsync(e => e.UserId == userId);
 
     /// <summary>
     /// Finds chat participants by chat id.
     /// </summary>
     /// <param name="chatId">The chat id.</param>
     /// <returns>A list of chat participants in the same chat sessions.</returns>
-    public Task<IEnumerable<ChatParticipant>> FindByChatIdAsync(string chatId)
-    {
-        return base.StorageContext.QueryEntitiesAsync(e => e.ChatId == chatId);
-    }
+    public Task<IEnumerable<ChatParticipant>> FindByChatIdAsync(string chatId) =>
+        base.StorageContext.QueryEntitiesAsync(e => e.ChatId == chatId);
 
     /// <summary>
     /// Checks if a user is in a chat session.
@@ -52,8 +42,6 @@ public class ChatParticipantRepository : Repository<ChatParticipant>
         return users.Any();
     }
 
-    public Task<IEnumerable<ChatParticipant>> RemoveAllParticipantsForUser(string userId)
-    {
-        return base.StorageContext.DeleteManyAsync(e => e.UserId == userId);
-    }
+    public Task<IEnumerable<ChatParticipant>> RemoveAllParticipantsForUser(string userId) =>
+        base.StorageContext.DeleteManyAsync(e => e.UserId == userId);
 }

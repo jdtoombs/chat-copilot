@@ -7,12 +7,4 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for chat users.
 /// </summary>
-public class ChatUserRepository : Repository<ChatUser>
-{
-    /// <summary>
-    /// Initializes a new instance of the ChatUserRepository class.
-    /// </summary>
-    /// <param name="storageContext">The storage context.</param>
-    public ChatUserRepository(IStorageContext<ChatUser> storageContext)
-        : base(storageContext) { }
-}
+public class ChatUserRepository(IStorageContext<ChatUser> storageContext) : Repository<ChatUser>(storageContext) { }
