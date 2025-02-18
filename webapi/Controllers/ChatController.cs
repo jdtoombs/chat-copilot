@@ -47,6 +47,7 @@ public class ChatController(
     ITelemetryService telemetryService,
     IOptions<MsGraphOboPluginOptions> msGraphOboPluginOptions,
     IOptions<PromptsOptions> promptsOptions,
+    IQSpecializationService specializationService,
     IDictionary<string, Plugin> plugins
 ) : ControllerBase, IDisposable
 {
@@ -115,6 +116,13 @@ public class ChatController(
 
         // Register hosted plugins that have been enabled
         await this.RegisterHostedFunctionsAsync(kernel, chat!.EnabledPlugins);
+
+        var specialization = await specializationService.GetSpecializationAsync(chat!.specializationId);
+        if (specialization.CanGenImages)
+        {
+            kernel.ImportPluginFromObject(new Plugins.ImagePlugin(kernel), nameof(Plugins.ImagePlugin));
+        }
+
         string ChatFunction = silent ? SilentChatFunctionName : ChatFunctionName;
         // Get the function to invoke
         KernelFunction? chatFunction = kernel.Plugins.GetFunction(ChatPluginName, ChatFunction);
