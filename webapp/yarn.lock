@@ -2723,10 +2723,10 @@
   resolved "https://registry.yarnpkg.com/@marijn/find-cluster-break/-/find-cluster-break-1.0.2.tgz#775374306116d51c0c500b8c4face0f9a04752d8"
   integrity sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==
 
-"@mdxeditor/editor@^3.21.4":
-  version "3.21.4"
-  resolved "https://registry.yarnpkg.com/@mdxeditor/editor/-/editor-3.21.4.tgz#ac88575adfa8829db8b0a7847fdd49dc1067c1c8"
-  integrity sha512-XIcjWFiqdHVEmtdXHpJfs9QWjYIkT640xB0+NOjkd2ZC1jmRowmkZVn0XF2bDxheZYZ+pRhLdyx5uU/5REHWUA==
+"@mdxeditor/editor@^3.23.0":
+  version "3.23.0"
+  resolved "https://registry.yarnpkg.com/@mdxeditor/editor/-/editor-3.23.0.tgz#6d5f9a79332f26b318635cbff39a887cbbb2e467"
+  integrity sha512-OxIlbKsUByojSEDn+QyfiUaBtNBj1qFOfDv4WY30wR+EkGE37LkVVt3M10KiF9uP9vlwivPa5u3LS6C9SS6Rog==
   dependencies:
     "@codemirror/lang-markdown" "^6.2.3"
     "@codemirror/language-data" "^6.5.1"
