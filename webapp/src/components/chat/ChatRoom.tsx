@@ -2,13 +2,13 @@
 
 import { makeStyles, shorthands, Spinner, Text, tokens } from '@fluentui/react-components';
 import React, { useMemo, useState } from 'react';
-import { SpecializationCardList } from '../../components/specialization/SpecializationCardList';
 import { getFriendlyChatName, GetResponseOptions, useChat } from '../../libs/hooks/useChat';
 import { ChatMessageType } from '../../libs/models/ChatMessage';
 import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { FeatureKeys, Features } from '../../redux/features/app/AppState';
 import { SharedStyles } from '../../styles';
+import { SpecializationCardPane } from '../specialization/SpecializationCardPane';
 import { ChatInput } from './ChatInput';
 import { ChatHistory } from './chat-history/ChatHistory';
 import { ChatSuggestionList } from './suggestions/ChatSuggestionList';
@@ -53,16 +53,10 @@ const useClasses = makeStyles({
         display: 'flex',
         flexDirection: 'row',
     },
-    carouselroot: {
+    cardPaneRoot: {
         display: 'flex',
         justifyContent: 'center',
-    },
-    carouselwrapper: {
-        paddingTop: tokens.spacingHorizontalXXXL,
-        display: 'block',
-        lineHeight: tokens.lineHeightBase100,
-        justifyContent: 'center',
-        position: 'relative',
+        overflowY: 'scroll',
     },
 });
 
@@ -204,10 +198,8 @@ export const ChatRoom: React.FC = () => {
     return (
         <div className={classes.root} onDragEnter={onDragEnter} onDragOver={onDragEnter} onDragLeave={onDragLeave}>
             {showSpecialization && (
-                <div className={classes.carouselroot}>
-                    <div className={classes.carouselwrapper}>
-                        <SpecializationCardList specializations={filteredSpecializations} />
-                    </div>
+                <div className={classes.cardPaneRoot}>
+                    <SpecializationCardPane specializations={filteredSpecializations} />
                 </div>
             )}
             {!showSpecialization && (

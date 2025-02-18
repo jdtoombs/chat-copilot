@@ -1,15 +1,4 @@
-import {
-    Button,
-    Caption1,
-    Card,
-    CardHeader,
-    CardPreview,
-    makeStyles,
-    Text,
-    tokens,
-    Tooltip,
-} from '@fluentui/react-components';
-import { MoreHorizontal20Regular } from '@fluentui/react-icons';
+import { Body1, Card, CardPreview, makeStyles, Subtitle2, tokens } from '@fluentui/react-components';
 import * as React from 'react';
 import { useChat } from '../../libs/hooks';
 import { AlertType } from '../../libs/models/AlertType';
@@ -30,9 +19,8 @@ const useStyles = makeStyles({
     },
 
     card: {
-        width: '350px',
-        maxWidth: '100%',
-        height: '300px',
+        display: 'flex',
+        flexDirection: 'column',
     },
 
     root: {
@@ -43,6 +31,7 @@ const useStyles = makeStyles({
         color: tokens.colorNeutralForeground3,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
+        marginTop: '8px',
     },
 
     cardImage: { borderRadius: tokens.borderRadiusSmall, objectFit: 'contain' },
@@ -50,6 +39,24 @@ const useStyles = makeStyles({
     cardPreview: {
         backgroundColor: tokens.colorNeutralBackground3,
         height: '100px',
+    },
+
+    cardContent: {
+        padding: '1.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+
+    cardTitle: {
+        display: 'block',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+    },
+
+    cardDesc: {
+        marginTop: '16px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
     },
 
     logoBadge: {
@@ -69,20 +76,13 @@ const useStyles = makeStyles({
 });
 
 interface SpecializationItemProps {
-    /* eslint-disable
-        @typescript-eslint/no-unsafe-assignment,
-        @typescript-eslint/no-unsafe-member-access,
-        @typescript-eslint/no-unsafe-call
-    */
     specialization: ISpecialization;
 }
 
 export const SpecializationCard: React.FC<SpecializationItemProps> = ({ specialization }) => {
     const styles = useStyles();
     const chat = useChat();
-    const cardDivId = React.useId();
     const cardId = React.useId();
-    const specializationId = React.useId();
     const dispatch = useAppDispatch();
     const { selectedId } = useAppSelector((state: RootState) => state.conversations);
     const { specializations } = useAppSelector((state: RootState) => state.admin);
@@ -124,39 +124,19 @@ export const SpecializationCard: React.FC<SpecializationItemProps> = ({ speciali
     };
 
     return (
-        <div className={styles.root} key={cardDivId}>
-            <Card className={styles.card} data-testid="addNewBotMenuItem" onClick={onAddChat} key={cardId}>
-                <CardPreview className={styles.cardPreview}>
-                    <img
-                        className={styles.cardImage}
-                        src={getimagefilepath(specialization.imageFilePath)}
-                        alt="Presentation Preview"
-                    />
-                </CardPreview>
+        <Card className={styles.card} data-testid="addNewBotMenuItem" onClick={onAddChat} key={cardId}>
+            <CardPreview className={styles.cardPreview}>
+                <img
+                    className={styles.cardImage}
+                    src={getimagefilepath(specialization.imageFilePath)}
+                    alt="Presentation Preview"
+                />
+            </CardPreview>
 
-                <CardHeader
-                    header={<Text weight="semibold">{specialization.name}</Text>}
-                    description={<Caption1 className={styles.caption}>{truncate(specialization.description)}</Caption1>}
-                    action={
-                        <div
-                            className={
-                                specialization.description.length > 250 || specialization.id == 'general'
-                                    ? styles.showTooltip
-                                    : styles.hideTooltip
-                            }
-                            key={specializationId}
-                        >
-                            <Tooltip content={specialization.description} relationship="label">
-                                <Button
-                                    appearance="transparent"
-                                    icon={<MoreHorizontal20Regular />}
-                                    aria-label="More actions"
-                                ></Button>
-                            </Tooltip>
-                        </div>
-                    }
-                ></CardHeader>
-            </Card>
-        </div>
+            <div className={styles.cardContent}>
+                <Subtitle2>{specialization.name}</Subtitle2>
+                <Body1 className={styles.caption}>{truncate(specialization.description)}</Body1>
+            </div>
+        </Card>
     );
 };
