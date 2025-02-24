@@ -7956,10 +7956,10 @@ registry-url@3.1.0:
   dependencies:
     rc "^1.0.1"
 
-rehype-mathjax@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/rehype-mathjax/-/rehype-mathjax-7.0.0.tgz#86c2fe98f1a6c06f85f37dbf7521e630aec21d8f"
-  integrity sha512-xdzj8L1y0Zgai/+N3wpi/xIdiHbOJSaz3FFMZLnhnizEMzcl6Zt5LmMZfQ+J5DYo5fyjKGw/pMaJonds1apo/Q==
+rehype-mathjax@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/rehype-mathjax/-/rehype-mathjax-7.1.0.tgz#d551819fcd916048a103dd836aff591b8a1bfe34"
+  integrity sha512-mJHNpoqCC5UZ24OKx0wNjlzV18qeJz/Q/LtEjxXzt8vqrZ1Z3GxQnVrHcF5/PogcXUK8cWwJ4U/LWOQWEiABHw==
   dependencies:
     "@types/hast" "^3.0.0"
     "@types/mathjax" "^0.0.40"
@@ -7968,6 +7968,7 @@ rehype-mathjax@^7.0.0:
     mathjax-full "^3.0.0"
     unified "^11.0.0"
     unist-util-visit-parents "^6.0.0"
+    vfile "^6.0.0"
 
 remark-gfm@^4.0.1:
   version "4.0.1"
