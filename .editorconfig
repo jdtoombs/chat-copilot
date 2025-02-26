@@ -59,6 +59,9 @@ charset = utf-8-bom
 ###############################
 # .NET Coding Conventions     #
 ###############################
+[*.{test.cs}]
+dotnet_diagnostic.CA1707.severity = none # Remove the underscores from member name
+
 [*.{cs,vb}]
 # Organize usings
 dotnet_sort_system_directives_first = true
