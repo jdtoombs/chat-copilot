@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using CopilotChat.WebApi.Extensions;
-using CopilotChat.WebApi.Plugins.Chat.Ext;
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using Azure.Security.KeyVault.Secrets;
+using CopilotChat.WebApi.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
@@ -13,88 +11,71 @@ using Microsoft.SemanticKernel;
 
 namespace CopilotChat.WebApi.Services;
 
+#pragma warning disable SKEXP0010 // Experimental method AddAzureOpenAITextToImage, suppressed instability warning
+
 /// <summary>
 /// Extension methods for registering Semantic Kernel related services.
 /// </summary>
-public sealed class SemanticKernelProvider
+public sealed class SemanticKernelProvider(
+    IServiceProvider serviceProvider,
+    SecretClient secretClient,
+    IChatSessionService chatSessionService,
+    IContextValueAccessor contextValueAccessor
+)
 {
-    private readonly Kernel _kernel;
+    private Kernel? _kernel;
 
-    public SemanticKernelProvider(
-        IServiceProvider serviceProvider,
-        IConfiguration configuration,
-        IHttpClientFactory httpClientFactory,
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
-    )
+    public async Task<Kernel> GetSemanticKernel()
     {
-        this._kernel = InitializeSemanticKernel(
-            serviceProvider,
-            configuration,
-            httpClientFactory,
-            qAzureOpenAIChatOptions,
-            openAIDeployments
-        );
+        if (this._kernel == null)
+        {
+            this._kernel = await this.InitializeSemanticKernel();
+        }
+
+        return this._kernel.Clone();
     }
 
-    /// <summary>
-    /// Produce semantic-kernel with completion and dalle-3 services for chat.
-    /// </summary>
-    public Kernel GetSemanticKernel() => this._kernel.Clone();
-
-    private static Kernel InitializeSemanticKernel(
-        IServiceProvider serviceProvider,
-        IConfiguration configuration,
-        IHttpClientFactory httpClientFactory,
-        QAzureOpenAIChatOptions qAzureOpenAIChatOptions,
-        IEnumerable<OpenAIDeploymentAPIKey> openAIDeployments
-    )
+    private async Task<Kernel> InitializeSemanticKernel()
     {
         var builder = Kernel.CreateBuilder();
 
         builder.Services.AddLogging();
 
+        var chatId = contextValueAccessor.GetRouteValue("chatId")?.ToString();
+        if (string.IsNullOrEmpty(chatId))
+        {
+            return builder.Build();
+        }
+
         var memoryOptions = serviceProvider.GetRequiredService<IOptions<KernelMemoryConfig>>().Value;
+
+        var openAIDeployment = await chatSessionService.GetDeployment(chatId);
+        var completionDeployment = await chatSessionService.GetCompletionDeployment(chatId);
+        var imageGenerationDeployment = await chatSessionService.GetImageGenerationDeployment(chatId);
+
+        var apiKey = await secretClient.GetSecretAsync(openAIDeployment.SecretName);
+
         switch (memoryOptions.TextGeneratorType)
         {
             case string x when x.Equals("AzureOpenAI", StringComparison.OrdinalIgnoreCase):
             case string y when y.Equals("AzureOpenAIText", StringComparison.OrdinalIgnoreCase):
-                foreach (var openAIDeployment in openAIDeployments)
+                if (completionDeployment != null)
                 {
-                    foreach (var chatCompletionDeployment in openAIDeployment.Deployment.ChatCompletionDeployments)
-                    {
-#pragma warning disable CA2000 // No need to dispose of HttpClient instances from IHttpClientFactory
-                        builder.AddAzureOpenAIChatCompletion(
-                            chatCompletionDeployment.Name,
-                            openAIDeployment.Deployment.Endpoint?.ToString(),
-                            openAIDeployment.ApiKey,
-                            httpClient: httpClientFactory.CreateClient(),
-                            serviceId: $"{chatCompletionDeployment.Name} ({openAIDeployment.Deployment.Name})"
-                        );
-                    }
-                    foreach (var imageGenDeployment in openAIDeployment.Deployment.ImageGenerationDeployments)
-                    {
-#pragma warning disable SKEXP0010 // Experimental method AddAzureOpenAITextToImage, suppressed instability warning
-                        builder.AddAzureOpenAITextToImage(
-                            imageGenDeployment,
-                            openAIDeployment.Deployment.Endpoint?.ToString(),
-                            openAIDeployment.ApiKey,
-                            httpClient: httpClientFactory.CreateClient(),
-                            serviceId: imageGenDeployment
-                        );
-                    }
+                    builder.AddAzureOpenAIChatCompletion(
+                        completionDeployment.Name,
+                        openAIDeployment.Endpoint,
+                        apiKey.Value.Value
+                    );
                 }
-#pragma warning restore SKEXP0010
-                break;
 
-            case string x when x.Equals("OpenAI", StringComparison.OrdinalIgnoreCase):
-                var openAIOptions = memoryOptions.GetServiceConfig<OpenAIConfig>(configuration, "OpenAI");
-                builder.AddOpenAIChatCompletion(
-                    openAIOptions.TextModel,
-                    openAIOptions.APIKey,
-                    httpClient: httpClientFactory.CreateClient()
-                );
-#pragma warning restore CA2000
+                if (imageGenerationDeployment != null)
+                {
+                    builder.AddAzureOpenAITextToImage(
+                        imageGenerationDeployment,
+                        openAIDeployment.Endpoint,
+                        apiKey.Value.Value
+                    );
+                }
                 break;
             default:
                 throw new ArgumentException(

@@ -943,10 +943,7 @@ public class ChatPlugin
     {
         // Create the stream
         var provider = this._kernel.GetRequiredService<IServiceProvider>();
-        var deployment = await this._qOpenAIDeploymentService.GetDeployment(this._qSpecialization.OpenAIDeploymentId);
-        var chatCompletion = provider.GetKeyedService<IChatCompletionService>(
-            $"{this._qSpecialization.CompletionDeploymentName} ({deployment.Name})"
-        );
+        var chatCompletion = provider.GetRequiredService<IChatCompletionService>();
 
         if (chatCompletion == null)
         {

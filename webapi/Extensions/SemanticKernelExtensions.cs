@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using CopilotChat.WebApi.Context;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
@@ -57,7 +57,7 @@ internal static class SemanticKernelExtensions
         builder.Services.AddScoped<Kernel>(sp =>
         {
             var provider = sp.GetRequiredService<SemanticKernelProvider>();
-            var kernel = provider.GetSemanticKernel();
+            var kernel = provider.GetSemanticKernel().GetAwaiter().GetResult();
 
             sp.GetRequiredService<RegisterFunctionsWithKernel>()(sp, kernel);
 
@@ -139,40 +139,20 @@ internal static class SemanticKernelExtensions
     {
         builder.Services.AddScoped(sp =>
         {
-            var openAiRepo = sp.GetRequiredService<OpenAIDeploymentRepository>();
             var openAiService = new QOpenAIDeploymentService(
-                openAiRepo,
+                sp.GetRequiredService<OpenAIDeploymentRepository>(),
                 sp.GetRequiredService<ISecretClientAccessor>()
             );
             var openAiDeploymentsTask = openAiService.GetAllDeployments();
             openAiDeploymentsTask.Wait();
             var openAiDeployments = openAiDeploymentsTask.Result;
             var deploymentAndKeys = new List<OpenAIDeploymentAPIKey>();
-            var secretClient = sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient();
-            foreach (var deployment in openAiDeployments)
-            {
-                try
-                {
-                    var secretValue = secretClient.GetSecretAsync(deployment.SecretName).GetAwaiter().GetResult();
-                    deploymentAndKeys.Add(new OpenAIDeploymentAPIKey(deployment, secretValue.Value.Value));
-                }
-                catch (Azure.RequestFailedException e)
-                {
-                    sp.GetRequiredService<ILogger>()
-                        .LogWarning(
-                            "Could not retrieve secret key for {0}, Azure responded: {1}",
-                            deployment.Name,
-                            e.Message
-                        );
-                }
-            }
 
             return new SemanticKernelProvider(
                 sp,
-                builder.Configuration,
-                sp.GetRequiredService<IHttpClientFactory>(),
-                builder.Configuration.GetSection(QAzureOpenAIChatOptions.PropertyName).Get<QAzureOpenAIChatOptions>(),
-                deploymentAndKeys
+                sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient(),
+                sp.GetRequiredService<IChatSessionService>(),
+                sp.GetRequiredService<IContextValueAccessor>()
             );
         });
     }

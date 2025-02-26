@@ -55,7 +55,7 @@ public class Specialization : IStorageEntity
     /// <summary>
     /// Open AI Deployment, which may host several chat completions.
     /// </summary>
-    public string? OpenAIDeploymentId { get; set; }
+    public string OpenAIDeploymentId { get; set; }
 
     /// <summary>
     /// Completion deployment name.

@@ -490,6 +490,9 @@ public static class CopilotChatServiceExtensions
         // chat extension services
         services.AddScoped<IQAzureOpenAIChatExtension, QAzureOpenAIChatExtension>();
 
+        // chat session services
+        services.AddScoped<IChatSessionService, ChatSessionService>();
+
         // specialization services
         services.AddScoped<IQSpecializationService, QSpecializationService>();
         services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();

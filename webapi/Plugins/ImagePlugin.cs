@@ -28,7 +28,7 @@ public class ImagePlugin(Kernel kernel)
         }
 
         var provider = kernel.GetRequiredService<IServiceProvider>();
-        var textToImageService = provider.GetKeyedService<ITextToImageService>("dall-e-3");
+        var textToImageService = provider.GetRequiredService<ITextToImageService>();
 
         if (textToImageService == null)
         {
