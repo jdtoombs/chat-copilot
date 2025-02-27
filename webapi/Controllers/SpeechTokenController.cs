@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class SpeechTokenController(
+internal class SpeechTokenController(
     IOptions<AzureSpeechOptions> options,
     ILogger<SpeechTokenController> logger,
     IHttpClientFactory httpClientFactory

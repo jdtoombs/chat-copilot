@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Models.Storage;
 /// <summary>
 /// Information about the specialization
 /// </summary>
-public class Specialization : IStorageEntity
+internal class Specialization : IStorageEntity
 {
     /// <summary>
     /// ID that is persistent and unique.

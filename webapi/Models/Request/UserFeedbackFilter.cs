@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public class UserFeedbackFilter
+internal class UserFeedbackFilter
 {
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }

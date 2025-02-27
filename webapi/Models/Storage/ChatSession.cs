@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Models.Storage;
 /// A chat session
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
-public class ChatSession : IStorageEntity
+internal class ChatSession : IStorageEntity
 {
     private const string CurrentVersion = "2.0";
 

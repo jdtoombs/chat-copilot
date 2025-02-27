@@ -1,8 +1,8 @@
-using Azure.Security.KeyVault.Secrets;
+﻿using Azure.Security.KeyVault.Secrets;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public interface ISecretClientAccessor
+internal interface ISecretClientAccessor
 {
-    public SecretClient GetSecretClient();
+    SecretClient GetSecretClient();
 }

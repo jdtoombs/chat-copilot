@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class OpenAIDeploymentController(
+internal class OpenAIDeploymentController(
     ILogger<OpenAIDeploymentController> logger,
     OpenAIDeploymentRepository openAIDeploymentRepository,
     IQOpenAIDeploymentService qOpenAIDeploymentService

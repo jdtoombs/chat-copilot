@@ -16,7 +16,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for search service.
 /// </summary>
-public class QSearchService : IQSearchService
+internal class QSearchService : IQSearchService
 {
     private readonly HttpClient _httpClient;
     private readonly HttpClientHandler? _httpClientHandler;

@@ -5,7 +5,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Models.Storage;
 
-public class AISearchDeployment : IStorageEntity
+internal class AISearchDeployment : IStorageEntity
 {
     public string Id { get; set; }
 

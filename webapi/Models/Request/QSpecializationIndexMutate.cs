@@ -1,3 +1,3 @@
 ﻿namespace CopilotChat.WebApi.Models.Request;
 
-public class QSpecializationIndexMutate : QSpecializationIndexBase { };
+internal class QSpecializationIndexMutate : QSpecializationIndexBase { };

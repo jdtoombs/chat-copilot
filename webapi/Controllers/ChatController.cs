@@ -41,7 +41,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling chat messages and responses.
 /// </summary>
 [ApiController]
-public class ChatController(
+internal class ChatController(
     ILogger<ChatController> logger,
     IHttpClientFactory httpClientFactory,
     ITelemetryService telemetryService,
@@ -485,7 +485,7 @@ public class ChatController(
 /// Retrieves authentication content (e.g. username/password, API key) via the provided delegate and
 /// applies it to HTTP requests using the "basic" authentication scheme.
 /// </summary>
-public class BasicAuthenticationProvider
+internal class BasicAuthenticationProvider
 {
     private readonly Func<Task<string>> _credentialsDelegate;
 
@@ -520,7 +520,7 @@ public class BasicAuthenticationProvider
 /// Retrieves a token via the provided delegate and applies it to HTTP requests using the
 /// "bearer" authentication scheme.
 /// </summary>
-public class BearerAuthenticationProvider
+internal class BearerAuthenticationProvider
 {
     private readonly Func<Task<string>> _bearerTokenDelegate;
 

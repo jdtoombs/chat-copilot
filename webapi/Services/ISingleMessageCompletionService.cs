@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Defines the contract for a service that retrieves chat completions.
 /// </summary>
-public interface ISingleMessageCompletionService
+internal interface ISingleMessageCompletionService
 {
     /// <summary>
     /// Retrieves the chat completion for a given user prompt.

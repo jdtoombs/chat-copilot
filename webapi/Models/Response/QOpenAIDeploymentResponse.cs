@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-public class QOpenAIDeploymentResponse
+internal class QOpenAIDeploymentResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }

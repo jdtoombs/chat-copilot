@@ -1,8 +1,8 @@
-using CopilotChat.Shared;
+﻿using CopilotChat.Shared;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public interface IDefaultConfigurationFactory
+internal interface IDefaultConfigurationFactory
 {
-    public DefaultConfiguration GetDefaultConfiguration();
+    DefaultConfiguration GetDefaultConfiguration();
 }

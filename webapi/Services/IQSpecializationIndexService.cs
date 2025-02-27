@@ -6,7 +6,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public interface IQSpecializationIndexService
+internal interface IQSpecializationIndexService
 {
     Task<IEnumerable<SpecializationIndex>> GetAllIndexes();
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CopilotChat.WebApi.Auth.Specializations;
 
-public static class AuthorizationTestContext
+internal static class AuthorizationTestContext
 {
     public static AuthorizationHandlerContext BuildAuthorizationContext(IEnumerable<Claim> claims)
     {

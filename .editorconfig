@@ -59,9 +59,6 @@ charset = utf-8-bom
 ###############################
 # .NET Coding Conventions     #
 ###############################
-[*.{test.cs}]
-dotnet_diagnostic.CA1707.severity = none # Remove the underscores from member name
-
 [*.{cs,vb}]
 # Organize usings
 dotnet_sort_system_directives_first = true
@@ -372,6 +369,8 @@ csharp_style_expression_bodied_local_functions = false:silent
 # Allow placing test classes in the same directory as the class to test
 # ie: MyProject/MyClass.cs (MyProject.MyClass) and MyProject/MyClass.test.cs (MyProject.MyClass.Test)
 dotnet_diagnostic.IDE0130.severity = none # Namespace does not match folder structure
+dotnet_diagnostic.CA1707.severity = none # Remove the underscores from member name
+dotnet_diagnostic.CA1515.severity = none # Consider making public types internal
 
 ###############################
 # Java Coding Conventions     #

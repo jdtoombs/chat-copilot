@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public static class QueryExtensions
+internal static class QueryExtensions
 {
     /// <summary>
     /// Returns all items if count is -1, otherwise returns the specified count of items.

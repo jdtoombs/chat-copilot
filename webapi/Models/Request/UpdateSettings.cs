@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public sealed class UpdateSettings
+internal sealed class UpdateSettings
 {
     /// <summary>
     /// Key of the setting

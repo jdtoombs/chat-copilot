@@ -33,7 +33,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
 [ApiController]
-public class ChatHistoryController(
+internal class ChatHistoryController(
     ILogger<ChatHistoryController> logger,
     IKernelMemory memoryClient,
     ChatSessionRepository sessionRepository,
@@ -171,7 +171,7 @@ public class ChatHistoryController(
         return this.Ok(chatMessages);
     }
 
-    public class RateChatMessageBody
+    internal class RateChatMessageBody
     {
         public bool? positive { get; set; }
     }

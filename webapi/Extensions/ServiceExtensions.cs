@@ -36,7 +36,7 @@ namespace CopilotChat.WebApi.Extensions;
 /// Add options and services for Q-Pilot.
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
-public static class CopilotChatServiceExtensions
+internal static class CopilotChatServiceExtensions
 {
     /// <summary>
     /// Parse configuration into options.

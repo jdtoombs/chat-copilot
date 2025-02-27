@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.JiraPlugin.Model;
 /// <summary>
 /// Represents an individual comment on an issue in jira.
 /// </summary>
-public class IndividualComments
+internal class IndividualComments
 {
     /// <summary>
     /// Gets or sets the body of the comment.

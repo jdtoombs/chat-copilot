@@ -6,7 +6,7 @@ namespace CopilotChat.WebApi.Utilities;
 /// <summary>
 /// Provides utility methods for managing and processing citations tasks.
 /// </summary>
-public static class CitationUtils
+internal static class CitationUtils
 {
     /// <summary>
     /// Determines the MIME type of a file based on its extension.

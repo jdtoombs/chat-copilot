@@ -8,7 +8,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QSpecializationIndexService(SpecializationIndexRepository indexRepository) : IQSpecializationIndexService
+internal class QSpecializationIndexService(SpecializationIndexRepository indexRepository) : IQSpecializationIndexService
 {
     public Task<IEnumerable<SpecializationIndex>> GetAllIndexes()
     {

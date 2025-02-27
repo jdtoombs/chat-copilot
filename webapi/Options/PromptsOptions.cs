@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Configuration options for the chat
 /// </summary>
-public class PromptsOptions
+internal class PromptsOptions
 {
     public const string PropertyName = "Prompts";
 

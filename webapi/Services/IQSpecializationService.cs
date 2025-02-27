@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Defines specialization service
 /// </summary>
-public interface IQSpecializationService
+internal interface IQSpecializationService
 {
     /// <summary>
     /// Retrieve all specializations.

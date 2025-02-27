@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Auth;
 /// <summary>
 /// Class which provides validated security information for use in controllers.
 /// </summary>
-public class AuthInfo : IAuthInfo
+internal class AuthInfo : IAuthInfo
 {
     private record struct AuthData(string UserId, string UserName);
 

@@ -18,7 +18,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for managing specializations.
 /// </summary>
 [ApiController]
-public class SpecializationController(
+internal class SpecializationController(
     ILogger<SpecializationController> logger,
     IQSpecializationService qSpecializationService
 ) : ControllerBase

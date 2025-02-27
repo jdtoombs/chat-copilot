@@ -31,7 +31,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// This controller is responsible for contracts that are not possible to fulfill by kernel memory components.
 /// </remarks>
 [ApiController]
-public class DocumentController(
+internal class DocumentController(
     ILogger<DocumentController> logger,
     IAuthInfo authInfo,
     IOptions<DocumentMemoryOptions> documentMemoryOptions,

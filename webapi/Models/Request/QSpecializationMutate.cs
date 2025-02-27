@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// Form for mutating a Specialization with a POST Http request.
 /// Includes raw files to be added to Blob Storage Container
 /// </summary>
-public class QSpecializationMutate : QSpecializationBase
+internal class QSpecializationMutate : QSpecializationBase
 {
     /// <summary>
     /// Image file of the Specialization.

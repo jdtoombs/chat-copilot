@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for specialization management.
 /// </summary>
-public class SpecializationRepository(IStorageContext<Specialization> storageContext)
+internal class SpecializationRepository(IStorageContext<Specialization> storageContext)
     : Repository<Specialization>(storageContext)
 {
     /// <summary>

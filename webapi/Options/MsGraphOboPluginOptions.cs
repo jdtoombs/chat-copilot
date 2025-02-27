@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Options;
 
-public class MsGraphOboPluginOptions
+internal class MsGraphOboPluginOptions
 {
     public const string PropertyName = "OnBehalfOf";
 

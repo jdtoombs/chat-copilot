@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.GitHubPlugin.Model;
 /// <summary>
 /// Represents a user on GitHub.
 /// </summary>
-public class GitHubUser
+internal class GitHubUser
 {
     /// <summary>
     /// The user's name.

@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.JiraPlugin.Model;
 /// <summary>
 /// Represents a the trimmed down response for retrieving an issue from jira.
 /// </summary>
-public class IssueResponse
+internal class IssueResponse
 {
     /// <summary>
     /// Gets or sets the GUID of the issue.

@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// Response definition for search response
 /// This model is built with AzureAISearch response structure as base model.
 /// </summary>
-public class QSearchResult
+internal class QSearchResult
 {
     [JsonPropertyName("count")]
     public int count { get; set; }
@@ -18,7 +18,7 @@ public class QSearchResult
     public IEnumerable<QSearchResultValue>? values { get; set; } = new List<QSearchResultValue>();
 }
 
-public class QSearchResultValue
+internal class QSearchResultValue
 {
     [JsonPropertyName("matches")]
     public IEnumerable<QSearchMatch>? matches { get; set; } = new List<QSearchMatch>();
@@ -29,7 +29,7 @@ public class QSearchResultValue
     public string? filename { get; set; }
 }
 
-public class QSearchMatch
+internal class QSearchMatch
 {
     public string id { get; set; } = string.Empty;
 
@@ -43,7 +43,7 @@ public class QSearchMatch
     public QSearchMetadata metadata { get; set; } = new QSearchMetadata();
 }
 
-public class QSearchMetadata
+internal class QSearchMetadata
 {
     [JsonPropertyName("page_number")]
     public int pageCount { get; set; } = 0;
@@ -52,7 +52,7 @@ public class QSearchMetadata
     public QSearchMetadataSource source { get; set; } = new QSearchMetadataSource();
 }
 
-public class QSearchMetadataSource
+internal class QSearchMetadataSource
 {
     [JsonPropertyName("filename")]
     public string filename { get; set; } = string.Empty;

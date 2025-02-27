@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 /// <summary>
 /// This class is a representation of Azure AI Chat options.
 /// </summary>
-public class QAzureOpenAIChatOptions
+internal class QAzureOpenAIChatOptions
 {
     public const string PropertyName = "QAzureOpenAIChatConfig";
     public bool Enabled { get; set; } = false;
@@ -21,14 +21,14 @@ public class QAzureOpenAIChatOptions
     [Required]
     public BlobStorageOption BlobStorage { get; set; } = new BlobStorageOption();
 
-    public class ChatCompletionDeployment
+    internal class ChatCompletionDeployment
     {
         public string Name { get; set; } = string.Empty;
         public int CompletionTokenLimit { get; set; }
         public int OutputTokens { get; set; }
     }
 
-    public class BlobStorageOption
+    internal class BlobStorageOption
     {
         public string ConnectionString { get; set; } = string.Empty;
         public string SpecializationContainerName { get; set; } = "specialization";

@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// <summary>
 /// Form for importing a document from a POST Http request.
 /// </summary>
-public class DocumentStatusForm
+internal class DocumentStatusForm
 {
     /// <summary>
     /// The file to import.

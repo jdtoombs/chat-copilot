@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Defines a service that performs content safety analysis on images.
 /// </summary>
-public class DocumentTypeProvider
+internal class DocumentTypeProvider
 {
     private readonly Dictionary<string, bool> supportedTypes;
 

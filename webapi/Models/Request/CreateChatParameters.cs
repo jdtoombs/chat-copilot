@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// Parameters for creating a new chat session.
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
-public class CreateChatParameters
+internal class CreateChatParameters
 {
     /// <summary>
     /// Set a GUID manually here. Optional, as the repository can also generate it.

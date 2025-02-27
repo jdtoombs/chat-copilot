@@ -8,7 +8,7 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// Defines the basic CRUD operations for a repository.
 /// </summary>
-public interface IRepository<T>
+internal interface IRepository<T>
     where T : IStorageEntity
 {
     /// <summary>

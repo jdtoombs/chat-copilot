@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-public class AskResult
+internal class AskResult
 {
     public string Value { get; set; } = string.Empty;
 

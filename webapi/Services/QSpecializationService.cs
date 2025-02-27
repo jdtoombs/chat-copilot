@@ -19,7 +19,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for specialization service.
 /// </summary>
-public class QSpecializationService(
+internal class QSpecializationService(
     SpecializationRepository specializationSourceRepository,
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     IQBlobStorage qBlobStorage

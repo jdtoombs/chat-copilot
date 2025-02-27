@@ -10,7 +10,7 @@ using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 
 namespace CopilotChat.WebApi.Services;
 
-public class SingleMessageCompletionService(Kernel kernel, IQAzureOpenAIChatExtension qAzureOpenAIChatExtension)
+internal class SingleMessageCompletionService(Kernel kernel, IQAzureOpenAIChatExtension qAzureOpenAIChatExtension)
     : ISingleMessageCompletionService
 {
     /// <summary>

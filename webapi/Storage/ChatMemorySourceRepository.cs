@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for chat messages.
 /// </summary>
-public class ChatMemorySourceRepository(IStorageContext<MemorySource> storageContext)
+internal class ChatMemorySourceRepository(IStorageContext<MemorySource> storageContext)
     : Repository<MemorySource>(storageContext)
 {
     /// <summary>

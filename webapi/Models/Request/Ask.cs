@@ -7,7 +7,7 @@ using CopilotChat.WebApi.Options;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public class Ask
+internal class Ask
 {
     [Required, NotEmptyOrWhitespace]
     public string Input { get; set; } = string.Empty;

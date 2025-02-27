@@ -8,7 +8,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.JiraPlugin.Model;
 /// <summary>
 /// Represents a the list of comments that make up a CommentResponse.
 /// </summary>
-public class CommentResponse
+internal class CommentResponse
 {
     /// <summary>
     /// Gets or sets the list of all comments contained in this comment response.

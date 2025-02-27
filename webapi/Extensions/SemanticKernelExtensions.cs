@@ -38,13 +38,13 @@ internal static class SemanticKernelExtensions
     /// <summary>
     /// Delegate to register functions with a Semantic Kernel
     /// </summary>
-    public delegate Task RegisterFunctionsWithKernel(IServiceProvider sp, Kernel kernel);
+    internal delegate Task RegisterFunctionsWithKernel(IServiceProvider sp, Kernel kernel);
 
     /// <summary>
     /// Delegate for any complimentary setup of the kernel, i.e., registering custom plugins, etc.
     /// See webapi/README.md#Add-Custom-Setup-to-Chat-Copilot's-Kernel for more details.
     /// </summary>
-    public delegate Task KernelSetupHook(IServiceProvider sp, Kernel kernel);
+    internal delegate Task KernelSetupHook(IServiceProvider sp, Kernel kernel);
 
     /// <summary>
     /// Add Semantic Kernel services

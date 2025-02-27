@@ -18,7 +18,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling loading and updating chat users settings
 /// </summary>
 [ApiController]
-public class UserSettingsController(
+internal class UserSettingsController(
     ILogger<UserSettingsController> logger,
     IOptions<QAzureOpenAIChatOptions> chatOptions
 ) : ControllerBase

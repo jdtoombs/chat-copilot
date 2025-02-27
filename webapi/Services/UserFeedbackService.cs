@@ -12,7 +12,7 @@ using CopilotChat.WebApi.Utilities;
 
 namespace CopilotChat.WebApi.Services;
 
-public class UserFeedbackService(ChatSessionRepository sessionRepository, ChatMessageRepository messageRepository)
+internal class UserFeedbackService(ChatSessionRepository sessionRepository, ChatMessageRepository messageRepository)
     : IUserFeedbackService
 {
     /// <summary>

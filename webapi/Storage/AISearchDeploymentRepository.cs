@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-public class AISearchDeploymentRepository(IStorageContext<AISearchDeployment> storageContext)
+internal class AISearchDeploymentRepository(IStorageContext<AISearchDeployment> storageContext)
     : Repository<AISearchDeployment>(storageContext)
 {
     public Task<IEnumerable<AISearchDeployment>> GetAllSearchDeployments() =>

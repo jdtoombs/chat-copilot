@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Storage;
 /// <summary>
 /// The ChatUsers settings
 /// </summary>
-public class ChatUserSettings
+internal class ChatUserSettings
 {
     /// <summary>
     /// Is Dark Mode Enabled
@@ -31,7 +31,7 @@ public class ChatUserSettings
 /// A chat participant is a user that is part of a chat.
 /// A user can be part of multiple chats, thus a user can have multiple chat participants.
 /// </summary>
-public class ChatUser : IStorageEntity
+internal class ChatUser : IStorageEntity
 {
     /// <summary>
     /// Participant ID that is persistent and unique.

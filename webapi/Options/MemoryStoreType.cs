@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// The type of memory store to use.
 /// </summary>
-public enum MemoryStoreType
+internal enum MemoryStoreType
 {
     /// <summary>
     /// In-memory volatile memory store.
@@ -33,7 +33,7 @@ public enum MemoryStoreType
     AzureAISearch,
 }
 
-public static class MemoryStoreTypeExtensions
+internal static class MemoryStoreTypeExtensions
 {
     /// <summary>
     /// Gets the memory store type from the configuration.

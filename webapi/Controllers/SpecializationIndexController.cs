@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class SpecializationIndexController(
+internal class SpecializationIndexController(
     ILogger<SpecializationIndexController> logger,
     IQSpecializationIndexService qSpecializationIndexService
 ) : ControllerBase

@@ -12,7 +12,7 @@ TODO: Update
 
 You will need the following items to run the application:
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Node.js](https://nodejs.org/en/download)
 - [Yarn](https://classic.yarnpkg.com/docs/install)
 - [Git](https://www.git-scm.com/downloads)

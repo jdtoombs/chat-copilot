@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.JiraPlugin.Model;
 /// <summary>
 /// Represents the Author of a comment.
 /// </summary>
-public class CommentAuthor
+internal class CommentAuthor
 {
     /// <summary>
     /// Gets or sets the Comment Author's display name.

@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public class QSpecializationIndexCreate : QSpecializationIndexBase
+internal class QSpecializationIndexCreate : QSpecializationIndexBase
 {
     [JsonPropertyName("name")]
     public new required string Name { get; set; }

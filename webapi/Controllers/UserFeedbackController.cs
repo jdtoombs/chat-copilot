@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-public class UserFeedbackController(IUserFeedbackService userFeedbackService) : ControllerBase
+internal class UserFeedbackController(IUserFeedbackService userFeedbackService) : ControllerBase
 {
     [HttpGet("userfeedback/search")]
     public async Task<IActionResult> SearchUserFeedback([FromQuery] UserFeedbackFilter filter)

@@ -3,7 +3,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-public class QSpecializationIndexResponse
+internal class QSpecializationIndexResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;

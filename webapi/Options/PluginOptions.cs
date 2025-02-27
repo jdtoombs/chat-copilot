@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Option for a single plugin.
 /// </summary>
-public class Plugin
+internal class Plugin
 {
     /// <summary>
     /// The name of the plugin.

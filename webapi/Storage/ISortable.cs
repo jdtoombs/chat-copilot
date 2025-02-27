@@ -4,12 +4,12 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-public interface ISortable<T, TSortOption>
+internal interface ISortable<T, TSortOption>
 {
     IQueryable<T> Sort(IQueryable<T> queryable, TSortOption? sortOption);
 }
 
-public interface ICopilotChatMessageSortable : ISortable<CopilotChatMessage, CopilotChatMessageSortOption?>
+internal interface ICopilotChatMessageSortable : ISortable<CopilotChatMessage, CopilotChatMessageSortOption?>
 {
     new IQueryable<CopilotChatMessage> Sort(
         IQueryable<CopilotChatMessage> queryable,

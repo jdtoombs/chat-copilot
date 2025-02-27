@@ -21,7 +21,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for returning the service options to the client.
 /// </summary>
 [ApiController]
-public class PluginController(
+internal class PluginController(
     IHttpClientFactory httpClientFactory,
     IDictionary<string, Plugin> availablePlugins,
     ChatSessionRepository sessionRepository

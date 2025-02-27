@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// Value of `Content` for a `ChatMessage` of type `ChatMessageType.Document`.
 /// </summary>
-public class DocumentMessageContent
+internal class DocumentMessageContent
 {
     /// <summary>
     /// List of documents contained in the message.

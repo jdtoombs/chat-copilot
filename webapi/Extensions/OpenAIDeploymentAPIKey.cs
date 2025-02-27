@@ -2,7 +2,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Extensions;
 
-public class OpenAIDeploymentAPIKey
+internal class OpenAIDeploymentAPIKey
 {
     public OpenAIDeploymentAPIKey(OpenAIDeployment deployment, string apiKey)
     {
