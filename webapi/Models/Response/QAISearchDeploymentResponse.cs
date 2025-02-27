@@ -3,7 +3,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-internal class QAISearchDeploymentResponse
+public class QAISearchDeploymentResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;

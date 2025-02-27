@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-internal sealed class DocumentData
+public sealed class DocumentData
 {
     /// <summary>
     /// Name of the uploaded document.

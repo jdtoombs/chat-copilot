@@ -21,7 +21,7 @@ using Microsoft.KernelMemory;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-internal class ChatArchiveController(
+public class ChatArchiveController(
     IKernelMemory memoryClient,
     ChatSessionRepository chatRepository,
     ChatMessageRepository chatMessageRepository,

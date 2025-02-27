@@ -4,7 +4,7 @@ using Microsoft.SemanticKernel;
 
 namespace CopilotChat.WebApi.Plugins;
 
-internal class EmailPlugin(IEmailSender emailSender)
+public class EmailPlugin(IEmailSender emailSender)
 {
     [KernelFunction, Description("Send an email")]
     public void SendEmail(

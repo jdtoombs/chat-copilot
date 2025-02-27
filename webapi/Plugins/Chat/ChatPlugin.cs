@@ -40,7 +40,7 @@ namespace CopilotChat.WebApi.Plugins.Chat;
 /// to extract conversation history and user intentions.
 /// Note: This class has been modified to support chat specialization.
 /// </summary>
-internal class ChatPlugin
+public class ChatPlugin
 {
     /// <summary>
     /// A kernel instance to create a completion function since each invocation

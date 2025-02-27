@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.JiraPlugin.Model;
 /// <summary>
 /// Represents the fields that make up an IssueResponse.
 /// </summary>
-internal class IssueResponseFields
+public class IssueResponseFields
 {
     /// <summary>
     /// Gets or sets the ID of the label.

@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Models.Storage;
 
-internal class ChatCompletionDeployment
+public class ChatCompletionDeployment
 {
     public string Name { get; set; } = string.Empty;
 
@@ -13,7 +13,7 @@ internal class ChatCompletionDeployment
     public uint OutputTokens { get; set; } = 0;
 }
 
-internal class OpenAIDeployment : IStorageEntity
+public class OpenAIDeployment : IStorageEntity
 {
     public string Id { get; set; }
 

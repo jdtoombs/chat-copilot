@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Plugins.Utils;
 /// <summary>
 /// Utility methods for working with asynchronous operations and callbacks.
 /// </summary>
-internal static class JsonUtils
+public static class JsonUtils
 {
     /// <summary>
     /// Try to optimize json from the planner response

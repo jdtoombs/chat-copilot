@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Auth;
 /// <summary>
 /// Class implementing "authorization" that validates the user has access to a chat.
 /// </summary>
-internal class ChatParticipantAuthorizationHandler : AuthorizationHandler<ChatParticipantRequirement, HttpContext>
+public class ChatParticipantAuthorizationHandler : AuthorizationHandler<ChatParticipantRequirement, HttpContext>
 {
     private readonly IAuthInfo _authInfo;
     private readonly ChatSessionRepository _chatSessionRepository;

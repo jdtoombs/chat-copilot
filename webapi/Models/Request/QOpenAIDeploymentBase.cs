@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-internal class QOpenAIDeploymentBase
+public class QOpenAIDeploymentBase
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

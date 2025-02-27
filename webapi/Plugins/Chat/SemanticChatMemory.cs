@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Plugins.Chat;
 /// <summary>
 /// A collection of semantic chat memory.
 /// </summary>
-internal class SemanticChatMemory
+public class SemanticChatMemory
 {
     /// <summary>
     /// The chat memory items.

@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Defines search service
 /// </summary>
-internal interface IQSearchService : IDisposable
+public interface IQSearchService : IDisposable
 {
     /// <summary>
     /// Retrieve search results from AzureAISearch endpoint.

@@ -6,7 +6,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-internal interface IQSearchDeploymentService
+public interface IQSearchDeploymentService
 {
     Task<IEnumerable<AISearchDeployment>> GetAllSearchDeployments();
 

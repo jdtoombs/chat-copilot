@@ -5,7 +5,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-internal class ChatSessionService(
+public class ChatSessionService(
     ChatSessionRepository chatSessionRepository,
     IQSpecializationService specializationService,
     IQOpenAIDeploymentService openAIDeploymentService

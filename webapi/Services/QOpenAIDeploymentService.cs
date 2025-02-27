@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace CopilotChat.WebApi.Services;
 
-internal class QOpenAIDeploymentService(
+public class QOpenAIDeploymentService(
     OpenAIDeploymentRepository deploymentRepository,
     ISecretClientAccessor secretClientAccessor
 ) : IQOpenAIDeploymentService

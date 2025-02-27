@@ -3,7 +3,7 @@
 /// <summary>
 /// Send email messages via simple mail transfer protocol.
 /// </summary>
-internal interface IEmailSender
+public interface IEmailSender
 {
     /// <summary>
     /// Sends an email to the specified address.

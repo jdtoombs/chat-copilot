@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Extensions;
 
-internal interface ISecretClientAccessor
+public interface ISecretClientAccessor
 {
     SecretClient GetSecretClient();
 }

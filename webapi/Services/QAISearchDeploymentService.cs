@@ -9,7 +9,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-internal class QAISearchDeploymentService(
+public class QAISearchDeploymentService(
     AISearchDeploymentRepository searchRepository,
     ISecretClientAccessor secretClientAccessor
 ) : IQSearchDeploymentService

@@ -27,7 +27,7 @@ namespace CopilotChat.WebApi;
 /// <summary>
 /// Q-Pilot Service
 /// </summary>
-internal sealed class Program
+public sealed class Program
 {
     /// <summary>
     /// Entry point

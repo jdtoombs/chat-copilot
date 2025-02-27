@@ -21,7 +21,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// 3. Managing participants in a chat session.
 /// </summary>
 [ApiController]
-internal class ChatParticipantController(
+public class ChatParticipantController(
     ChatParticipantRepository chatParticipantRepository,
     ChatSessionRepository chatSessionRepository
 ) : ControllerBase

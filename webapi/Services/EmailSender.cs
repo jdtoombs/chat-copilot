@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Services;
 
-internal class EmailSender(SmtpClient client) : IEmailSender
+public class EmailSender(SmtpClient client) : IEmailSender
 {
     public void Send(string sender, string recipient, string subject, string body)
     {

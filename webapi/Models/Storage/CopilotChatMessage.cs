@@ -14,7 +14,7 @@ namespace CopilotChat.WebApi.Models.Storage;
 // Summary:
 //     The enum UserFeedback.
 [JsonConverter(typeof(JsonStringEnumConverter))]
-internal enum UserFeedback
+public enum UserFeedback
 {
     /// <summary>
     /// Positive feedback
@@ -30,7 +30,7 @@ internal enum UserFeedback
 /// <summary>
 /// Information about a single chat message.
 /// </summary>
-internal class CopilotChatMessage : IStorageEntity
+public class CopilotChatMessage : IStorageEntity
 {
     private static readonly JsonSerializerOptions SerializerSettings = new()
     {
@@ -40,7 +40,7 @@ internal class CopilotChatMessage : IStorageEntity
     /// <summary>
     /// Role of the author of a chat message.
     /// </summary>
-    internal enum AuthorRoles
+    public enum AuthorRoles
     {
         /// <summary>
         /// The current user of the chat.
@@ -56,7 +56,7 @@ internal class CopilotChatMessage : IStorageEntity
     /// <summary>
     /// Type of the chat message.
     /// </summary>
-    internal enum ChatMessageType
+    public enum ChatMessageType
     {
         /// <summary>
         /// A standard message

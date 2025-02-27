@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace CopilotChat.WebApi.Utilities;
 
-internal static class PredicateUtils
+public static class PredicateUtils
 {
     public static Expression<Func<T, bool>> And<T>(
         this Expression<Func<T, bool>> expr1,

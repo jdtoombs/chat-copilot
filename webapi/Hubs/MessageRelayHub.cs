@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Hubs;
 /// <summary>
 /// Represents a chat hub for real-time communication.
 /// </summary>
-internal class MessageRelayHub : Hub
+public class MessageRelayHub : Hub
 {
     private const string ReceiveMessageClientCall = "ReceiveMessage";
     private const string ReceiveUserTypingStateClientCall = "ReceiveUserTypingState";

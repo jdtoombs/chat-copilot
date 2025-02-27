@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Plugins;
 
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-internal class ImagePlugin(Kernel kernel)
+public class ImagePlugin(Kernel kernel)
 {
     [KernelFunction("generate_image")]
     [Description("Generate an image and returns a url to the hosted image.")]

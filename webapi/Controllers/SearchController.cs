@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling search.
 /// </summary>
 [ApiController]
-internal class SearchController(IQSearchService qSearchService) : ControllerBase
+public class SearchController(IQSearchService qSearchService) : ControllerBase
 {
     /// <summary>
     /// Invokes the Azure search function to get a results.

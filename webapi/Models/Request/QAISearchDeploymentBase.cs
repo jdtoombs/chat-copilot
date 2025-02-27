@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-internal class QAISearchDeploymentBase
+public class QAISearchDeploymentBase
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

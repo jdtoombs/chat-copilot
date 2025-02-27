@@ -1,6 +1,6 @@
 ﻿namespace CopilotChat.WebApi.Services;
 
-internal class IOpenAITextToImageOptions
+public class IOpenAITextToImageOptions
 {
     public string Deployment { get; } = string.Empty;
     public string Endpoint { get; } = string.Empty;

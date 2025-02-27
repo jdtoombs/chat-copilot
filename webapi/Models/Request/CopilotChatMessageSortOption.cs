@@ -3,7 +3,7 @@
 namespace CopilotChat.WebApi.Models.Request;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
-internal enum CopilotChatMessageSortOption
+public enum CopilotChatMessageSortOption
 {
     DateDesc,
     DateAsc,

@@ -3,7 +3,7 @@ using CopilotChat.Shared;
 
 namespace CopilotChat.WebApi.Extensions;
 
-internal interface IDefaultConfigurationAccessor
+public interface IDefaultConfigurationAccessor
 {
     Task<DefaultConfiguration> CreateDefaultConfigurationAsync();
 }

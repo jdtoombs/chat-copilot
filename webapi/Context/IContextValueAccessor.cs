@@ -1,6 +1,6 @@
 ﻿namespace CopilotChat.WebApi.Context;
 
-internal interface IContextValueAccessor
+public interface IContextValueAccessor
 {
     object? GetRouteValue(string key);
 }

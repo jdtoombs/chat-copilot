@@ -3,7 +3,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-internal interface IChatSessionService
+public interface IChatSessionService
 {
     Task<OpenAIDeployment> GetDeployment(string chatId);
     Task<ChatCompletionDeployment?> GetCompletionDeployment(string chatId);

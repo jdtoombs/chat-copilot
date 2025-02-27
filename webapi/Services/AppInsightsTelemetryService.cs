@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Implementation of the telemetry service interface for Azure Application Insights (AppInsights).
 /// </summary>
-internal class AppInsightsTelemetryService : ITelemetryService
+public class AppInsightsTelemetryService : ITelemetryService
 {
     private const string UnknownUserId = "unauthenticated";
 

@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// <summary>
 /// Request definition for Specialization
 /// </summary>
-internal class QSpecializationBase
+public class QSpecializationBase
 {
     /// <summary>
     /// Key of the specialization

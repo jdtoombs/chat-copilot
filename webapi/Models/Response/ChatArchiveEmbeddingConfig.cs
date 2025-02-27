@@ -8,12 +8,12 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// Chat archive embedding configuration.
 /// </summary>
-internal class ChatArchiveEmbeddingConfig
+public class ChatArchiveEmbeddingConfig
 {
     /// <summary>
     /// Supported types of AI services.
     /// </summary>
-    internal enum AIServiceType
+    public enum AIServiceType
     {
         /// <summary>
         /// Azure OpenAI https://learn.microsoft.com/en-us/azure/cognitive-services/openai/

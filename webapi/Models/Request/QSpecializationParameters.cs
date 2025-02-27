@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// <summary>
 /// Request definition for Specialization
 /// </summary>
-internal class QSpecializationParameters : QSpecializationBase
+public class QSpecializationParameters : QSpecializationBase
 {
     /// <summary>
     /// Image FilePath of the specialization.

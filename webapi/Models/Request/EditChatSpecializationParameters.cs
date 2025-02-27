@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Parameters for editing chat specialization.
 /// </summary>
-internal class EditChatSpecializationParameters
+public class EditChatSpecializationParameters
 {
     /// <summary>
     /// Specialization used to generate responses.

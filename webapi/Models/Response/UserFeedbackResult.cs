@@ -5,7 +5,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-internal class UserFeedbackResult
+public class UserFeedbackResult
 {
     [JsonPropertyName("count")]
     public int Count { get; set; }
@@ -14,7 +14,7 @@ internal class UserFeedbackResult
     public List<UserFeedbackItem> Items { get; set; } = new List<UserFeedbackItem>();
 }
 
-internal class UserFeedbackItem
+public class UserFeedbackItem
 {
     public string ChatId { get; set; } = string.Empty;
     public string MessageId { get; set; } = string.Empty;

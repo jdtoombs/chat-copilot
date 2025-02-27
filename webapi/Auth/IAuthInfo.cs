@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Auth;
 
-internal interface IAuthInfo
+public interface IAuthInfo
 {
     /// <summary>
     /// The authenticated user's unique ID.

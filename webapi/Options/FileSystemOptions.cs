@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// File system storage configuration.
 /// </summary>
-internal class FileSystemOptions
+public class FileSystemOptions
 {
     /// <summary>
     /// Gets or sets the file path for persistent file system storage.

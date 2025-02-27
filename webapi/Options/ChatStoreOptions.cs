@@ -5,14 +5,14 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Configuration settings for the chat store.
 /// </summary>
-internal class ChatStoreOptions
+public class ChatStoreOptions
 {
     public const string PropertyName = "ChatStore";
 
     /// <summary>
     /// The type of chat store to use.
     /// </summary>
-    internal enum ChatStoreType
+    public enum ChatStoreType
     {
         /// <summary>
         /// Non-persistent chat store

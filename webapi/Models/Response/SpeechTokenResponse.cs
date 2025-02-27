@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// Token Response is a simple wrapper around the token and region
 /// </summary>
-internal class SpeechTokenResponse
+public class SpeechTokenResponse
 {
     public string? Token { get; set; }
     public string? Region { get; set; }

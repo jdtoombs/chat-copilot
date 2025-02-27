@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.GitHubPlugin.Model;
 /// <summary>
 /// Represents a GitHub Pull Request.
 /// </summary>
-internal class PullRequest
+public class PullRequest
 {
     /// <summary>
     /// Gets or sets the URL of the pull request

@@ -5,7 +5,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Models.Storage;
 
-internal class SpecializationIndex : IStorageEntity
+public class SpecializationIndex : IStorageEntity
 {
     public string Id { get; set; }
 

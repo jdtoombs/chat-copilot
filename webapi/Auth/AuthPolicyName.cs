@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Auth;
 /// <summary>
 /// Holds the policy names for custom authorization policies.
 /// </summary>
-internal static class AuthPolicyName
+public static class AuthPolicyName
 {
     public const string RequireChatParticipant = "RequireChatParticipant";
     public const string RequireSpecialization = "RequireSpecialization";

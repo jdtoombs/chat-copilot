@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// Request definition for search
 /// This model is built by bearing the MVP requirement of supporting simple text based search.
 /// </summary>
-internal class QSearchParameters
+public class QSearchParameters
 {
     [JsonPropertyName("search")]
     public string Search { get; set; } = string.Empty;

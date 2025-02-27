@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Storage;
 
-internal interface IStorageEntity
+public interface IStorageEntity
 {
     /// <summary>
     /// Unique ID of the entity.

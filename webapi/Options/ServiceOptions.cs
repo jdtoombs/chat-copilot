@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Configuration options for the Q-Pilot service.
 /// </summary>
-internal class ServiceOptions
+public class ServiceOptions
 {
     public const string PropertyName = "Service";
 

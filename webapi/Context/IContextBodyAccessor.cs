@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Context;
 
-internal interface IContextBodyAccessor
+public interface IContextBodyAccessor
 {
     Task<T?> ReadBody<T>()
         where T : class;

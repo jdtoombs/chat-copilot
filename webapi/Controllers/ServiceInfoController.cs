@@ -20,7 +20,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for returning information on the service.
 /// </summary>
 [ApiController]
-internal class ServiceInfoController(
+public class ServiceInfoController(
     IConfiguration configuration,
     IOptions<KernelMemoryConfig> memoryOptions,
     IOptions<ChatAuthenticationOptions> chatAuthenticationOption,

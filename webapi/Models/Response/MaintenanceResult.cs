@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// Defines optional messaging for maintenance mode.
 /// </summary>
-internal class MaintenanceResult
+public class MaintenanceResult
 {
     /// <summary>
     /// The maintenance notification title.

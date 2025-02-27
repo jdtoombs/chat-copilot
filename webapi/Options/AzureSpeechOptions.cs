@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Configuration options for Azure speech recognition.
 /// </summary>
-internal sealed class AzureSpeechOptions
+public sealed class AzureSpeechOptions
 {
     public const string PropertyName = "AzureSpeech";
 

@@ -1,6 +1,6 @@
 ﻿namespace CopilotChat.WebApi.Options;
 
-internal class CommunicationOptions
+public class CommunicationOptions
 {
     public const string PropertyName = "Communication";
 

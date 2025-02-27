@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-internal class SpecializationIndexRepository(IStorageContext<SpecializationIndex> storageContext)
+public class SpecializationIndexRepository(IStorageContext<SpecializationIndex> storageContext)
     : Repository<SpecializationIndex>(storageContext)
 {
     /// <summary>

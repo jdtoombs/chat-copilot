@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// Response definition for Specialization
 /// </summary>
-internal class QSpecializationResponse
+public class QSpecializationResponse
 {
     /// <summary>
     /// Id of the specialization

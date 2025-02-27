@@ -8,7 +8,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// <summary>
 /// The final prompt sent to generate bot response.
 /// </summary>
-internal class BotResponsePrompt
+public class BotResponsePrompt
 {
     /// <summary>
     /// The system persona of the chat, includes SystemDescription and SystemResponse components from PromptsOptions.cs.

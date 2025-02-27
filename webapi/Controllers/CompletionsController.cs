@@ -16,7 +16,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-internal class CompletionsController(
+public class CompletionsController(
     ISingleMessageCompletionService singleMessageCompletionService,
     IQSpecializationService qSpecializationService
 ) : ControllerBase

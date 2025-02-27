@@ -15,19 +15,19 @@ using Microsoft.SemanticKernel;
 
 namespace CopilotChat.WebApi.Services;
 
-internal record AnalysisResult(
+public record AnalysisResult(
     [property: JsonPropertyName("category")] string Category,
     [property: JsonPropertyName("severity")] short Severity
 );
 
-internal record ImageContent([property: JsonPropertyName("content")] string Content);
+public record ImageContent([property: JsonPropertyName("content")] string Content);
 
-internal record ImageAnalysisRequest([property: JsonPropertyName("image")] ImageContent Image);
+public record ImageAnalysisRequest([property: JsonPropertyName("image")] ImageContent Image);
 
 /// <summary>
 /// Moderator service to handle content safety.
 /// </summary>
-internal sealed class AzureContentSafety : IContentSafetyService
+public sealed class AzureContentSafety : IContentSafetyService
 {
     private const string HttpUserAgent = "Q-Pilot";
 

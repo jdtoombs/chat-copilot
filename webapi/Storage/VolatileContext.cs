@@ -16,7 +16,7 @@ namespace CopilotChat.WebApi.Storage;
 /// A storage context that stores entities in memory.
 /// </summary>
 [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-internal class VolatileContext<T> : IStorageContext<T>
+public class VolatileContext<T> : IStorageContext<T>
     where T : IStorageEntity
 {
     /// <summary>
@@ -116,7 +116,7 @@ internal class VolatileContext<T> : IStorageContext<T>
 /// <summary>
 /// Specialization of VolatileContext<T> for CopilotChatMessage.
 /// </summary>
-internal class VolatileCopilotChatMessageContext
+public class VolatileCopilotChatMessageContext
     : VolatileContext<CopilotChatMessage>,
         ICopilotChatMessageStorageContext,
         ICopilotChatMessageSortable

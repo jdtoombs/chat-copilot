@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Storage;
 
-internal class OpenAIDeploymentRepository(IStorageContext<OpenAIDeployment> storageContext)
+public class OpenAIDeploymentRepository(IStorageContext<OpenAIDeployment> storageContext)
     : Repository<OpenAIDeployment>(storageContext)
 {
     public Task<IEnumerable<OpenAIDeployment>> GetAllDeploymentsAsync() =>

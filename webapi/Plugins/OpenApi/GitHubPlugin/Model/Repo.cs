@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.GitHubPlugin.Model;
 /// <summary>
 /// Represents a GitHub Repo.
 /// </summary>
-internal class Repo
+public class Repo
 {
     /// <summary>
     /// Gets or sets the name of the repo

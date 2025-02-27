@@ -16,7 +16,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Extension methods for registering Semantic Kernel related services.
 /// </summary>
-internal sealed class SemanticKernelProvider(
+public sealed class SemanticKernelProvider(
     IServiceProvider serviceProvider,
     SecretClient secretClient,
     IChatSessionService chatSessionService,

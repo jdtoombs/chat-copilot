@@ -9,7 +9,7 @@ namespace CopilotChat.WebApi.Models.Response;
 /// Response definition for AzureAIsearch response
 /// This model is built with AzureAISearch response structure as base model.
 /// </summary>
-internal class QAzureSearchResponse
+public class QAzureSearchResponse
 {
     [JsonPropertyName("@odata.count")]
     public int Count { get; set; }
@@ -18,7 +18,7 @@ internal class QAzureSearchResponse
     public List<QSearchValue> values { get; set; } = new List<QSearchValue>();
 }
 
-internal class QSearchValue
+public class QSearchValue
 {
     [JsonPropertyName("@search.highlights")]
     public QSearchHighlight highlights { get; set; } = new QSearchHighlight();
@@ -34,7 +34,7 @@ internal class QSearchValue
     public string id { get; set; } = string.Empty;
 }
 
-internal class QSearchHighlight
+public class QSearchHighlight
 {
     [JsonPropertyName("content")]
     public List<string> content { get; set; } = new List<string>();

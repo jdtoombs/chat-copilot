@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Plugins.Utils;
 /// <summary>
 /// Utility methods for token management.
 /// </summary>
-internal static class TokenUtils
+public static class TokenUtils
 {
     private static SharpToken.GptEncoding tokenizer = SharpToken.GptEncoding.GetEncoding("cl100k_base");
 

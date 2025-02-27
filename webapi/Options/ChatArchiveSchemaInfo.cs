@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Information on schema used to serialize chat archives.
 /// </summary>
-internal record ChatArchiveSchemaInfo
+public record ChatArchiveSchemaInfo
 {
     /// <summary>
     /// The name of the schema.

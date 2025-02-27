@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace CopilotChat.WebApi.Controllers;
 
 [ApiController]
-internal class AISearchDeploymentController(
+public class AISearchDeploymentController(
     ILogger<AISearchDeploymentController> logger,
     IQSearchDeploymentService searchDeploymentService
 ) : ControllerBase

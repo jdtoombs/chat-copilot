@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace CopilotChat.WebApi.Extensions;
 
-internal class DefaultConfigurationAccessor(
+public class DefaultConfigurationAccessor(
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     ISecretClientAccessor secretClient,
     OpenAIDeploymentRepository deploymentRepository

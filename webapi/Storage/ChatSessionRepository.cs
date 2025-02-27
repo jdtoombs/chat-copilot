@@ -11,7 +11,7 @@ namespace CopilotChat.WebApi.Storage;
 /// <summary>
 /// A repository for chat sessions.
 /// </summary>
-internal class ChatSessionRepository(IStorageContext<ChatSession> storageContext)
+public class ChatSessionRepository(IStorageContext<ChatSession> storageContext)
     : Repository<ChatSession>(storageContext)
 {
     /// <summary>

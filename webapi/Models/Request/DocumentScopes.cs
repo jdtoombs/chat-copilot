@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Models.Request;
 /// <summary>
 /// Scope of the document. This determines the collection name in the document memory.
 /// </summary>
-internal enum DocumentScopes
+public enum DocumentScopes
 {
     Global,
     Chat,

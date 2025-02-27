@@ -7,7 +7,7 @@ namespace CopilotChat.WebApi.Plugins.OpenApi.GitHubPlugin.Model;
 /// <summary>
 /// Represents a pull request label.
 /// </summary>
-internal class Label
+public class Label
 {
     /// <summary>
     /// Gets or sets the ID of the label.

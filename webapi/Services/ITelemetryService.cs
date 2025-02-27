@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Interface for common telemetry events to track actions across the semantic kernel.
 /// </summary>
-internal interface ITelemetryService
+public interface ITelemetryService
 {
     /// <summary>
     /// Creates a telemetry event when a function is executed.

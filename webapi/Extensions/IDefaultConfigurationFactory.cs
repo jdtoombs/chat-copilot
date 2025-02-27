@@ -2,7 +2,7 @@
 
 namespace CopilotChat.WebApi.Extensions;
 
-internal interface IDefaultConfigurationFactory
+public interface IDefaultConfigurationFactory
 {
     DefaultConfiguration GetDefaultConfiguration();
 }

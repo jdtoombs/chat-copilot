@@ -23,7 +23,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller for retrieving kernel memory data of chat sessions.
 /// </summary>
 [ApiController]
-internal class ChatMemoryController(
+public class ChatMemoryController(
     ILogger<ChatMemoryController> logger,
     IOptions<PromptsOptions> promptsOptions,
     ChatSessionRepository chatSessionRepository

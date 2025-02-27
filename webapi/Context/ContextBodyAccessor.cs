@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace CopilotChat.WebApi.Context;
 
-internal class ContextBodyAccessor(IHttpContextAccessor contextAccessor) : IContextBodyAccessor
+public class ContextBodyAccessor(IHttpContextAccessor contextAccessor) : IContextBodyAccessor
 {
     public async Task<T?> ReadBody<T>()
         where T : class

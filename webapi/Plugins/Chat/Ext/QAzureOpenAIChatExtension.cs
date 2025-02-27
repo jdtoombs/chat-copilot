@@ -14,7 +14,7 @@ namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 /// <summary>
 /// Chat extension class to support Azure search indexes for bot response.
 /// </summary>
-internal class QAzureOpenAIChatExtension(
+public class QAzureOpenAIChatExtension(
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     IQOpenAIDeploymentService qOpenAIDeploymentService,
     IQSearchDeploymentService qSearchDeploymentService,

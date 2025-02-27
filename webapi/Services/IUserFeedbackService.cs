@@ -4,7 +4,7 @@ using CopilotChat.WebApi.Models.Response;
 
 namespace CopilotChat.WebApi.Services;
 
-internal interface IUserFeedbackService
+public interface IUserFeedbackService
 {
     Task<UserFeedbackResult> Search(UserFeedbackFilter filter);
 }

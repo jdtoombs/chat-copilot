@@ -10,7 +10,7 @@ namespace CopilotChat.WebApi.Auth.Specializations;
 /// <summary>
 /// Class implementing "authorization" that validates the user has access to a specialization linked to the chat being targeted.
 /// </summary>
-internal class LinkedToChatAuthorizationHandler(
+public class LinkedToChatAuthorizationHandler(
     SpecializationRepository specializationRepository,
     ChatSessionRepository chatSessionRepository,
     IContextValueAccessor contextValueAccessor

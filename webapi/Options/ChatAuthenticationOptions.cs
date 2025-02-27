@@ -7,11 +7,11 @@ namespace CopilotChat.WebApi.Options;
 /// <summary>
 /// Configuration options for authenticating to the service.
 /// </summary>
-internal class ChatAuthenticationOptions
+public class ChatAuthenticationOptions
 {
     public const string PropertyName = "Authentication";
 
-    internal enum AuthenticationType
+    public enum AuthenticationType
     {
         None,
         AzureAd,
@@ -32,7 +32,7 @@ internal class ChatAuthenticationOptions
     /// <summary>
     /// Configuration options for Azure Active Directory (AAD) authorization.
     /// </summary>
-    internal class AzureAdOptions
+    public class AzureAdOptions
     {
         /// <summary>
         /// AAD instance url, i.e., https://login.microsoftonline.com
