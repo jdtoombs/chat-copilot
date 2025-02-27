@@ -9,6 +9,7 @@ using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -78,6 +79,31 @@ public class SpecializationController(
 
             return this.StatusCode(500, $"Failed to create specialization for label '{qSpecializationMutate.Label}'.");
         }
+    }
+
+    /// <summary>
+    /// Edit a specialization.
+    /// </summary>
+    /// <param name="patchSpecialization">Contains specialization patch actions</param>
+    /// <param name="specializationId">The specializtion id.</param>
+    /// <returns>The HTTP action result.</returns>
+    [HttpPatch]
+    [Route("specializations/{specializationId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PatchSpecializationAsync(
+        [FromBody] JsonPatchDocument<Specialization> patchSpecialization,
+        [FromRoute] Guid specializationId
+    )
+    {
+        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+
+        patchSpecialization.ApplyTo(specialization);
+
+        await qSpecializationService.UpdateSpecialization(specialization);
+
+        return this.Ok(specialization);
     }
 
     /// <summary>

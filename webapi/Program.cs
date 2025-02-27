@@ -97,7 +97,8 @@ public sealed class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            });
+            })
+            .AddNewtonsoftJson();
         builder.Services.AddHealthChecks();
 
         // Configure middleware and endpoints

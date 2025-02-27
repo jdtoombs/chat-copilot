@@ -99,6 +99,9 @@ public class QSpecializationService(
         return specializationSource;
     }
 
+    public Task UpdateSpecialization(Specialization specialization) =>
+        specializationSourceRepository.UpsertAsync(specialization);
+
     /// <summary>
     /// Updates an existing specialization.
     /// </summary>
