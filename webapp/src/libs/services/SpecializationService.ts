@@ -164,7 +164,7 @@ export class SpecializationService extends BaseService {
 
         const result = await this.getResponseAsync<ISpecialization>(
             {
-                commandPath: `specializations/${specializationId}`,
+                commandPath: `specializations/${specializationId}/patch`,
                 method: 'PATCH',
                 body: formData,
             },

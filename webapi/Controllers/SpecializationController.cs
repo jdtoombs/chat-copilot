@@ -87,7 +87,7 @@ public class SpecializationController(
     /// <param name="specializationId">The specializtion id.</param>
     /// <returns>The HTTP action result.</returns>
     [HttpPatch]
-    [Route("specializations/{specializationId:guid}")]
+    [Route("specializations/{specializationId:guid}/patch")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
