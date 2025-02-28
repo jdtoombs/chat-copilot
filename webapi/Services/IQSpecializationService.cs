@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Storage;
+using Microsoft.AspNetCore.Http;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -47,6 +48,36 @@ public interface IQSpecializationService
     /// <param name="qSpecializationMutate">Specialization mutate payload</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the specialization</returns>
     Task<Specialization?> UpdateSpecialization(Guid specializationId, QSpecializationMutate qSpecializationMutate);
+
+    /// <summary>
+    /// Update specialization icon
+    /// </summary>
+    /// <param name="specialization">Specialization to update</param>
+    /// <param name="icon">Image file to save as specialization icon</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    Task UpdateIcon(Specialization specialization, IFormFile icon);
+
+    /// <summary>
+    /// Delete specialization icon
+    /// </summary>
+    /// <param name="specialization">Specialization to update</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    Task DeleteIcon(Specialization specialization);
+
+    /// <summary>
+    /// Update specialization image
+    /// </summary>
+    /// <param name="specialization">Specialization to update</param>
+    /// <param name="icon">Image file to save as specialization image</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    Task UpdateImage(Specialization specialization, IFormFile image);
+
+    /// <summary>
+    /// Delete specialization image
+    /// </summary>
+    /// <param name="specialization">Specialization to update</param>
+    /// <returns>A task that represents the asynchronous operation</returns>
+    Task DeleteImage(Specialization specialization);
 
     /// <summary>
     /// Deletes the specialization.

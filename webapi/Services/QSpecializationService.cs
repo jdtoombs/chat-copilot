@@ -102,6 +102,54 @@ public class QSpecializationService(
     public Task UpdateSpecialization(Specialization specialization) =>
         specializationSourceRepository.UpsertAsync(specialization);
 
+    public async Task UpdateIcon(Specialization specialization, IFormFile icon)
+    {
+        specialization.IconFilePath = await this.UpsertSpecializationBlobAsync(
+            icon,
+            specialization.IconFilePath,
+            false,
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
+        );
+
+        await specializationSourceRepository.UpsertAsync(specialization);
+    }
+
+    public async Task DeleteIcon(Specialization specialization)
+    {
+        specialization.IconFilePath = await this.UpsertSpecializationBlobAsync(
+            null,
+            specialization.IconFilePath,
+            true,
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
+        );
+
+        await specializationSourceRepository.UpsertAsync(specialization);
+    }
+
+    public async Task UpdateImage(Specialization specialization, IFormFile image)
+    {
+        specialization.ImageFilePath = await this.UpsertSpecializationBlobAsync(
+            image,
+            specialization.ImageFilePath,
+            false,
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
+        );
+
+        await specializationSourceRepository.UpsertAsync(specialization);
+    }
+
+    public async Task DeleteImage(Specialization specialization)
+    {
+        specialization.ImageFilePath = await this.UpsertSpecializationBlobAsync(
+            null,
+            specialization.ImageFilePath,
+            true,
+            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage)
+        );
+
+        await specializationSourceRepository.UpsertAsync(specialization);
+    }
+
     /// <summary>
     /// Updates an existing specialization.
     /// </summary>

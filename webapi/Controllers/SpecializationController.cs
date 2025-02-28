@@ -146,6 +146,84 @@ public class SpecializationController(
     }
 
     /// <summary>
+    /// Update specialization icon
+    /// </summary>
+    /// <param name="icon">Image file to save as specialization icon</param>
+    /// <param name="specializationId">The specializtion id</param>
+    /// <returns>The HTTP action result.</returns>
+    [HttpPatch]
+    [Route("specializations/{specializationId:guid}/icon")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateIconAsync([FromForm] IFormFile icon, [FromRoute] Guid specializationId)
+    {
+        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+
+        await qSpecializationService.UpdateIcon(specialization, icon);
+
+        return this.Ok();
+    }
+
+    /// <summary>
+    /// Delete specialization icon
+    /// </summary>
+    /// <param name="specializationId">The specializtion id</param>
+    /// <returns>The HTTP action result.</returns>
+    [HttpDelete]
+    [Route("specializations/{specializationId:guid}/icon")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteIconAsync([FromRoute] Guid specializationId)
+    {
+        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+
+        await qSpecializationService.DeleteIcon(specialization);
+
+        return this.Ok();
+    }
+
+    /// <summary>
+    /// Update specialization image
+    /// </summary>
+    /// <param name="image">Image file to save as specialization image</param>
+    /// <param name="specializationId">The specializtion id</param>
+    /// <returns>The HTTP action result.</returns>
+    [HttpPatch]
+    [Route("specializations/{specializationId:guid}/image")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateImageAsync([FromForm] IFormFile image, [FromRoute] Guid specializationId)
+    {
+        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+
+        await qSpecializationService.UpdateImage(specialization, image);
+
+        return this.Ok();
+    }
+
+    /// <summary>
+    /// Delete specialization image
+    /// </summary>
+    /// <param name="specializationId">The specializtion id</param>
+    /// <returns>The HTTP action result.</returns>
+    [HttpDelete]
+    [Route("specializations/{specializationId:guid}/image")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteImageAsync([FromRoute] Guid specializationId)
+    {
+        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+
+        await qSpecializationService.DeleteImage(specialization);
+
+        return this.Ok();
+    }
+
+    /// <summary>
     /// Delete specialization.
     /// </summary>
     /// <param name="specializationId">The specializtion id.</param>
