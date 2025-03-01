@@ -45,8 +45,6 @@ export const useSpecialization = () => {
                     const updatedData: ISpecializationRequest = {
                         ...currentDefault,
                         isDefault: false,
-                        imageFile: null,
-                        iconFile: null,
                     };
                     await specializationService
                         .updateSpecializationAsync(currentDefault.id, updatedData, accessToken)
@@ -91,8 +89,6 @@ export const useSpecialization = () => {
                     const updatedData: ISpecializationRequest = {
                         ...currentDefault,
                         isDefault: false,
-                        imageFile: null,
-                        iconFile: null,
                     };
                     await specializationService
                         .updateSpecializationAsync(currentDefault.id, updatedData, accessToken)
@@ -114,6 +110,86 @@ export const useSpecialization = () => {
             );
         } catch (e: any) {
             const errorMessage = `Unable to load chats. Details: ${getErrorDetails(e)}`;
+            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+        } finally {
+            dispatch(hideSpinner());
+        }
+    };
+
+    const updateImage = async (id: string, image: File) => {
+        dispatch(showSpinner());
+        try {
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            await specializationService.updateSpecializationImage(id, image, accessToken);
+
+            dispatch(
+                addAlert({
+                    message: `Specialization image updated successfully.`,
+                    type: AlertType.Success,
+                }),
+            );
+        } catch (e: any) {
+            const errorMessage = `Unable to update specialization image. Details: ${getErrorDetails(e)}`;
+            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+        } finally {
+            dispatch(hideSpinner());
+        }
+    };
+
+    const deleteImage = async (id: string) => {
+        dispatch(showSpinner());
+        try {
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            await specializationService.deleteSpecializationImage(id, accessToken);
+
+            dispatch(
+                addAlert({
+                    message: `Specialization image deleted successfully.`,
+                    type: AlertType.Success,
+                }),
+            );
+        } catch (e: any) {
+            const errorMessage = `Unable to delete specialization image. Details: ${getErrorDetails(e)}`;
+            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+        } finally {
+            dispatch(hideSpinner());
+        }
+    };
+
+    const updateIcon = async (id: string, icon: File) => {
+        dispatch(showSpinner());
+        try {
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            await specializationService.updateSpecializationIcon(id, icon, accessToken);
+
+            dispatch(
+                addAlert({
+                    message: `Specialization icon updated successfully.`,
+                    type: AlertType.Success,
+                }),
+            );
+        } catch (e: any) {
+            const errorMessage = `Unable to update specialization icon. Details: ${getErrorDetails(e)}`;
+            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+        } finally {
+            dispatch(hideSpinner());
+        }
+    };
+
+    const deleteIcon = async (id: string) => {
+        dispatch(showSpinner());
+        try {
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            await specializationService.deleteSpecializationIcon(id, accessToken);
+
+            dispatch(
+                addAlert({
+                    message: `Specialization icon deleted successfully.`,
+                    type: AlertType.Success,
+                }),
+            );
+        } catch (e: any) {
+            const errorMessage = `Unable to delete specialization icon. Details: ${getErrorDetails(e)}`;
             dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
         } finally {
             dispatch(hideSpinner());
@@ -196,6 +272,10 @@ export const useSpecialization = () => {
         loadSpecializations,
         createSpecialization,
         updateSpecialization,
+        updateImage,
+        deleteImage,
+        updateIcon,
+        deleteIcon,
         toggleSpecialization,
         deleteSpecialization,
         setSpecializationsOrder,

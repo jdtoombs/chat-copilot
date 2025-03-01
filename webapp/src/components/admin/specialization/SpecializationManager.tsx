@@ -204,10 +204,6 @@ export const SpecializationManager: React.FC = () => {
                 description,
                 roleInformation,
                 indexId,
-                imageFile: imageFile.file,
-                iconFile: iconFile.file,
-                deleteImage: !imageFile.src, // Set the delete flag if the src is null
-                deleteIcon: !iconFile.src, // Set the delete flag if the src is null,
                 openAIDeploymentId: deploymentId,
                 completionDeploymentName,
                 groupMemberships: membershipId,
@@ -229,8 +225,6 @@ export const SpecializationManager: React.FC = () => {
                 description,
                 roleInformation,
                 indexId,
-                imageFile: imageFile.file,
-                iconFile: iconFile.file,
                 openAIDeploymentId: deploymentId,
                 completionDeploymentName,
                 groupMemberships: membershipId,
@@ -517,7 +511,7 @@ export const SpecializationManager: React.FC = () => {
             Use appropriate titles and paragraphs to organize the information in a way that is clear and easy
             for the chatbot to interpret and apply. IMPORTANT: REPLY ONLY WITH THE UPDATED MARKDOWN DO NOT WRITE ANYTHING ELSE IN YOUR RESPONSE.
             HERE IS THE INPUT TEXT for you to convert:
- 
+
             ${roleInformation}
         `;
         //Configure ask object for service function request
@@ -912,29 +906,39 @@ export const SpecializationManager: React.FC = () => {
                         setMembershipId(data.value.split(', '));
                     }}
                 />
-                <div className={classes.fileUploadContainer}>
-                    <div className={classes.imageContainer}>
-                        <label>Specialization Image</label>
-                        <ImageUploaderPreview
-                            buttonLabel="Upload Image"
-                            file={imageFile.file ?? imageFile.src}
-                            onFileUpdate={(file, src) => {
-                                setImageFile({ file, src });
-                            }}
-                        />
+                {editMode && (
+                    <div className={classes.fileUploadContainer}>
+                        <div className={classes.imageContainer}>
+                            <label>Specialization Image</label>
+                            <ImageUploaderPreview
+                                buttonLabel="Upload Image"
+                                file={imageFile.file ?? imageFile.src}
+                                onFileUpdate={(file, src) => {
+                                    setImageFile({ file, src });
+
+                                    file
+                                        ? void specialization.updateImage(id, file)
+                                        : void specialization.deleteImage(id);
+                                }}
+                            />
+                        </div>
+                        <div className={classes.imageContainer}>
+                            <label>Specialization Icon</label>
+                            <ImageUploaderPreview
+                                buttonLabel="Upload Icon"
+                                file={iconFile.file ?? iconFile.src}
+                                onFileUpdate={(file, src) => {
+                                    // Set the src to null if the file is falsy ie: '' or null
+                                    setIconFile({ file, src: src || null });
+
+                                    file
+                                        ? void specialization.updateIcon(id, file)
+                                        : void specialization.deleteIcon(id);
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div className={classes.imageContainer}>
-                        <label>Specialization Icon</label>
-                        <ImageUploaderPreview
-                            buttonLabel="Upload Icon"
-                            file={iconFile.file ?? iconFile.src}
-                            onFileUpdate={(file, src) => {
-                                // Set the src to null if the file is falsy ie: '' or null
-                                setIconFile({ file, src: src || null });
-                            }}
-                        />
-                    </div>
-                </div>
+                )}
                 <div className={classes.controls}>
                     <Button appearance="secondary" disabled={!id} onClick={onDeleteSpecialization}>
                         Delete

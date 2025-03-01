@@ -81,12 +81,6 @@ export class SpecializationService extends BaseService {
         if (body.maxResponseTokenLimit) {
             formData.append('maxResponseTokenLimit', body.maxResponseTokenLimit.toString());
         }
-        if (body.imageFile) {
-            formData.append('imageFile', body.imageFile);
-        }
-        if (body.iconFile) {
-            formData.append('iconFile', body.iconFile);
-        }
 
         const result = await this.getResponseAsync<ISpecialization>(
             {
@@ -97,6 +91,62 @@ export class SpecializationService extends BaseService {
             accessToken,
         );
         return result;
+    };
+
+    public updateSpecializationImage = async (
+        specializationId: string,
+        image: File,
+        accessToken: string,
+    ): Promise<void> => {
+        const formData = new FormData();
+        formData.append('image', image);
+
+        await this.getResponseAsync<ISpecialization>(
+            {
+                commandPath: `specializations/${specializationId}/image`,
+                method: 'PATCH',
+                body: formData,
+            },
+            accessToken,
+        );
+    };
+
+    public deleteSpecializationImage = async (specializationId: string, accessToken: string): Promise<void> => {
+        await this.getResponseAsync<ISpecialization>(
+            {
+                commandPath: `specializations/${specializationId}/image`,
+                method: 'DELETE',
+            },
+            accessToken,
+        );
+    };
+
+    public updateSpecializationIcon = async (
+        specializationId: string,
+        icon: File,
+        accessToken: string,
+    ): Promise<void> => {
+        const formData = new FormData();
+        formData.append('icon', icon);
+
+        await this.getResponseAsync<ISpecialization>(
+            {
+                commandPath: `specializations/${specializationId}/icon`,
+                method: 'PATCH',
+                body: formData,
+            },
+            accessToken,
+        );
+    };
+
+    public deleteSpecializationIcon = async (specializationId: string, accessToken: string): Promise<void> => {
+        await this.getResponseAsync<ISpecialization>(
+            {
+                commandPath: `specializations/${specializationId}/icon`,
+                method: 'DELETE',
+            },
+            accessToken,
+        );
     };
 
     /**
@@ -145,21 +195,6 @@ export class SpecializationService extends BaseService {
         }
         if (body.maxResponseTokenLimit) {
             formData.append('maxResponseTokenLimit', body.maxResponseTokenLimit.toString());
-        }
-        if (body.deleteImage) {
-            formData.append('deleteImageFile', 'True');
-        }
-
-        if (body.deleteIcon) {
-            formData.append('deleteIconFile', 'True');
-        }
-
-        if (body.imageFile) {
-            formData.append('imageFile', body.imageFile);
-        }
-
-        if (body.iconFile) {
-            formData.append('iconFile', body.iconFile);
         }
 
         const result = await this.getResponseAsync<ISpecialization>(

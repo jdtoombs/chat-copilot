@@ -153,7 +153,7 @@ public class SpecializationController(
     /// <returns>The HTTP action result.</returns>
     [HttpPatch]
     [Route("specializations/{specializationId:guid}/icon")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateIconAsync([FromForm] IFormFile icon, [FromRoute] Guid specializationId)
@@ -162,7 +162,7 @@ public class SpecializationController(
 
         await qSpecializationService.UpdateIcon(specialization, icon);
 
-        return this.Ok();
+        return this.NoContent();
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ public class SpecializationController(
     /// <returns>The HTTP action result.</returns>
     [HttpDelete]
     [Route("specializations/{specializationId:guid}/icon")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteIconAsync([FromRoute] Guid specializationId)
@@ -181,7 +181,7 @@ public class SpecializationController(
 
         await qSpecializationService.DeleteIcon(specialization);
 
-        return this.Ok();
+        return this.NoContent();
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ public class SpecializationController(
     /// <returns>The HTTP action result.</returns>
     [HttpPatch]
     [Route("specializations/{specializationId:guid}/image")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateImageAsync([FromForm] IFormFile image, [FromRoute] Guid specializationId)
@@ -201,7 +201,7 @@ public class SpecializationController(
 
         await qSpecializationService.UpdateImage(specialization, image);
 
-        return this.Ok();
+        return this.NoContent();
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ public class SpecializationController(
     /// <returns>The HTTP action result.</returns>
     [HttpDelete]
     [Route("specializations/{specializationId:guid}/image")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImageAsync([FromRoute] Guid specializationId)
@@ -220,7 +220,7 @@ public class SpecializationController(
 
         await qSpecializationService.DeleteImage(specialization);
 
-        return this.Ok();
+        return this.NoContent();
     }
 
     /// <summary>

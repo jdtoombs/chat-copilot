@@ -35,10 +35,6 @@ export interface ISpecializationRequest {
     indexId: string;
     openAIDeploymentId: string;
     completionDeploymentName: string;
-    imageFile: File | null;
-    iconFile: File | null;
-    deleteImage?: boolean; // Flag to delete the image
-    deleteIcon?: boolean; // Flag to delete the icon
     groupMemberships: string[];
     initialChatMessage: string;
     isDefault: boolean;
