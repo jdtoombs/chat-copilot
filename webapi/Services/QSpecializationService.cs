@@ -23,73 +23,35 @@ public class QSpecializationService(
     IQBlobStorage qBlobStorage
 ) : IQSpecializationService
 {
-    /// <summary>
-    /// Retrieve all specializations.
-    /// </summary>
-    /// <returns>The task result contains all specializations</returns>
-    public Task<IEnumerable<Specialization>> GetAllSpecializations()
+    public Task<IEnumerable<Specialization>> GetAllSpecializations() =>
+        specializationSourceRepository.GetAllSpecializationsAsync();
+
+    public Task<Specialization> GetSpecializationAsync(string id) =>
+        specializationSourceRepository.GetSpecializationAsync(id);
+
+    public async Task<Specialization> SaveSpecialization(QSpecializationBase specialization)
     {
-        return specializationSourceRepository.GetAllSpecializationsAsync();
-    }
-
-    /// <summary>
-    /// Retrieve a specialization based on key.
-    /// </summary>
-    /// <param name="key">Specialization key</param>
-    /// <returns>Returns the specialization source</returns>
-    public Task<Specialization> GetSpecializationAsync(string id)
-    {
-        return specializationSourceRepository.GetSpecializationAsync(id);
-    }
-
-    /// <summary>
-    /// Creates new specialization.
-    /// </summary>
-    /// <param name="qSpecializationMutate">Specialization mutate payload</param>
-    /// <returns>The task result contains the specialization source</returns>
-    public async Task<Specialization> SaveSpecialization(QSpecializationMutate qSpecializationMutate)
-    {
-        // Add the image to the blob storage or use the default image
-        var imageFilePath =
-            qSpecializationMutate.ImageFile == null
-                ? ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage)
-                : await qBlobStorage.AddBlobAsync(qSpecializationMutate.ImageFile);
-
-        // Add the icon to the blob storage or use the default icon
-        var iconFilePath =
-            qSpecializationMutate.IconFile == null
-                ? ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
-                : await qBlobStorage.AddBlobAsync(qSpecializationMutate.IconFile);
-
-        var deserializedSuggestions = qSpecializationMutate.Suggestions;
-
         Specialization specializationSource = new(
-            Label: qSpecializationMutate.Label,
-            Name: qSpecializationMutate.Name,
-            Description: qSpecializationMutate.Description,
-            RoleInformation: qSpecializationMutate.RoleInformation,
-            InitialChatMessage: qSpecializationMutate.InitialChatMessage,
-            OpenAIDeploymentId: qSpecializationMutate.OpenAIDeploymentId,
-            CompletionDeploymentName: qSpecializationMutate.CompletionDeploymentName,
-            IndexId: qSpecializationMutate.IndexId,
-            IsDefault: qSpecializationMutate.IsDefault,
-            RestrictResultScope: qSpecializationMutate.IndexId != null
-                ? qSpecializationMutate.RestrictResultScope
-                : null,
-            Strictness: qSpecializationMutate.IndexId != null ? qSpecializationMutate.Strictness : null,
-            DocumentCount: qSpecializationMutate.IndexId != null ? qSpecializationMutate.DocumentCount : null,
-            PastMessagesIncludedCount: qSpecializationMutate.IndexId != null
-                ? qSpecializationMutate.PastMessagesIncludedCount
-                : null,
-            MaxResponseTokenLimit: qSpecializationMutate.IndexId != null
-                ? qSpecializationMutate.MaxResponseTokenLimit
-                : null,
-            ImageFilePath: imageFilePath,
-            IconFilePath: iconFilePath,
-            GroupMemberships: qSpecializationMutate.GroupMemberships,
-            Order: qSpecializationMutate.Order,
-            Suggestions: deserializedSuggestions != null ? deserializedSuggestions : new List<string>(),
-            CanGenImages: qSpecializationMutate.CanGenImages
+            Label: specialization.Label,
+            Name: specialization.Name,
+            Description: specialization.Description,
+            RoleInformation: specialization.RoleInformation,
+            InitialChatMessage: specialization.InitialChatMessage,
+            OpenAIDeploymentId: specialization.OpenAIDeploymentId,
+            CompletionDeploymentName: specialization.CompletionDeploymentName,
+            IndexId: specialization.IndexId,
+            IsDefault: specialization.IsDefault,
+            RestrictResultScope: specialization.IndexId != null ? specialization.RestrictResultScope : null,
+            Strictness: specialization.IndexId != null ? specialization.Strictness : null,
+            DocumentCount: specialization.IndexId != null ? specialization.DocumentCount : null,
+            PastMessagesIncludedCount: specialization.IndexId != null ? specialization.PastMessagesIncludedCount : null,
+            MaxResponseTokenLimit: specialization.IndexId != null ? specialization.MaxResponseTokenLimit : null,
+            ImageFilePath: ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage),
+            IconFilePath: ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon),
+            GroupMemberships: specialization.GroupMemberships,
+            Order: specialization.Order,
+            Suggestions: specialization.Suggestions ?? new List<string>(),
+            CanGenImages: specialization.CanGenImages
         );
 
         await specializationSourceRepository.CreateAsync(specializationSource);
@@ -148,11 +110,6 @@ public class QSpecializationService(
         await specializationSourceRepository.UpsertAsync(specialization);
     }
 
-    /// <summary>
-    /// Deletes the specialization.
-    /// </summary>
-    /// <param name="specializationId">Unique identifier of the specialization</param>
-    /// <returns>The task result contains the delete state</returns>
     public async Task<bool> DeleteSpecialization(Guid specializationId)
     {
         Specialization? specializationToDelete = await specializationSourceRepository.FindByIdAsync(
@@ -182,13 +139,6 @@ public class QSpecializationService(
         return true;
     }
 
-    /// <summary>
-    /// Reorders specializations based on the provided ordering information. This method updates the order of existing specializations
-    /// in the database asynchronously, utilizing concurrent task execution for efficiency.
-    /// </summary>
-    /// <param name="specializationOrder">A QSpecializationOrder object containing the new order for specializations, where each key is a specialization ID and each value is the intended order.</param>
-    /// <returns>A Task representing the asynchronous operation of updating all relevant specializations.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="specializationOrder"/> is null.</exception>
     public async Task OrderSpecializations(OrderMapGuidToInt specializationOrder)
     {
         if (specializationOrder == null)

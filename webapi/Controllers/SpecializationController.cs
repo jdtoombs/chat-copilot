@@ -52,7 +52,7 @@ public class SpecializationController(
     /// Creates a new specialization.
     /// </summary>
     /// <param name="authInfo">Auth info for the current request.</param>
-    /// <param name="qSpecializationParameters">Contains the specialization parameters</param>
+    /// <param name="specialization">Contains the specialization parameters</param>
     /// <returns>The HTTP action result.</returns>
     [Route("specializations")]
     [HttpPost]
@@ -63,21 +63,21 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
     public async Task<IActionResult> CreateSpecializationAsync(
         [FromServices] IAuthInfo authInfo,
-        [FromBody] QSpecializationMutate qSpecializationMutate
+        [FromBody] QSpecializationBase specialization
     )
     {
         try
         {
-            var _specializationsource = await qSpecializationService.SaveSpecialization(qSpecializationMutate);
+            var _specializationsource = await qSpecializationService.SaveSpecialization(specialization);
 
-            QSpecializationResponse qSpecializationResponse = new(_specializationsource);
-            return this.Ok(qSpecializationResponse);
+            QSpecializationResponse response = new(_specializationsource);
+            return this.Ok(response);
         }
         catch (Azure.RequestFailedException ex)
         {
             logger.LogError(ex, "Specialization create threw an exception");
 
-            return this.StatusCode(500, $"Failed to create specialization for label '{qSpecializationMutate.Label}'.");
+            return this.StatusCode(500, $"Failed to create specialization for label '{specialization.Label}'.");
         }
     }
 

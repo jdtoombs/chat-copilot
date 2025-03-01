@@ -32,7 +32,7 @@ public interface IQSpecializationService
     /// </summary>
     /// <param name="qSpecializationMutate">Specialization mutate payload</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the specialization</returns>
-    Task<Specialization> SaveSpecialization(QSpecializationMutate qSpecializationMutate);
+    Task<Specialization> SaveSpecialization(QSpecializationBase specialization);
 
     /// <summary>
     /// Updates the specialization.
@@ -78,5 +78,12 @@ public interface IQSpecializationService
     /// <returns>A task that represents the asynchronous operation. The task result contains the delete state</returns>
     Task<bool> DeleteSpecialization(Guid specializationId);
 
+    /// <summary>
+    /// Reorders specializations based on the provided ordering information. This method updates the order of existing specializations
+    /// in the database asynchronously, utilizing concurrent task execution for efficiency.
+    /// </summary>
+    /// <param name="specializationOrder">A QSpecializationOrder object containing the new order for specializations, where each key is a specialization ID and each value is the intended order.</param>
+    /// <returns>A Task representing the asynchronous operation of updating all relevant specializations.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="specializationOrder"/> is null.</exception>
     Task OrderSpecializations(OrderMapGuidToInt specializationOrder);
 }
