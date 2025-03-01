@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
@@ -12,7 +11,6 @@ using CopilotChat.WebApi.Storage;
 using CopilotChat.WebApi.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -63,7 +61,7 @@ public class QSpecializationService(
                 ? ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
                 : await qBlobStorage.AddBlobAsync(qSpecializationMutate.IconFile);
 
-        var deserializedSuggestions = JsonConvert.DeserializeObject<List<string>>(qSpecializationMutate.Suggestions);
+        var deserializedSuggestions = qSpecializationMutate.Suggestions;
 
         Specialization specializationSource = new(
             Label: qSpecializationMutate.Label,
@@ -88,7 +86,7 @@ public class QSpecializationService(
                 : null,
             ImageFilePath: imageFilePath,
             IconFilePath: iconFilePath,
-            GroupMemberships: qSpecializationMutate.GroupMemberships.Split(','),
+            GroupMemberships: qSpecializationMutate.GroupMemberships,
             Order: qSpecializationMutate.Order,
             Suggestions: deserializedSuggestions != null ? deserializedSuggestions : new List<string>(),
             CanGenImages: qSpecializationMutate.CanGenImages
@@ -148,124 +146,6 @@ public class QSpecializationService(
         );
 
         await specializationSourceRepository.UpsertAsync(specialization);
-    }
-
-    /// <summary>
-    /// Updates an existing specialization.
-    /// </summary>
-    /// <param name="specializationId">Identifier of the specialization to update.</param>
-    /// <param name="qSpecializationMutate">Contains updated details for the specialization.</param>
-    /// <returns>The updated or newly created specialization.</returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown if the specialization does not exist and is not of type General.
-    /// </exception>
-    public async Task<Specialization?> UpdateSpecialization(
-        Guid specializationId,
-        QSpecializationMutate qSpecializationMutate
-    )
-    {
-        Specialization? specializationToUpdate = await specializationSourceRepository.FindByIdAsync(
-            specializationId.ToString()
-        );
-
-        if (specializationToUpdate == null)
-        {
-            return null;
-        }
-
-        // Update the image file and set the file path
-        specializationToUpdate.ImageFilePath = await this.UpsertSpecializationBlobAsync(
-            qSpecializationMutate.ImageFile,
-            specializationToUpdate.ImageFilePath,
-            Convert.ToBoolean(qSpecializationMutate.DeleteImageFile, CultureInfo.InvariantCulture),
-            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage)
-        );
-
-        // Update the icon file and set the file path
-        specializationToUpdate.IconFilePath = await this.UpsertSpecializationBlobAsync(
-            qSpecializationMutate.IconFile,
-            specializationToUpdate.IconFilePath,
-            Convert.ToBoolean(qSpecializationMutate.DeleteIconFile, CultureInfo.InvariantCulture),
-            ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon)
-        );
-
-        specializationToUpdate.IsActive = Convert.ToBoolean(
-            qSpecializationMutate.isActive,
-            CultureInfo.InvariantCulture
-        );
-
-        var deserializedSuggestions = JsonConvert.DeserializeObject<List<string>>(qSpecializationMutate.Suggestions);
-
-        specializationToUpdate.Name = qSpecializationMutate.Name ?? specializationToUpdate.Name;
-
-        specializationToUpdate.Label = qSpecializationMutate.Label ?? specializationToUpdate.Label;
-
-        specializationToUpdate.Description = qSpecializationMutate.Description ?? specializationToUpdate.Description;
-
-        specializationToUpdate.RoleInformation =
-            qSpecializationMutate.RoleInformation ?? specializationToUpdate.RoleInformation;
-
-        specializationToUpdate.InitialChatMessage =
-            qSpecializationMutate.InitialChatMessage ?? specializationToUpdate.InitialChatMessage;
-
-        specializationToUpdate.OpenAIDeploymentId =
-            qSpecializationMutate.OpenAIDeploymentId ?? specializationToUpdate.OpenAIDeploymentId;
-
-        specializationToUpdate.CompletionDeploymentName =
-            qSpecializationMutate.CompletionDeploymentName ?? specializationToUpdate.CompletionDeploymentName;
-
-        if (qSpecializationMutate.IsIndexIdSet)
-        {
-            // IndexName was explicitly set
-            specializationToUpdate.IndexId = qSpecializationMutate.IndexId;
-
-            if (specializationToUpdate.IndexId == null)
-            {
-                // If IndexName is explicitly set to null, set related properties to null
-                specializationToUpdate.RestrictResultScope = null;
-                specializationToUpdate.Strictness = null;
-                specializationToUpdate.DocumentCount = null;
-                specializationToUpdate.PastMessagesIncludedCount = null;
-                specializationToUpdate.MaxResponseTokenLimit = null;
-            }
-            else
-            {
-                // If IndexName is not null, update related properties
-                specializationToUpdate.RestrictResultScope =
-                    qSpecializationMutate.RestrictResultScope ?? specializationToUpdate.RestrictResultScope;
-                specializationToUpdate.Strictness =
-                    qSpecializationMutate.Strictness ?? specializationToUpdate.Strictness;
-                specializationToUpdate.DocumentCount =
-                    qSpecializationMutate.DocumentCount ?? specializationToUpdate.DocumentCount;
-                specializationToUpdate.PastMessagesIncludedCount =
-                    qSpecializationMutate.PastMessagesIncludedCount ?? specializationToUpdate.PastMessagesIncludedCount;
-                specializationToUpdate.MaxResponseTokenLimit =
-                    qSpecializationMutate.MaxResponseTokenLimit ?? specializationToUpdate.MaxResponseTokenLimit;
-            }
-        }
-        else
-        {
-            // IndexName was not specified, retain existing values
-            specializationToUpdate.RestrictResultScope = specializationToUpdate.RestrictResultScope;
-            specializationToUpdate.Strictness = specializationToUpdate.Strictness;
-            specializationToUpdate.DocumentCount = specializationToUpdate.DocumentCount;
-            specializationToUpdate.PastMessagesIncludedCount = specializationToUpdate.PastMessagesIncludedCount;
-            specializationToUpdate.MaxResponseTokenLimit = specializationToUpdate.MaxResponseTokenLimit;
-        }
-        specializationToUpdate.IsDefault = qSpecializationMutate.IsDefault ?? specializationToUpdate.IsDefault;
-
-        // Group memberships (mutate payload) are a comma separated list of UUIDs.
-        specializationToUpdate.GroupMemberships = !string.IsNullOrEmpty(qSpecializationMutate.GroupMemberships)
-            ? qSpecializationMutate.GroupMemberships.Split(',')
-            : specializationToUpdate.GroupMemberships;
-
-        specializationToUpdate.Suggestions =
-            deserializedSuggestions != null ? deserializedSuggestions : specializationToUpdate.Suggestions;
-        specializationToUpdate.CanGenImages = qSpecializationMutate.CanGenImages;
-
-        await specializationSourceRepository.UpsertAsync(specializationToUpdate);
-
-        return specializationToUpdate;
     }
 
     /// <summary>

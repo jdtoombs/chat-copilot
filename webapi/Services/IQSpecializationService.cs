@@ -42,14 +42,6 @@ public interface IQSpecializationService
     Task UpdateSpecialization(Specialization specialization);
 
     /// <summary>
-    /// Updates the specialization.
-    /// </summary>
-    /// <param name="specializationId">Unique identifier of the specialization</param>
-    /// <param name="qSpecializationMutate">Specialization mutate payload</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the specialization</returns>
-    Task<Specialization?> UpdateSpecialization(Guid specializationId, QSpecializationMutate qSpecializationMutate);
-
-    /// <summary>
     /// Update specialization icon
     /// </summary>
     /// <param name="specialization">Specialization to update</param>

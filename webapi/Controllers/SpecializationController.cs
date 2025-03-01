@@ -63,7 +63,7 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
     public async Task<IActionResult> CreateSpecializationAsync(
         [FromServices] IAuthInfo authInfo,
-        [FromForm] QSpecializationMutate qSpecializationMutate
+        [FromBody] QSpecializationMutate qSpecializationMutate
     )
     {
         try
@@ -104,45 +104,6 @@ public class SpecializationController(
         await qSpecializationService.UpdateSpecialization(specialization);
 
         return this.Ok(specialization);
-    }
-
-    /// <summary>
-    /// Edit a specialization.
-    /// </summary>
-    /// <param name="qSpecializationParameters">Contains the specialization parameters</param>
-    /// <param name="specializationId">The specializtion id.</param>
-    /// <returns>The HTTP action result.</returns>
-    [HttpPatch]
-    [Route("specializations/{specializationId:guid}/patch")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> EditSpecializationAsync(
-        [FromForm] QSpecializationMutate qSpecializationMutate,
-        [FromRoute] Guid specializationId
-    )
-    {
-        try
-        {
-            Specialization? specializationToEdit = await qSpecializationService.UpdateSpecialization(
-                specializationId,
-                qSpecializationMutate
-            );
-
-            if (specializationToEdit != null)
-            {
-                QSpecializationResponse qSpecializationResponse = new(specializationToEdit);
-                return this.Ok(qSpecializationResponse);
-            }
-
-            return this.StatusCode(500, $"Failed to update specialization for id '{specializationId}'.");
-        }
-        catch (Azure.RequestFailedException ex)
-        {
-            logger.LogError(ex, "Specialization update threw an exception");
-
-            return this.StatusCode(500, $"Failed to edit specialization for id '{specializationId}'.");
-        }
     }
 
     /// <summary>

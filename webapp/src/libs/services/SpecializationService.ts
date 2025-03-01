@@ -50,43 +50,11 @@ export class SpecializationService extends BaseService {
         body: ISpecializationRequest,
         accessToken: string,
     ): Promise<ISpecialization> => {
-        const formData = new FormData();
-
-        // FormData expects string values for each key
-        formData.append('label', body.label);
-        formData.append('name', body.name);
-        formData.append('description', body.description);
-        formData.append('roleInformation', body.roleInformation);
-        formData.append('openAIDeploymentId', body.openAIDeploymentId);
-        formData.append('completionDeploymentName', body.completionDeploymentName);
-        formData.append('initialChatMessage', body.initialChatMessage);
-        formData.append('indexId', body.indexId);
-        formData.append('groupMemberships', body.groupMemberships.join(','));
-        formData.append('order', body.order.toString());
-        formData.append('isDefault', body.isDefault.toString());
-        formData.append('suggestions', JSON.stringify(body.suggestions));
-        formData.append('canGenImages', body.canGenImages.toString());
-        if (body.restrictResultScope) {
-            formData.append('restrictResultScope', body.restrictResultScope.toString());
-        }
-        if (body.strictness) {
-            formData.append('strictness', body.strictness.toString());
-        }
-        if (body.documentCount) {
-            formData.append('documentCount', body.documentCount.toString());
-        }
-        if (body.pastMessagesIncludedCount) {
-            formData.append('pastMessagesIncludedCount', body.pastMessagesIncludedCount.toString());
-        }
-        if (body.maxResponseTokenLimit) {
-            formData.append('maxResponseTokenLimit', body.maxResponseTokenLimit.toString());
-        }
-
         const result = await this.getResponseAsync<ISpecialization>(
             {
                 commandPath: 'specializations',
                 method: 'POST',
-                body: formData,
+                body,
             },
             accessToken,
         );
@@ -156,52 +124,64 @@ export class SpecializationService extends BaseService {
      *
      * @async
      * @param {string} specializationId
-     * @param {ISpecializationRequest} body - Specialization request body.
+     * @param {ISpecializationRequest} specialization - Specialization request body.
      * @param {string} accessToken
      * @returns {Promise<ISpecialization>}
      */
     public updateSpecializationAsync = async (
         specializationId: string,
-        body: ISpecializationRequest,
+        specialization: ISpecializationRequest,
         accessToken: string,
     ): Promise<ISpecialization> => {
-        const formData = new FormData();
+        const body = [];
 
-        // FormData expects string values for each key
-        formData.append('label', body.label);
-        formData.append('name', body.name);
-        formData.append('description', body.description);
-        formData.append('roleInformation', body.roleInformation);
-        formData.append('openAIDeploymentId', body.openAIDeploymentId);
-        formData.append('completionDeploymentName', body.completionDeploymentName);
-        formData.append('initialChatMessage', body.initialChatMessage);
-        formData.append('indexId', body.indexId);
-        formData.append('groupMemberships', body.groupMemberships.join(','));
-        formData.append('order', body.order.toString());
-        formData.append('isDefault', body.isDefault.toString());
-        formData.append('suggestions', JSON.stringify(body.suggestions));
-        formData.append('canGenImages', body.canGenImages.toString());
-        if (body.restrictResultScope != null) {
-            formData.append('restrictResultScope', body.restrictResultScope.toString());
+        body.push({ op: 'replace', path: '/label', value: specialization.label });
+        body.push({ op: 'replace', path: '/name', value: specialization.name });
+        body.push({ op: 'replace', path: '/description', value: specialization.description });
+        body.push({ op: 'replace', path: '/roleInformation', value: specialization.roleInformation });
+        body.push({ op: 'replace', path: '/openAIDeploymentId', value: specialization.openAIDeploymentId });
+        body.push({ op: 'replace', path: '/completionDeploymentName', value: specialization.completionDeploymentName });
+        body.push({ op: 'replace', path: '/initialChatMessage', value: specialization.initialChatMessage });
+        body.push({ op: 'replace', path: '/indexId', value: specialization.indexId });
+        body.push({ op: 'replace', path: '/groupMemberships', value: specialization.groupMemberships });
+        body.push({ op: 'replace', path: '/order', value: specialization.order.toString() });
+        body.push({ op: 'replace', path: '/isDefault', value: specialization.isDefault.toString() });
+        body.push({ op: 'replace', path: '/suggestions', value: specialization.suggestions });
+        body.push({ op: 'replace', path: '/canGenImages', value: specialization.canGenImages.toString() });
+
+        if (specialization.restrictResultScope != null) {
+            body.push({
+                op: 'replace',
+                path: '/restrictResultScope',
+                value: specialization.restrictResultScope.toString(),
+            });
         }
-        if (body.strictness) {
-            formData.append('strictness', body.strictness.toString());
+        if (specialization.strictness) {
+            body.push({ op: 'replace', path: '/strictness', value: specialization.strictness.toString() });
         }
-        if (body.documentCount) {
-            formData.append('documentCount', body.documentCount.toString());
+        if (specialization.documentCount) {
+            body.push({ op: 'replace', path: '/documentCount', value: specialization.documentCount.toString() });
         }
-        if (body.pastMessagesIncludedCount) {
-            formData.append('pastMessagesIncludedCount', body.pastMessagesIncludedCount.toString());
+        if (specialization.pastMessagesIncludedCount) {
+            body.push({
+                op: 'replace',
+                path: '/pastMessagesIncludedCount',
+                value: specialization.pastMessagesIncludedCount.toString(),
+            });
         }
-        if (body.maxResponseTokenLimit) {
-            formData.append('maxResponseTokenLimit', body.maxResponseTokenLimit.toString());
+        if (specialization.maxResponseTokenLimit) {
+            body.push({
+                op: 'replace',
+                path: '/maxResponseTokenLimit',
+                value: specialization.maxResponseTokenLimit.toString(),
+            });
         }
 
         const result = await this.getResponseAsync<ISpecialization>(
             {
-                commandPath: `specializations/${specializationId}/patch`,
+                commandPath: `specializations/${specializationId}`,
                 method: 'PATCH',
-                body: formData,
+                body: body,
             },
             accessToken,
         );
