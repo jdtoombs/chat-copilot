@@ -126,15 +126,22 @@ To configure the SharePoint Indexer, I followed the documentation [here](https:/
 ## Manual by Developer
 
 1. az cloud set --name AzureCloud
-1. az acr login --name crpegasusshared
+1. az acr login --name crsharedakscluster
 1. docker build -f docker/webapi/Dockerfile -t chat-copilot-webapi .
-1. docker tag chat-copilot-webapi:latest crpegasusshared.azurecr.io/chat-copilot-webapi:latest
-1. docker push crpegasusshared.azurecr.io/chat-copilot-webapi
+1. docker tag chat-copilot-webapi:latest crsharedakscluster.azurecr.io/chat-copilot-webapi:latest
+1. docker push crsharedakscluster.azurecr.io/chat-copilot-webapi
 1. docker build -f docker/webapp/Dockerfile.nginx -t chat-copilot-webapp .
-1. docker tag chat-copilot-webapp:latest crpegasusshared.azurecr.io/chat-copilot-webapp:latest
-1. docker push crpegasusshared.azurecr.io/chat-copilot-webapp
+1. docker tag chat-copilot-webapp:latest crsharedakscluster.azurecr.io/chat-copilot-webapp:latest
+1. docker push crsharedakscluster.azurecr.io/chat-copilot-webapp
 1. cd helm/
 1. helm upgrade -n copilot-dev --install dev .
+
+## Automated by Github Actions/Workflows
+
+1. Manually Run Terraform scripts in /azure/
+1. Run the "Build and Deploy" Github Action to deploy to Dev
+1. Run the "Deploy to AKS" and select the "Test" Environment to deploy to Test
+1. Run the "Deploy to AKS" and select the "Prod" Environment to deploy to Prod
 
 # Troubleshooting
 

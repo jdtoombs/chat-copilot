@@ -1,4 +1,12 @@
-name: copilot-deploy-aks
+name: Deploy to AKS
+# This workflow deploys the application to Azure Kubernetes Service (AKS).
+# It is triggered on demand or can be called from another workflow.
+# It deploys the application to the specified environment (dev, test, or prod).
+# The workflow consists of a single job that deploys the application to AKS.
+# The job uses Azure CLI to import Docker images from Azure Container Registry (ACR) and deploys them using Helm.
+# The workflow also sets up the Azure context for AKS and installs Helm.
+# The workflow uses the Azure login action to authenticate with Azure and the Azure AKS set context action to set up the AKS context.
+# The workflow uses the Azure setup Helm action to install Helm and the Helm upgrade action to deploy the application.
 
 on:
   workflow_dispatch: # deploy on demand

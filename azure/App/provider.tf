@@ -1,14 +1,14 @@
 # define terraform provider
 terraform {
-  required_version = ">= 1.8.5"
+  required_version = ">=1.10.5"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~>4.17"
+      version = ">=4.20.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~>2.32"
+      version = ">=2.36.0"
     }
   }
 }
@@ -22,14 +22,14 @@ provider "kubernetes" {
 
 # configure the azure provider
 provider "azurerm" {
-  environment     = "public"
+  environment     = var.azure_environment
   subscription_id = var.azure_subscription_id
   tenant_id       = var.azure_tenant_id
   features {}
 }
 
 provider "azurerm" {
-  environment     = "public"
+  environment     = var.azure_environment
   subscription_id = var.kubernetes_azure_subscription_id
   tenant_id       = var.kubernetes_azure_tenant_id
   features {}

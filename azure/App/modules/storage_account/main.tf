@@ -18,7 +18,7 @@ resource "azurerm_storage_account" "stg" {
 resource "azurerm_storage_container" "stg" {
   for_each              = toset(var.container_names)
   name                  = each.value
-  storage_account_name  = azurerm_storage_account.stg.name
+  storage_account_id    = azurerm_storage_account.stg.id
   container_access_type = "blob"
   metadata              = null
 }

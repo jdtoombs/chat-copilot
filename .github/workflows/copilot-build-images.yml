@@ -1,4 +1,11 @@
-name: copilot-build-images
+name: Build Images
+# This workflow builds Docker images for the application and pushes them to Azure Container Registry (ACR).
+# It is triggered on demand or can be called from another workflow.
+# The workflow builds images for the webapi and webapp components of the application.
+# The workflow uses a matrix strategy to build multiple images in parallel.
+# The workflow uses the Docker Buildx action to build and push the images to ACR.
+# The workflow also uses the Docker Metadata action to extract metadata for the images, such as tags and labels.
+# The workflow uses the Docker Login action to authenticate with ACR before building and pushing the images.
 
 on:
   workflow_dispatch:

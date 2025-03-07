@@ -8,7 +8,7 @@ image:
 fe:
   env:
     - name: "VITE_APP_BACKEND_URI"
-      value: "https://q-pilot-dev.api.pegasus.quartechlab.com/"
+      value: "https://dev.api.q-pilot.quartech.com/"
     - name: "VITE_APP_ENVIRONMENT"
       value: "development"
 

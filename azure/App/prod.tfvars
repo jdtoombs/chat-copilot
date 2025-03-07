@@ -1,12 +1,13 @@
 azure_subscription_id = "b2cba309-26dd-459c-a021-54cb56fe6c49"
 azure_tenant_id       = "898fdc18-1bd2-4a3b-84a7-2efb988e3b90"
+azure_environment     = "public"
 
 location = {
-  name = "canadacentral",
+  name        = "canadacentral",
   region_code = "cnc"
 }
 location_openai = {
-  name = "canadaeast",
+  name        = "canadaeast",
   region_code = "cne"
 }
 
@@ -15,18 +16,18 @@ project_code = "copilot"
 environment = "prod"
 
 tags = {
-  client  = "Quartech"
-  owner   = "david.camden@quartech.com" 
-  project = "Q-Pilot",
-  client-name = "Quartech",
-  project-name = "Q-Pilot",
+  client         = "Quartech"
+  owner          = "david.camden@quartech.com"
+  project        = "Q-Pilot",
+  client-name    = "Quartech",
+  project-name   = "Q-Pilot",
   developer-name = "Quartech"
 }
 
-kubernetes_azure_subscription_id = "55e460fd-3416-40f4-b548-a6cae492f532"
+kubernetes_azure_subscription_id = "6163682b-8d24-45e8-8352-3fc634febf51"
 kubernetes_azure_tenant_id       = "898fdc18-1bd2-4a3b-84a7-2efb988e3b90"
-kubernetes_cluster_name          = "aks-pegasus-cnc-shared"
-kubernetes_resource_group_name   = "rg-pegasus-cnc-shared-aks"
+kubernetes_cluster_name          = "aks-sharedaks-cnc-cluster"
+kubernetes_resource_group_name   = "rg-sharedaks-cnc-cluster-aks"
 
 app_api_object_id = "55f7148f-b09d-4916-ba12-5c3f1ff80b4a"
 
@@ -44,25 +45,25 @@ cosmosdb_sql_containers = [
 
 openai_deployments = [
   {
-    name = "gpt-4o-mini",
+    name       = "gpt-4o-mini",
     model_name = "gpt-4o-mini",
-    version = "2024-07-18",
-    sku_name = "GlobalStandard",
-    capacity = 50000
+    version    = "2024-07-18",
+    sku_name   = "GlobalStandard",
+    capacity   = 50000
   },
   {
-    name = "gpt-4o",
+    name       = "gpt-4o",
     model_name = "gpt-4o",
-    version = "2024-08-06",
-    sku_name = "GlobalStandard",
-    capacity = 10000
+    version    = "2024-08-06",
+    sku_name   = "GlobalStandard",
+    capacity   = 10000
   },
   {
-    name = "text-embedding-ada-002",
+    name       = "text-embedding-ada-002",
     model_name = "text-embedding-ada-002",
-    version = 2,
-    sku_name = "Standard",
-    capacity = 100
+    version    = 2,
+    sku_name   = "Standard",
+    capacity   = 100
   }
 ]
 

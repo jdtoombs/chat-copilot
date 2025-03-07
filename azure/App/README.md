@@ -28,15 +28,18 @@ Use GEO Codes for Region Codes: https://learn.microsoft.com/en-us/azure/backup/s
 > Import-Module Az.Accounts
 > ```
 
-1. `az cloud set --name AzureCloud `
+Login:
+1. `az cloud set --name AzureCloud`
 1. `az login`
 1. `az account set --subscription b2cba309-26dd-459c-a021-54cb56fe6c49`
 1. `$ACCOUNT_KEY=(az storage account keys list -g rg-copilot-cnc-tfstate -n stcopilottfstate -o tsv --query [0].value)`
 1. `$env:ARM_ACCESS_KEY=$ACCOUNT_KEY`
 1. `terraform init`
-1. `terraform workspace select -or-create test` # default/test/prod
-1. `terraform plan -var-file="test.tfvars"` # dev.tfvars/test.tfvars/prod.tfvars
-1. `terraform apply -var-file="test.tfvars"` # dev.tfvars/test.tfvars/prod.tfvars
+
+Apply:
+1. `terraform workspace select -or-create default` # default/test/prod
+1. `terraform plan -var-file="dev.tfvars"` # dev.tfvars/test.tfvars/prod.tfvars
+1. `terraform apply -var-file="dev.tfvars"` # dev.tfvars/test.tfvars/prod.tfvars
 
 Azure Cloud Names:
 

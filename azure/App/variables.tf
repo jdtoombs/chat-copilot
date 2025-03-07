@@ -13,6 +13,12 @@ variable "azure_tenant_id" {
   description = "Azure Tenant ID"
 }
 
+variable "azure_environment" {
+  type        = string
+  description = "The Cloud Environment which should be used. Possible values are public, usgovernment, and china. Defaults to public."
+  default     = "public"
+}
+
 
 ##########
 # Global #
@@ -54,16 +60,16 @@ variable "tags" {
 ##################
 
 variable "location" {
-  type        = object({
-    name = string,
+  type = object({
+    name        = string,
     region_code = string
   })
   description = "Azure region where the resource group will be created"
 }
 
 variable "location_openai" {
-  type        = object({
-    name = string,
+  type = object({
+    name        = string,
     region_code = string
   })
   description = "Azure region for vision account, as availability may differ from other resources."
@@ -126,13 +132,13 @@ variable "container_names" {
 ###################
 variable "openai_deployments" {
   type = list(object({
-    name = string
+    name       = string
     model_name = string
-    version = string
-    sku_name = string
-    capacity = number
+    version    = string
+    sku_name   = string
+    capacity   = number
   }))
-  default = []
+  default     = []
   description = "List of Azure OpenAI deployments to create."
 }
 

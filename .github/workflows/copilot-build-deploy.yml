@@ -1,4 +1,11 @@
-name: copilot-build-deploy
+name: Build and Deploy to Dev
+# This workflow builds and deploys the application to the dev environment.
+# It is triggered on push to the main branch and can also be triggered manually.
+# It builds the Docker images and deploys them to Azure Kubernetes Service (AKS).
+# The workflow consists of two jobs: copilot-build-images and copilot-deploy-aks.
+# The copilot-build-images job builds the Docker images and pushes them to Azure Container Registry (ACR).
+# The copilot-deploy-aks job deploys the images to AKS.
+# The copilot-deploy-aks job depends on the copilot-build-images job, ensuring that the images are built before deployment.
 
 on:
   workflow_dispatch:

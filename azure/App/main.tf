@@ -301,7 +301,7 @@ module "azure_open_ai" {
   resource_group_name = azurerm_resource_group.openai_completions.name
   account_location    = var.location_openai.name
   account_kind        = "OpenAI"
-  sku_name = "S0"
+  sku_name            = "S0"
   openai_deployments  = var.openai_deployments
   tags                = var.tags
 }
@@ -312,7 +312,7 @@ module "azure_computer_vision" {
   resource_group_name = azurerm_resource_group.openai.name
   account_location    = var.location.name
   account_kind        = "ComputerVision"
-  sku_name = "S1"
+  sku_name            = "S1"
   openai_deployments  = []
   tags                = var.tags
 }

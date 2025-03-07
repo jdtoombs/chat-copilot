@@ -4,8 +4,8 @@ fullnameOverride: ""
 cert:
   enabled: true
   hosts:
-    - host: q-pilot-dev.pegasus.quartechlab.com
-    - host: q-pilot-dev.api.pegasus.quartechlab.com
+    - host: dev.q-pilot.quartech.com
+    - host: dev.api.q-pilot.quartech.com
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -54,12 +54,12 @@ volumeMounts: []
 volumes: []
 configs: {}
 resources:
-    requests:
-      cpu: 100m
-      memory: 450Mi
-    limits:
-      cpu: 350m
-      memory: 850Mi
+  requests:
+    cpu: 100m
+    memory: 450Mi
+  limits:
+    cpu: 350m
+    memory: 850Mi
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -87,7 +87,7 @@ secretProviderClass:
   # Retrieved from Terraform Output
   vaultName: "kvt-copilot-cnc-app-dev"
   # Retrieved from Terraform Output
-  clientId: "c866d6a7-798e-4cfe-aafe-95ab5c43e190"
+  clientId: "f3fd4e02-0933-427b-bda5-193819502d3c"
 
 ingress:
   className: ""
@@ -207,7 +207,7 @@ webapp:
   enabled: true
   service: {}
   image:
-    repository: crpegasusshared.azurecr.io/chat-copilot-webapp
+    repository: crsharedakscluster.azurecr.io/chat-copilot-webapp
     tag: "latest"
   livenessProbe: {}
   readinessProbe: {}
@@ -244,13 +244,13 @@ webapp:
   ingress:
     enabled: true
     hosts:
-      - host: q-pilot-dev.pegasus.quartechlab.com
+      - host: dev.q-pilot.quartech.com
         paths:
           - path: /
             pathType: Prefix
     tls:
       - hosts:
-          - q-pilot-dev.pegasus.quartechlab.com
+          - dev.q-pilot.quartech.com
   tolerations: []
   affinity: {}
 
@@ -266,7 +266,7 @@ webapi:
   service: {}
 
   image:
-    repository: crpegasusshared.azurecr.io/chat-copilot-webapi
+    repository: crsharedakscluster.azurecr.io/chat-copilot-webapi
     tag: "latest"
 
   livenessProbe: {}
@@ -279,6 +279,29 @@ webapi:
   securityContext: {}
 
   env:
+    - name: "APP_NAME"
+      value: "webapi"
+    # TODO check on what secrets are needed
+    - name: "AZURE_CLIENT_SECRET"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: q-pilot-client-secret
+    - name: "ChatStore__Cosmos__ConnectionString"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: ChatStore-Cosmos-ConnectionString
+    - name: "Communication__AppName"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: Communication-App
+    - name: "KernelMemory__Services__AzureBlobs__ConnectionString"
+      valueFrom:
+        secretKeyRef:
+          name: q-pilot-webapi-secret
+          key: KernelMemory-Services-AzureBlobs-ConnectionString
     - name: "KernelMemory__Services__AzureOpenAIEmbedding__APIKey"
       valueFrom:
         secretKeyRef:
@@ -289,68 +312,21 @@ webapi:
         secretKeyRef:
           name: q-pilot-webapi-secret
           key: KernelMemory-Services-AzureOpenAIText-APIKey
-    - name: "ChatStore__Cosmos__ConnectionString"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: ChatStore-Cosmos-ConnectionString
-    - name: "QAzureOpenAIChatConfig__OpenAIDeploymentConnections__0__ApiKey"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-OpenAIDeploymentConnections-0-ApiKey
-    - name: "QAzureOpenAIChatConfig__OpenAIDeploymentConnections__1__ApiKey"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-OpenAIDeploymentConnections-1-ApiKey
-    - name: "QAzureOpenAIChatConfig__OpenAIDeploymentConnections__2__ApiKey"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-OpenAIDeploymentConnections-2-ApiKey
-    - name: "QAzureOpenAIChatConfig__AISearchDeploymentConnections__0__ApiKey"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-AISearchDeploymentConnections-0-ApiKey
-    - name: "QAzureOpenAIChatConfig__AISearchDeploymentConnections__1__ApiKey"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-AISearchDeploymentConnections-1-ApiKey
-    - name: "QAzureOpenAIChatConfig__BlobStorage__ConnectionString"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: QAzureOpenAIChatConfig-BlobStorage-ConnectionString
-    - name: "KernelMemory__Services__AzureVision__Key"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key: KernelMemory-Services-AzureVision-Key
     - name: "KernelMemory__Services__AzureVision__Endpoint"
       valueFrom:
         secretKeyRef:
           name: q-pilot-webapi-secret
           key: KernelMemory-Services-AzureVision-Endpoint
-    - name: "KernelMemory__Services__AzureBlobs__ConnectionString"
+    - name: "KernelMemory__Services__AzureVision__Key"
       valueFrom:
         secretKeyRef:
           name: q-pilot-webapi-secret
-          key: KernelMemory-Services-AzureBlobs-ConnectionString
-    - name: "Communication__AppName"
+          key: KernelMemory-Services-AzureVision-Key
+    - name: "QAzureOpenAIChatConfig__BlobStorage__ConnectionString"
       valueFrom:
         secretKeyRef:
           name: q-pilot-webapi-secret
-          key: Communication-App
-    - name: "AZURE_CLIENT_SECRET"
-      valueFrom:
-        secretKeyRef:
-          name: q-pilot-webapi-secret
-          key:  q-pilot-client-secret
-    - name: "APP_NAME"
-      value: "webapi"
+          key: QAzureOpenAIChatConfig-BlobStorage-ConnectionString
 
   volumeMounts:
     - name: appsettings-volume
@@ -393,34 +369,29 @@ webapi:
 
   secretProviderClass:
     enabled: true
-    secrets:
-      [
+    secrets: [
+        # TODO check on what secrets are needed
+        q-pilot-client-secret,
+        ChatStore-Cosmos-ConnectionString,
+        Communication-App,
+        KernelMemory-Services-AzureBlobs-ConnectionString,
         KernelMemory-Services-AzureOpenAIEmbedding-APIKey,
         KernelMemory-Services-AzureOpenAIText-APIKey,
-        ChatStore-Cosmos-ConnectionString,
-        QAzureOpenAIChatConfig-BlobStorage-ConnectionString,
-        QAzureOpenAIChatConfig-OpenAIDeploymentConnections-0-ApiKey,
-        QAzureOpenAIChatConfig-OpenAIDeploymentConnections-1-ApiKey,
-        QAzureOpenAIChatConfig-OpenAIDeploymentConnections-2-ApiKey,
-        QAzureOpenAIChatConfig-AISearchDeploymentConnections-0-ApiKey,
-        QAzureOpenAIChatConfig-AISearchDeploymentConnections-1-ApiKey,
-        KernelMemory-Services-AzureVision-Key,
         KernelMemory-Services-AzureVision-Endpoint,
-        q-pilot-client-secret,
-        Communication-App,
-        KernelMemory-Services-AzureBlobs-ConnectionString
+        KernelMemory-Services-AzureVision-Key,
+        QAzureOpenAIChatConfig-BlobStorage-ConnectionString,
       ]
 
   ingress:
     enabled: true
     hosts:
-      - host: q-pilot-dev.api.pegasus.quartechlab.com
+      - host: dev.api.q-pilot.quartech.com
         paths:
           - path: /
             pathType: Prefix
     tls:
       - hosts:
-          - q-pilot-dev.api.pegasus.quartechlab.com
+          - dev.api.q-pilot.quartech.com
 
   tolerations: []
   affinity: {}
