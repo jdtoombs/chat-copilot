@@ -1,8 +1,19 @@
+##################
+# Existing Resources
+##################
+
 data "azurerm_client_config" "current" {}
 
 data "azurerm_kubernetes_cluster" "aks" {
   name                = var.kubernetes_cluster_name
   resource_group_name = var.kubernetes_resource_group_name
+
+  provider = azurerm.kubernetes
+}
+
+data "azurerm_container_registry" "acr" {
+  name                = var.acr_name
+  resource_group_name = var.acr_resource_group_name
 
   provider = azurerm.kubernetes
 }
@@ -69,6 +80,10 @@ module "azure_mssql_database" {
 }
 */
 
+########################
+# AKS #
+########################
+
 module "kubernetes_namespace" {
   source       = "./modules/kubernetes-namespace"
   environment  = var.environment
@@ -76,6 +91,14 @@ module "kubernetes_namespace" {
 
   providers = { azurerm = azurerm.kubernetes, kubernetes = kubernetes }
 
+}
+
+resource "azurerm_role_assignment" "acr" {
+  scope                = data.azurerm_container_registry.acr.id
+  role_definition_name = "Contributor"
+  principal_id         = var.app_github_object_id
+
+  provider = azurerm
 }
 
 

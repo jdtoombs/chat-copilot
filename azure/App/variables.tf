@@ -166,7 +166,27 @@ variable "kubernetes_azure_tenant_id" {
   description = "Existing AKS Cluster Azure Tenant ID"
 }
 
+variable "acr_name" {
+  type        = string
+  description = "Existing Azure Container Registry Name"
+
+}
+
+variable "acr_resource_group_name" {
+  type        = string
+  description = "Existing Azure Container Registry Resource Group Name"
+}
+
 variable "app_api_object_id" {
   type        = string
   description = "Existing App Registration Object ID for API"
-} 
+}
+
+#####################
+# Github Actions #
+#####################
+
+variable "app_github_object_id" {
+  type        = string
+  description = "Existing App Registration Object ID for Github"
+}

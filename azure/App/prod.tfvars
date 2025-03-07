@@ -29,7 +29,11 @@ kubernetes_azure_tenant_id       = "898fdc18-1bd2-4a3b-84a7-2efb988e3b90"
 kubernetes_cluster_name          = "aks-sharedaks-cnc-cluster"
 kubernetes_resource_group_name   = "rg-sharedaks-cnc-cluster-aks"
 
-app_api_object_id = "55f7148f-b09d-4916-ba12-5c3f1ff80b4a"
+acr_name                = "crsharedakscluster"
+acr_resource_group_name = "rg-sharedaks-cnc-cluster-cr"
+
+app_api_object_id    = "55f7148f-b09d-4916-ba12-5c3f1ff80b4a"
+app_github_object_id = "adc2f406-2df6-4c47-a542-ae55cf73d35f"
 
 cosmosdb_sql_containers = [
   { name = "chatsessions", partition_key_path = "/id" },
