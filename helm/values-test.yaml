@@ -1,7 +1,7 @@
 cert:
   hosts:
-    - host: q-pilot-test.pegasus.quartechlab.com
-    - host: q-pilot-test.api.pegasus.quartechlab.com
+    - host: test.q-pilot.quartech.com
+    - host: test.api.q-pilot.quartech.com
 
 image:
   tag: "test"
@@ -17,7 +17,7 @@ secretProviderClass:
 fe:
   env:
     - name: "VITE_APP_BACKEND_URI"
-      value: "https://q-pilot-test.api.pegasus.quartechlab.com/"
+      value: "https://test.api.q-pilot.quartech.com"
     - name: "VITE_APP_ENVIRONMENT"
       value: "test"
 
@@ -45,13 +45,13 @@ webapp:
     tag: "test"
   ingress:
     hosts:
-      - host: q-pilot-test.pegasus.quartechlab.com
+      - host: test.q-pilot.quartech.com
         paths:
           - path: /
             pathType: Prefix
     tls:
       - hosts:
-          - q-pilot-test.pegasus.quartechlab.com
+          - test.q-pilot.quartech.com
 
 ###############
 # webapi specific values
@@ -98,10 +98,10 @@ webapi:
 
   ingress:
     hosts:
-      - host: q-pilot-test.api.pegasus.quartechlab.com
+      - host: test.api.q-pilot.quartech.com
         paths:
           - path: /
             pathType: Prefix
     tls:
       - hosts:
-          - q-pilot-test.api.pegasus.quartechlab.com
+          - test.api.q-pilot.quartech.com

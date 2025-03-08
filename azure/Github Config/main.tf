@@ -18,80 +18,10 @@ data "azurerm_container_registry" "acr" {
   provider = azurerm.kubernetes
 }
 
-##################
-# resource group #
-##################
-
-/*
-resource "azurerm_resource_group" "sql" {
-  name     = "rg-${local.standard_name}-sql"
-  location = var.location.name
-}
-*/
-
-resource "azurerm_resource_group" "kv" {
-  name     = "rg-${local.standard_name}-kv"
-  location = var.location.name
-  provider = azurerm.kubernetes
-  tags     = var.tags
-}
-
-resource "azurerm_resource_group" "cosmos" {
-  name     = "rg-${local.standard_name}-cosmos"
-  location = var.location.name
-  tags     = var.tags
-}
-
-resource "azurerm_resource_group" "storage" {
-  name     = "rg-${local.standard_name}-storage"
-  location = var.location.name
-  tags     = var.tags
-}
-
-resource "azurerm_resource_group" "openai" {
-  name     = "rg-${local.standard_name}-openai"
-  location = var.location.name
-  tags     = var.tags
-}
-
-resource "azurerm_resource_group" "openai_completions" {
-  name     = "rg-${local.standard_name_openai}-openai"
-  location = var.location_openai.name
-  tags     = var.tags
-}
-
-########################
-# SQL Database #
-########################
-/*
-module "azure_mssql_database" {
-  source              = "./modules/azure-mssql-database"
-  sqlserver_name      = "sql-${local.standard_name}"
-  database_names      = var.database_names
-  sku_name            = var.sku_name
-  location            = azurerm_resource_group.sql.location
-  resource_group_name = azurerm_resource_group.sql.name
-  key_vault_id        = module.azure_keyvault.key_vault_id
-
-  tags = var.tags
-  depends_on = [
-    module.azure_keyvault
-  ]
-}
-*/
-
 ########################
 # AKS #
 ########################
 
-module "kubernetes_namespace" {
-  source       = "./modules/kubernetes-namespace"
-  environment  = var.environment
-  project_code = var.project_code
-
-  providers = { azurerm = azurerm.kubernetes, kubernetes = kubernetes }
-
-}
 
 resource "azurerm_role_assignment" "acr" {
   scope                = data.azurerm_container_registry.acr.id
@@ -110,43 +40,6 @@ resource "azurerm_role_assignment" "aks" {
   provider = azurerm
 }
 
-
-module "azure_keyvault" {
-  source              = "./modules/azure-keyvault"
-  name                = "kvt-${local.standard_name}"
-  location            = azurerm_resource_group.kv.location
-  resource_group_name = azurerm_resource_group.kv.name
-
-  enabled_for_deployment          = false
-  enabled_for_disk_encryption     = false
-  enabled_for_template_deployment = false
-
-  tags = var.tags
-
-  providers = { azurerm = azurerm.kubernetes }
-}
-
-resource "azurerm_key_vault_access_policy" "vaultaccess" {
-  key_vault_id = module.azure_keyvault.key_vault_id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
-  # cluster access to secrets should be read-only
-  secret_permissions = [
-    "Get", "List", "Set", "Restore"
-  ]
-  provider = azurerm.kubernetes
-}
-
-resource "azurerm_key_vault_access_policy" "vaultaccessforapi" {
-  key_vault_id = module.azure_keyvault.key_vault_id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = var.app_api_object_id
-  # cluster access to secrets should be read-only
-  secret_permissions = [
-    "Get", "List", "Set", "Restore"
-  ]
-  provider = azurerm.kubernetes
-}
 
 ##################
 # Azure App Registration
@@ -294,67 +187,3 @@ resource "azuread_application" "frontend" {
   }
 }
 */
-
-
-##################
-# Cosmos DB
-##################
-
-module "azure_cosmosdb" {
-  source                  = "./modules/azure-cosmosdb"
-  name                    = "cosmos-${local.standard_name}"
-  location                = var.location.name
-  resource_group_name     = azurerm_resource_group.cosmos.name
-  cosmosdb_sql_containers = var.cosmosdb_sql_containers
-  throughput              = var.throughput
-  tags                    = var.tags
-}
-
-##################
-# Storage Account
-##################
-
-module "storage_account" {
-  source              = "./modules/storage_account"
-  name                = "stg${local.short_name}"
-  resource_group_name = azurerm_resource_group.storage.name
-  location            = var.location.name
-  container_names     = var.container_names
-  tags                = var.tags
-}
-
-################
-# Azure Open AI
-################
-
-module "azure_open_ai" {
-  source              = "./modules/azure-cognitive"
-  account_name        = "${local.standard_name_openai}-openai"
-  resource_group_name = azurerm_resource_group.openai_completions.name
-  account_location    = var.location_openai.name
-  account_kind        = "OpenAI"
-  sku_name            = "S0"
-  openai_deployments  = var.openai_deployments
-  tags                = var.tags
-}
-
-module "azure_computer_vision" {
-  source              = "./modules/azure-cognitive"
-  account_name        = "${local.standard_name}-computer-vision"
-  resource_group_name = azurerm_resource_group.openai.name
-  account_location    = var.location.name
-  account_kind        = "ComputerVision"
-  sku_name            = "S1"
-  openai_deployments  = []
-  tags                = var.tags
-}
-
-module "azure_ai_search" {
-  source              = "./modules/azure-ai-search"
-  name                = "${local.standard_name_openai}-search"
-  resource_group_name = azurerm_resource_group.openai_completions.name
-  location            = var.location_openai.name
-  replica_count       = 2
-  partition_count     = 1
-  tags                = var.tags
-}
