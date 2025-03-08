@@ -166,7 +166,14 @@ public static class CopilotChatServiceExtensions
     /// </summary>
     internal static IServiceCollection AddCorsPolicy(this IServiceCollection services, IConfiguration configuration)
     {
+        // debug
+        Console.WriteLine("Creating CORS policy...");
         string[] allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+        Console.WriteLine(
+            allowedOrigins.Length > 0
+                ? $"CORS policy: {string.Join(", ", allowedOrigins)}"
+                : "CORS policy: No origins allowed."
+        );
         if (allowedOrigins.Length > 0)
         {
             services.AddCors(options =>
