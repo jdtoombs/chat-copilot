@@ -159,9 +159,15 @@ public class ChatController(
                 && ex.Message.Contains("Service request failed.", System.StringComparison.OrdinalIgnoreCase)
             )
             {
-                logger.LogError("Something went wrong while the AI chat service processed the request.");
+                logger.LogError(
+                    "Something went wrong while the AI chat service processed the request: {Message}",
+                    ex.Message,
+                    ex
+                );
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Service request failed.");
             }
+
+            logger.LogError("An error occurred while processing the chat message: {Message}", ex.Message, ex);
 
             telemetryService.TrackPluginFunction(ChatPluginName, ChatFunction, false);
 

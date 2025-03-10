@@ -115,19 +115,15 @@ public sealed class Program
         // Add Q-Pilot hub for real time communication
         app.MapHub<MessageRelayHub>("/messageRelayHub");
 
-        // Enable Swagger for development environments.
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+        // Enable Swagger
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
-            // Redirect root URL to Swagger UI URL
-            app.MapWhen(
-                context => context.Request.Path == "/",
-                appBuilder =>
-                    appBuilder.Run(async context => await Task.Run(() => context.Response.Redirect("/swagger")))
-            );
-        }
+        // Redirect root URL to Swagger UI URL
+        app.MapWhen(
+            context => context.Request.Path == "/",
+            appBuilder => appBuilder.Run(async context => await Task.Run(() => context.Response.Redirect("/swagger")))
+        );
 
         // Start the service
         Task runTask = app.RunAsync();
