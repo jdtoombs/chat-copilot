@@ -204,15 +204,13 @@ export class SpecializationService extends BaseService {
         request: ISpecializationToggleRequest,
         accessToken: string,
     ): Promise<ISpecialization> => {
-        const formData = new FormData();
-
-        formData.append('isActive', request.isActive.toString());
+        const body = [{ op: 'replace', path: '/isActive', value: request.isActive.toString() }];
 
         const result = await this.getResponseAsync<ISpecialization>(
             {
                 commandPath: `specializations/${specializationId}`,
                 method: 'PATCH',
-                body: formData,
+                body: body,
             },
             accessToken,
         );
