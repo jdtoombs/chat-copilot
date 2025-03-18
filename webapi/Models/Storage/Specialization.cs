@@ -7,145 +7,61 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Models.Storage;
 
-/// <summary>
-/// Information about the specialization
-/// </summary>
 public class Specialization : IStorageEntity
 {
-    /// <summary>
-    /// ID that is persistent and unique.
-    /// </summary>
     public string Id { get; set; }
 
-    /// <summary>
-    /// Short representation of specialization.
-    /// </summary>
     public string Label { get; set; }
 
-    /// <summary>
-    /// Name of the specialization.
-    /// </summary>
     public string Name { get; set; }
 
-    /// <summary>
-    /// Description of the specialization.
-    /// </summary>
     public string Description { get; set; }
 
-    /// <summary>
-    /// The initial chat message to display when starting a conversation under this specialization
-    /// </summary>
     public string InitialChatMessage { get; set; }
 
-    /// <summary>
-    /// Role Information
-    /// </summary>
     public string RoleInformation { get; set; }
 
-    /// <summary>
-    /// List of group memberships for the user.
-    /// </summary>
     public IList<string> GroupMemberships { get; set; } = new List<string>();
 
-    /// <summary>
-    /// Specialization index id reference
-    /// </summary>
     public string? IndexId { get; set; }
 
-    /// <summary>
-    /// Open AI Deployment, which may host several chat completions.
-    /// </summary>
     public string OpenAIDeploymentId { get; set; }
 
-    /// <summary>
-    /// Completion deployment name.
-    /// </summary>
     public string? CompletionDeploymentName { get; set; }
 
-    /// <summary>
-    /// Image URL for pictorial description of specialization.
-    /// </summary>
     public string ImageFilePath { get; set; }
 
-    /// <summary>
-    /// Icon URL for pictorial description of specialization.
-    /// </summary>
     public string IconFilePath { get; set; }
 
-    /// <summary>
-    /// The partition key for the specialization session.
-    /// </summary>
     [JsonIgnore]
     public string Partition => this.Id;
 
-    /// <summary>
-    /// On/oFF switch for the specializations.
-    /// </summary>
     public bool IsActive { get; set; }
 
-    /// <summary>
-    /// UserId of admin user
-    /// </summary>
     public string CreatedBy { get; set; } = "";
 
-    /// <summary>
-    /// UserId of admin user
-    /// </summary>
     public string UpdatedBy { get; set; } = "";
 
-    /// <summary>
-    /// Timestamp of action
-    /// </summary>
     public DateTimeOffset CreatedOn { get; set; }
 
-    /// <summary>
-    /// Timestamp of action
-    /// </summary>>
     public DateTimeOffset UpdatedAt { get; set; }
 
-    /// <summary>
-    /// Is Default flag of the specialization
-    /// </summary>
     public bool? IsDefault { get; set; }
 
-    /// <summary>
-    /// Restrict Result Scope of specialization
-    /// </summary>
     public bool? RestrictResultScope { get; set; }
 
-    /// <summary>
-    /// Strictness of specialization
-    /// </summary>>
     public int? Strictness { get; set; }
 
-    /// <summary>
-    /// Document Count of specialization
-    /// </summary>>
     public int? DocumentCount { get; set; }
 
-    /// <summary>
-    /// Past Messages Included Count of specialization
-    /// </summary>>
     public int? PastMessagesIncludedCount { get; set; }
 
-    /// <summary>
-    /// Max Response Token Limit of specialization
-    /// </summary>>
     public int? MaxResponseTokenLimit { get; set; }
 
-    /// <summary>
-    /// Order of the specialization
-    /// </summary>>
     public int? Order { get; set; }
 
-    /// <summary>
-    /// Suggestions to be displayed to the user when starting a chat under this specialization.
-    /// </summary>
     public IList<string> Suggestions { get; set; } = new List<string>();
 
-    /// <summary>
-    /// Whether or not this specialization can create images with dall-e.
-    /// </summary>
     public bool CanGenImages { get; set; } = false;
 
     public Specialization() { }
