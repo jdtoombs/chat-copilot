@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
     MDXEditor,
     UndoRedo,
@@ -19,39 +19,20 @@ import {
     thematicBreakPlugin,
     InsertTable,
     BlockTypeSelect,
+    type MDXEditorMethods,
+    type MDXEditorProps,
     markdownShortcutPlugin,
 } from '@mdxeditor/editor';
 
-interface MDXEditorMethods {
-    setMarkdown: (value: string) => void;
-    getMarkdown: () => string;
-    insertMarkdown: (value: string) => void;
-    focus: (
-        callbackFn?: () => void,
-        opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean },
-    ) => void;
-}
-
-interface MarkDownEditorProps {
-    roleInformation: string;
-    setRoleInformation: (newMarkdown: string) => void;
-    id: string;
-}
-
-const MarkDownEditor: React.FC<MarkDownEditorProps> = ({ roleInformation, setRoleInformation, id }) => {
-    const editorRef = useRef<MDXEditorMethods | null>(null);
-    useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.setMarkdown(roleInformation);
-        }
-    }, [roleInformation]);
+const MarkDownEditor: React.FC<MDXEditorProps> = ({ markdown, onChange }) => {
+    const ref = useRef<MDXEditorMethods>(null);
+    ref.current?.setMarkdown(markdown);
 
     return (
-        <div className="specialization-manager">
+        <div>
             <MDXEditor
-                key={id}
-                ref={editorRef}
-                markdown={roleInformation}
+                ref={ref}
+                markdown=""
                 plugins={[
                     diffSourcePlugin({
                         diffMarkdown: 'An older version',
@@ -91,9 +72,7 @@ const MarkDownEditor: React.FC<MarkDownEditorProps> = ({ roleInformation, setRol
                     thematicBreakPlugin(),
                     markdownShortcutPlugin(),
                 ]}
-                onChange={(newMarkdown: string) => {
-                    setRoleInformation(newMarkdown);
-                }}
+                onChange={onChange}
             />
         </div>
     );

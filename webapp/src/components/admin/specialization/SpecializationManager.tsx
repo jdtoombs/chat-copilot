@@ -1,24 +1,21 @@
 import {
     Button,
     Checkbox,
-    CheckboxOnChangeData,
     Dropdown,
     Input,
-    InputOnChangeData,
     makeStyles,
     Option,
     OptionOnSelectData,
     SelectionEvents,
     shorthands,
     Slider,
-    SliderOnChangeData,
     Textarea,
     tokens,
     Tooltip,
 } from '@fluentui/react-components';
 import { Info20Regular } from '@fluentui/react-icons';
 import '@mdxeditor/editor/style.css';
-import React, { useEffect, useId, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSpecialization } from '../../../libs/hooks';
 import { AlertType } from '../../../libs/models/AlertType';
 import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
@@ -28,7 +25,6 @@ import { ImageUploaderPreview } from '../../files/ImageUploaderPreview';
 import { ConfirmationDialog } from '../../shared/ConfirmationDialog';
 import FieldArray from '../../shared/FieldArray';
 import { Row } from '../../shared/Row';
-//import { useCellValue, usePublisher } from '@mdxeditor/editor';
 
 import { useMsal } from '@azure/msal-react';
 import { AuthHelper } from '../../../libs/auth/AuthHelper';
@@ -118,6 +114,28 @@ export const SpecializationManager: React.FC = () => {
         openAIDeployments: chatCompletionDeployments,
         selectedId,
     } = useAppSelector((state: RootState) => state.admin);
+    const defaultSpecializationRequest = useMemo(() => {
+        return {
+            label: '',
+            name: '',
+            description: '',
+            roleInformation: '',
+            indexId: '',
+            openAIDeploymentId: '',
+            completionDeploymentName: '',
+            groupMemberships: [''],
+            initialChatMessage: '',
+            isDefault: false,
+            restrictResultScope: false,
+            strictness: 3,
+            documentCount: 5,
+            pastMessagesIncludedCount: 10,
+            maxResponseTokenLimit: 1024,
+            order: 0,
+            suggestions: [''],
+            canGenImages: false,
+        };
+    }, []);
 
     interface FormattedOpenAIDeployment {
         id: string;
@@ -139,53 +157,33 @@ export const SpecializationManager: React.FC = () => {
         return formatted;
     }, [chatCompletionDeployments]);
 
+    const [specializationRequest, setSpecializationRequest] = useState(defaultSpecializationRequest);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const [isLoadingContextFormatting, setIsLoadingContextFormatting] = useState(false);
-
     const [editMode, setEditMode] = useState(false);
-    const defaultSpecializationId = specializations.find((spec) => spec.isDefault)?.id;
     const [id, setId] = useState('');
-    const [indexId, setIndexId] = useState('');
-    const [deploymentId, setDeploymentId] = useState('');
-    const [completionDeploymentName, setCompletionDeploymentName] = useState('');
     const [deploymentOutputTokens, setDeploymentOutputTokens] = useState(0);
-
-    // Required fields
-    const [name, setName] = useState<string>('');
-    const [label, setLabel] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
-    const [roleInformation, setRoleInformation] = useState<string>('');
-    const [initialChatMessage, setInitialChatMessage] = useState<string>('');
-    const [membershipId, setMembershipId] = useState<string[]>([]);
-    const [suggestions, setSuggestions] = useState<string[]>(['']);
-
     const [imageFile, setImageFile] = useState<ISpecializationFile>({ file: null, src: null });
     const [iconFile, setIconFile] = useState<ISpecializationFile>({ file: null, src: null });
-    const [restrictResultScope, setRestrictResultScope] = useState<boolean | null>(false);
-    const [isDefault, setIsDefault] = useState<boolean>(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [strictness, setStrictness] = useState<number | null>(0);
-    const [documentCount, setDocumentCount] = useState<number | null>(0);
-    const [pastMessagesIncludedCount, setPastMessagesIncludedCount] = useState<number | null>(0);
-    const [maxResponseTokenLimit, setMaxResponseTokenLimit] = useState<number | null>(0);
-    const [order, setOrder] = useState(0);
-    const [canGenImages, setCanGenImages] = useState(false);
-
-    const [isValid, setIsValid] = useState(false);
     const [saveAttempted, setSaveAttempted] = useState(false);
-    const dropdownId = useId();
 
-    const hasEnrichmentIndex = !!indexId;
+    const isValid =
+        !!specializationRequest.label &&
+        !!specializationRequest.name &&
+        !!specializationRequest.roleInformation &&
+        !!specializationRequest.description &&
+        !!specializationRequest.initialChatMessage &&
+        !!specializationRequest.openAIDeploymentId &&
+        specializationRequest.groupMemberships.length > 0;
 
     /**
      * Save specialization by creating or updating.
      *
-     * Note: When we save a specialization we send the actual files (image / icon) to the server.
-     * On fetch we get the file paths from the Specialization payload and display them.
-     *
      * @returns {void}
      */
     const onSaveSpecialization = () => {
+        specializationRequest.groupMemberships.length > 0;
         if (!isValid) {
             setSaveAttempted(true);
             dispatch(
@@ -198,145 +196,75 @@ export const SpecializationManager: React.FC = () => {
         }
         setSaveAttempted(false);
         if (editMode) {
-            void specialization.updateSpecialization(id, {
-                label,
-                name,
-                description,
-                roleInformation,
-                indexId,
-                openAIDeploymentId: deploymentId,
-                completionDeploymentName,
-                groupMemberships: membershipId,
-                initialChatMessage,
-                isDefault,
-                restrictResultScope,
-                strictness,
-                documentCount,
-                pastMessagesIncludedCount,
-                maxResponseTokenLimit,
-                order,
-                suggestions,
-                canGenImages,
-            });
+            void specialization.updateSpecialization(id, specializationRequest);
         } else {
             void specialization.createSpecialization({
-                label,
-                name,
-                description,
-                roleInformation,
-                indexId,
-                openAIDeploymentId: deploymentId,
-                completionDeploymentName,
-                groupMemberships: membershipId,
-                initialChatMessage,
-                isDefault,
-                restrictResultScope,
-                strictness,
-                documentCount,
-                pastMessagesIncludedCount,
-                maxResponseTokenLimit,
+                ...specializationRequest,
                 order: specializations.length,
-                suggestions,
-                canGenImages,
             });
         }
     };
 
-    const resetSpecialization = () => {
+    const resetSpecialization = useCallback(() => {
+        setSpecializationRequest(defaultSpecializationRequest);
+
         setId('');
-        setLabel('');
-        setName('');
-        setDescription('');
-        setRoleInformation('');
-        setMembershipId([]);
         setImageFile({ file: null, src: null });
         setIconFile({ file: null, src: null });
-        setIndexId('');
-        setDeploymentId('');
-        setCompletionDeploymentName('');
         setDeploymentOutputTokens(4096);
-        setInitialChatMessage('');
-        setIsDefault(false);
-        setRestrictResultScope(false);
-        setStrictness(3);
-        setDocumentCount(5);
-        setPastMessagesIncludedCount(10);
-        setMaxResponseTokenLimit(1024);
-        setSuggestions(['']);
-    };
+    }, [defaultSpecializationRequest]);
 
-    useEffect(() => {
+    useMemo(() => {
         if (selectedId != '') {
             setEditMode(true);
             const specializationObj = specializations.find((specialization) => specialization.id === selectedId);
             if (specializationObj) {
-                setId(specializationObj.id);
-                setLabel(specializationObj.label);
-                setName(specializationObj.name);
-                setDescription(specializationObj.description);
-                setRoleInformation(specializationObj.roleInformation);
-                setMembershipId(specializationObj.groupMemberships);
-                setDeploymentId(specializationObj.openAIDeploymentId);
-                setCompletionDeploymentName(specializationObj.completionDeploymentName);
-                setDeploymentOutputTokens(
-                    chatCompletionDeployments
-                        .find((d) => d.id === specializationObj.openAIDeploymentId)
-                        ?.chatCompletionDeployments.find((a) => a.name === specializationObj.completionDeploymentName)
-                        ?.outputTokens ?? 4096,
-                );
-                setInitialChatMessage(specializationObj.initialChatMessage);
-                setIndexId(specializationObj.indexId);
-                setIsDefault(specializationObj.isDefault);
-                setRestrictResultScope(specializationObj.restrictResultScope ?? false);
-                setStrictness(specializationObj.strictness ?? 3);
-                setDocumentCount(specializationObj.documentCount ?? 5);
-                setPastMessagesIncludedCount(specializationObj.pastMessagesIncludedCount ?? 10);
-                setMaxResponseTokenLimit(specializationObj.maxResponseTokenLimit ?? 1024);
+                setSpecializationRequest({
+                    label: specializationObj.label,
+                    name: specializationObj.name,
+                    description: specializationObj.description,
+                    roleInformation: specializationObj.roleInformation,
+                    indexId: specializationObj.indexId,
+                    openAIDeploymentId: specializationObj.openAIDeploymentId,
+                    completionDeploymentName: specializationObj.completionDeploymentName,
+                    groupMemberships: specializationObj.groupMemberships,
+                    initialChatMessage: specializationObj.initialChatMessage,
+                    isDefault: specializationObj.isDefault,
+                    restrictResultScope: specializationObj.restrictResultScope ?? false,
+                    strictness: specializationObj.strictness ?? 3,
+                    documentCount: specializationObj.documentCount ?? 5,
+                    pastMessagesIncludedCount: specializationObj.pastMessagesIncludedCount ?? 10,
+                    maxResponseTokenLimit: specializationObj.maxResponseTokenLimit ?? 1024,
+                    order: specializationObj.order,
+                    suggestions: specializationObj.suggestions,
+                    canGenImages: specializationObj.canGenImages,
+                });
                 /**
                  * Set the image and icon file paths
                  * Note: The file is set to null because we only retrieve the file path from the server
                  */
                 setImageFile({ file: null, src: specializationObj.imageFilePath });
                 setIconFile({ file: null, src: specializationObj.iconFilePath });
-                setOrder(specializationObj.order);
-                setSuggestions(specializationObj.suggestions);
-                setCanGenImages(specializationObj.canGenImages);
+                setId(specializationObj.id);
+                setDeploymentOutputTokens(
+                    chatCompletionDeployments
+                        .find((d) => d.id === specializationObj.openAIDeploymentId)
+                        ?.chatCompletionDeployments.find((a) => a.name === specializationObj.completionDeploymentName)
+                        ?.outputTokens ?? 4096,
+                );
             }
         } else {
             setEditMode(false);
             resetSpecialization();
         }
-    }, [editMode, selectedId, specializations, chatCompletionDeployments]);
-
-    useEffect(() => {
-        const isValid =
-            !!label &&
-            !!name &&
-            !!roleInformation &&
-            !!description &&
-            !!initialChatMessage &&
-            membershipId.length > 0 &&
-            !!deploymentId;
-        setIsValid(isValid);
-        return () => {};
-    }, [
-        specializations,
-        selectedId,
-        label,
-        name,
-        roleInformation,
-        membershipId,
-        description,
-        initialChatMessage,
-        deploymentId,
-    ]);
+    }, [resetSpecialization, selectedId, specializations, chatCompletionDeployments]);
 
     const onDeleteSpecialization = () => {
         setIsDeleteDialogOpen(true);
     };
 
     const confirmDelete = () => {
-        if (isDefault && specializations.length > 1) {
+        if (specializationRequest.isDefault) {
             dispatch(
                 addAlert({
                     message: 'Please set another specialization as default before deleting this one.',
@@ -346,152 +274,67 @@ export const SpecializationManager: React.FC = () => {
             setIsDeleteDialogOpen(false);
             return;
         }
-        void specialization.deleteSpecialization(id, name);
+        void specialization.deleteSpecialization(id, specializationRequest.name);
         resetSpecialization();
         setIsDeleteDialogOpen(false);
     };
 
-    /**
-     * Callback function for handling changes to the "Enrichment Index" dropdown.
-     */
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const value = {
+            checkbox: (event as React.ChangeEvent<HTMLInputElement>).target.checked,
+            number: parseInt(event.target.value),
+            text: event.target.value,
+            textarea: event.target.value,
+            range: event.target.value,
+        }[event.target.type];
+
+        setSpecializationRequest({
+            ...specializationRequest,
+            [event.target.name]: value,
+        });
+    };
+
+    const handleRoleInformationChange = (roleInformation: string) => {
+        setSpecializationRequest({
+            ...specializationRequest,
+            roleInformation: roleInformation,
+        });
+    };
+
     const onChangeIndexName = (_event?: SelectionEvents, data?: OptionOnSelectData) => {
-        setIndexId(data?.optionValue ?? '');
+        setSpecializationRequest({
+            ...specializationRequest,
+            indexId: data?.optionValue ?? '',
+        });
     };
 
-    /**
-     * Callback function for handling changes to the "Limit responses to you data content" checkbox.
-     */
-    const onChangeRestrictResultScope = (_event?: React.ChangeEvent<HTMLInputElement>, data?: CheckboxOnChangeData) => {
-        setRestrictResultScope(!!data?.checked);
-    };
-
-    /**
-     * Automatically set the first specialization as default
-     */
-    useEffect(() => {
-        if (specializations.length === 0) {
-            setIsDefault(true);
-        }
-    }, [specializations]);
-
-    /**
-     * Callback function for handling changes to the "Set as Default Specialization" checkbox.
-     */
-    const onChangeIsDefault = (_event?: React.ChangeEvent<HTMLInputElement>, data?: CheckboxOnChangeData) => {
-        const isCurrentlyDefault = id === defaultSpecializationId;
-        if ((isCurrentlyDefault && !data?.checked) || specializations.length === 0) {
-            dispatch(
-                addAlert({
-                    message: 'Having a default specialization is a requirement.',
-                    type: AlertType.Warning,
-                }),
-            );
-            return;
-        }
-
-        if (!isCurrentlyDefault && data?.checked) {
-            dispatch(
-                addAlert({
-                    message: `You are trying to set ${name} as the default specialization.`,
-                    type: AlertType.Info,
-                }),
-            );
-            setIsDefault(true);
-        } else if (!isCurrentlyDefault && !data?.checked) {
-            setIsDefault(false);
-        }
-    };
-
-    /**
-     * Callback function for handling changes to the "Strictness" slider.
-     */
-    const onChangeStrictness = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
-        setStrictness(data?.value ?? 0);
-    };
-
-    /**
-     * Callback function for handling changes to the "Retrieved Documents" input.
-     */
-    const onInputChangeStrictness = (_event?: React.ChangeEvent<HTMLInputElement>, data?: InputOnChangeData) => {
-        const value = data?.value;
-        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
-        setStrictness(intValue);
-    };
-
-    /**
-     * Callback function for handling changes to the "Retrieved Documents" slider.
-     */
-    const onChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
-        setDocumentCount(data?.value ?? 0);
-    };
-
-    /**
-     * Callback function for handling changes to the "Retrieved Documents" input.
-     */
-    const onInputChangeDocumentCount = (_event?: React.ChangeEvent<HTMLInputElement>, data?: InputOnChangeData) => {
-        const value = data?.value;
-        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
-        setDocumentCount(intValue);
-    };
-
-    /**
-     * Callback function for handling changes to the "Past messages included" slider.
-     */
-    const onChangePastMessagesIncludedCount = (
-        _event?: React.ChangeEvent<HTMLInputElement>,
-        data?: SliderOnChangeData,
-    ) => {
-        setPastMessagesIncludedCount(data?.value ?? 0);
-    };
-
-    /**
-     * Callback function for handling changes to the "Past messages included" input.
-     */
-    const onInputChangePastMessagesIncludedCount = (
-        _event?: React.ChangeEvent<HTMLInputElement>,
-        data?: InputOnChangeData,
-    ) => {
-        const value = data?.value;
-        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
-        setPastMessagesIncludedCount(intValue);
-    };
-
-    /**
-     * Callback function for handling changes to the "Max Response" slider.
-     */
-    const onChangeMaxResponseTokenLimit = (_event?: React.ChangeEvent<HTMLInputElement>, data?: SliderOnChangeData) => {
-        setMaxResponseTokenLimit(data?.value ?? 0);
-    };
-
-    /**
-     * Callback function for handling changes to the "Max Response" input.
-     */
-    const onInputChangeMaxResponseTokenLimit = (
-        _event?: React.ChangeEvent<HTMLInputElement>,
-        data?: InputOnChangeData,
-    ) => {
-        const value = data?.value;
-        const intValue = parseInt(value !== undefined ? value.toString() : '0', 10) || 0;
-        setMaxResponseTokenLimit(intValue);
-    };
-
-    /**
-     * Callback function for handling changes to the "Deployment" dropdown.
-     */
     const onDeploymentChange = (_event: SelectionEvents, data: OptionOnSelectData) => {
         const obj = JSON.parse(data.optionValue ?? '{}') as unknown as FormattedOpenAIDeployment;
-        setDeploymentId(obj.id);
-        setCompletionDeploymentName(obj.completionName);
+
+        setSpecializationRequest({
+            ...specializationRequest,
+            openAIDeploymentId: obj.id,
+            completionDeploymentName: obj.completionName,
+        });
+
         const outputTokens = chatCompletionDeployments
             .find((d) => d.id === obj.id)
             ?.chatCompletionDeployments.find((a) => a.name === obj.deploymentName)?.outputTokens;
         setDeploymentOutputTokens(outputTokens ?? 4096);
-        if (maxResponseTokenLimit && outputTokens && maxResponseTokenLimit > outputTokens) {
-            setMaxResponseTokenLimit(outputTokens);
+
+        if (
+            specializationRequest.maxResponseTokenLimit &&
+            outputTokens &&
+            specializationRequest.maxResponseTokenLimit > outputTokens
+        ) {
+            setSpecializationRequest({
+                ...specializationRequest,
+                maxResponseTokenLimit: outputTokens,
+            });
         }
     };
 
-    const determineIfNeedsAttention = React.useCallback(
+    const determineIfNeedsAttention = useCallback(
         (value: string | string[]) => {
             // friendly reminder that !![] === true
             let needsAttention = false;
@@ -512,7 +355,7 @@ export const SpecializationManager: React.FC = () => {
             for the chatbot to interpret and apply. IMPORTANT: REPLY ONLY WITH THE UPDATED MARKDOWN DO NOT WRITE ANYTHING ELSE IN YOUR RESPONSE.
             HERE IS THE INPUT TEXT for you to convert:
 
-            ${roleInformation}
+            ${specializationRequest.roleInformation}
         `;
         //Configure ask object for service function request
         const ask: IAsk = {
@@ -555,7 +398,10 @@ export const SpecializationManager: React.FC = () => {
                         arraySuggestions = extractJsonArray(match[1]);
                     }
                 }
-                setSuggestions(arraySuggestions);
+                setSpecializationRequest({
+                    ...specializationRequest,
+                    suggestions: arraySuggestions,
+                });
             })
             .catch(() => {
                 console.error('Suggestions retrieval failed.');
@@ -569,7 +415,10 @@ export const SpecializationManager: React.FC = () => {
         setIsLoadingContextFormatting(true);
         getMarkdown()
             .then((response) => {
-                setRoleInformation(response.value);
+                setSpecializationRequest({
+                    ...specializationRequest,
+                    roleInformation: response.value,
+                });
             })
             .catch((e: Error) => {
                 console.error(`Could not retrieve markdown from completions service. ${e.message}`);
@@ -588,24 +437,22 @@ export const SpecializationManager: React.FC = () => {
                 </label>
                 <Input
                     id="name"
+                    name="name"
                     required
-                    value={name}
-                    className={determineIfNeedsAttention(name)}
-                    onChange={(_event, data) => {
-                        setName(data.value);
-                    }}
+                    value={specializationRequest.name}
+                    className={determineIfNeedsAttention(specializationRequest.name)}
+                    onChange={handleChange}
                 />
                 <label htmlFor="label">
                     Label<span className={classes.required}>*</span>
                 </label>
                 <Input
                     id="label"
+                    name="label"
                     required
-                    className={determineIfNeedsAttention(label)}
-                    value={label}
-                    onChange={(_event, data) => {
-                        setLabel(data.value);
-                    }}
+                    className={determineIfNeedsAttention(specializationRequest.label)}
+                    value={specializationRequest.label}
+                    onChange={handleChange}
                 />
                 <label htmlFor="deployment">
                     Deployment<span className={classes.required}>*</span>
@@ -613,10 +460,9 @@ export const SpecializationManager: React.FC = () => {
                 <Dropdown
                     clearable
                     id="deployment"
-                    className={determineIfNeedsAttention(deploymentId)}
-                    aria-labelledby={dropdownId}
+                    className={determineIfNeedsAttention(specializationRequest.openAIDeploymentId)}
                     onOptionSelect={onDeploymentChange}
-                    value={`${completionDeploymentName} (${chatCompletionDeployments.find((a) => a.id === deploymentId)?.name})`}
+                    value={`${specializationRequest.completionDeploymentName} (${chatCompletionDeployments.find((a) => a.id === specializationRequest.openAIDeploymentId)?.name})`}
                 >
                     {completionDeploymentsFormatted.map((deployment) => (
                         <Option key={deployment.id} value={JSON.stringify(deployment)}>
@@ -629,7 +475,10 @@ export const SpecializationManager: React.FC = () => {
                     clearable
                     id="index-name"
                     onOptionSelect={onChangeIndexName}
-                    value={specializationIndexes.find((index) => index.id === indexId)?.name ?? 'None'}
+                    value={
+                        specializationIndexes.find((index) => index.id === specializationRequest.indexId)?.name ??
+                        'None'
+                    }
                 >
                     <Option value="">None</Option>
                     {specializationIndexes.map((specializationIndex) => (
@@ -643,19 +492,23 @@ export const SpecializationManager: React.FC = () => {
                     ))}
                 </Dropdown>
                 <Row>
-                    <Checkbox label="Set as Default Specialization" checked={isDefault} onChange={onChangeIsDefault} />
                     <Checkbox
+                        name="isDefault"
+                        label="Set as Default Specialization"
+                        checked={specializationRequest.isDefault}
+                        onChange={handleChange}
+                    />
+                    <Checkbox
+                        name="canGenImages"
                         label="Can Generate Images"
-                        checked={canGenImages}
-                        onChange={(_event, data) => {
-                            setCanGenImages(!!data.checked);
-                        }}
+                        checked={specializationRequest.canGenImages}
+                        onChange={handleChange}
                     />
                 </Row>
                 <ConfirmationDialog
                     open={isDeleteDialogOpen}
                     title="Delete Specialization"
-                    content={`Are you sure you want to delete the ${name} specialization?`}
+                    content={`Are you sure you want to delete the ${specializationRequest.name} specialization?`}
                     confirmLabel="Delete"
                     cancelLabel="Cancel"
                     onConfirm={confirmDelete}
@@ -663,13 +516,14 @@ export const SpecializationManager: React.FC = () => {
                         setIsDeleteDialogOpen(false);
                     }}
                 />
-                {hasEnrichmentIndex && (
+                {specializationRequest.indexId && (
                     <>
                         <div>
                             <Checkbox
+                                name="restrictResultScope"
                                 label="Limit responses to your data content"
-                                checked={restrictResultScope ?? false}
-                                onChange={onChangeRestrictResultScope}
+                                checked={specializationRequest.restrictResultScope}
+                                onChange={handleChange}
                             />
                             <Tooltip
                                 content={'Enabling this will limit responses specific to your data content'}
@@ -683,14 +537,16 @@ export const SpecializationManager: React.FC = () => {
                             <div className={classes.slider}>
                                 <Slider
                                     id="strictness"
+                                    name="strictness"
                                     min={1}
                                     max={5}
-                                    value={strictness ?? 3}
-                                    onChange={onChangeStrictness}
+                                    value={specializationRequest.strictness}
+                                    onChange={handleChange}
                                 />
                                 <Input
-                                    value={strictness?.toString()}
-                                    onChange={onInputChangeStrictness}
+                                    name="strictness"
+                                    value={specializationRequest.strictness.toString()}
+                                    onChange={handleChange}
                                     type="number"
                                     min={1}
                                     max={5}
@@ -709,14 +565,16 @@ export const SpecializationManager: React.FC = () => {
                             <div className={classes.slider}>
                                 <Slider
                                     id="documentCount"
+                                    name="documentCount"
                                     min={3}
                                     max={20}
-                                    value={documentCount ?? 5}
-                                    onChange={onChangeDocumentCount}
+                                    value={specializationRequest.documentCount}
+                                    onChange={handleChange}
                                 />
                                 <Input
-                                    value={documentCount?.toString()}
-                                    onChange={onInputChangeDocumentCount}
+                                    name="documentCount"
+                                    value={specializationRequest.documentCount.toString()}
+                                    onChange={handleChange}
                                     type="number"
                                     min={3}
                                     max={20}
@@ -734,14 +592,16 @@ export const SpecializationManager: React.FC = () => {
                             <label htmlFor="maxResponse">Past messages included (1-100)</label>
                             <div id="maxResponse" className={classes.slider}>
                                 <Slider
+                                    name="pastMessagesIncludedCount"
                                     min={1}
                                     max={100}
-                                    value={pastMessagesIncludedCount ?? 10}
-                                    onChange={onChangePastMessagesIncludedCount}
+                                    value={specializationRequest.pastMessagesIncludedCount}
+                                    onChange={handleChange}
                                 />
                                 <Input
-                                    value={pastMessagesIncludedCount?.toString()}
-                                    onChange={onInputChangePastMessagesIncludedCount}
+                                    name="pastMessagesIncludedCount"
+                                    value={specializationRequest.pastMessagesIncludedCount.toString()}
+                                    onChange={handleChange}
                                     type="number"
                                     min={1}
                                     max={100}
@@ -759,14 +619,16 @@ export const SpecializationManager: React.FC = () => {
                             <label htmlFor="maxResponse">Max Response (1-{deploymentOutputTokens})</label>
                             <div id="maxResponse" className={classes.slider}>
                                 <Slider
+                                    name="maxResponseTokenLimit"
                                     min={1}
                                     max={deploymentOutputTokens}
-                                    value={maxResponseTokenLimit ?? 1024}
-                                    onChange={onChangeMaxResponseTokenLimit}
+                                    value={specializationRequest.maxResponseTokenLimit}
+                                    onChange={handleChange}
                                 />
                                 <Input
-                                    value={maxResponseTokenLimit?.toString()}
-                                    onChange={onInputChangeMaxResponseTokenLimit}
+                                    name="maxResponseTokenLimit"
+                                    value={specializationRequest.maxResponseTokenLimit.toString()}
+                                    onChange={handleChange}
                                     type="number"
                                     min={1}
                                     max={deploymentOutputTokens}
@@ -789,14 +651,13 @@ export const SpecializationManager: React.FC = () => {
                 </label>
                 <Textarea
                     id="description"
+                    name="description"
                     required
                     resize="vertical"
-                    value={description}
-                    className={determineIfNeedsAttention(description)}
+                    value={specializationRequest.description}
+                    className={determineIfNeedsAttention(specializationRequest.description)}
                     rows={2}
-                    onChange={(_event, data) => {
-                        setDescription(data.value);
-                    }}
+                    onChange={handleChange}
                 />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label htmlFor="context" style={{ marginRight: '10px' }}>
@@ -828,16 +689,15 @@ export const SpecializationManager: React.FC = () => {
                     }}
                 >
                     <div
-                        className={determineIfNeedsAttention(roleInformation)}
+                        className={determineIfNeedsAttention(specializationRequest.roleInformation)}
                         style={{
                             minHeight: '150px',
                             backgroundColor: 'white',
                         }}
                     >
                         <MarkDownEditor
-                            roleInformation={roleInformation}
-                            setRoleInformation={setRoleInformation}
-                            id={id}
+                            markdown={specializationRequest.roleInformation}
+                            onChange={handleRoleInformationChange}
                         />
                     </div>
                 </div>
@@ -847,14 +707,13 @@ export const SpecializationManager: React.FC = () => {
                 </label>
                 <Textarea
                     id="initialMessage"
+                    name="initialChatMessage"
                     required
                     resize="vertical"
-                    value={initialChatMessage}
-                    className={determineIfNeedsAttention(initialChatMessage)}
+                    value={specializationRequest.initialChatMessage}
+                    className={determineIfNeedsAttention(specializationRequest.initialChatMessage)}
                     rows={2}
-                    onChange={(_event, data) => {
-                        setInitialChatMessage(data.value);
-                    }}
+                    onChange={handleChange}
                 />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label htmlFor="initialMessage">
@@ -873,21 +732,32 @@ export const SpecializationManager: React.FC = () => {
                     </label>
                 </div>
                 <FieldArray
-                    values={suggestions}
+                    values={specializationRequest.suggestions}
                     maxItems={4}
-                    className={determineIfNeedsAttention(suggestions)}
+                    className={determineIfNeedsAttention(specializationRequest.suggestions)}
                     onFieldChanged={(index, newValue) => {
-                        const values = suggestions.slice(0);
+                        const values = specializationRequest.suggestions.slice(0);
                         values[index] = newValue;
-                        setSuggestions(values);
+                        setSpecializationRequest({
+                            ...specializationRequest,
+                            suggestions: values,
+                        });
                     }}
                     onFieldAdded={() => {
-                        const values = suggestions.slice(0);
+                        const values = specializationRequest.suggestions.slice(0);
                         values.push('');
-                        setSuggestions(values);
+                        setSpecializationRequest({
+                            ...specializationRequest,
+                            suggestions: values,
+                        });
                     }}
                     onFieldRemoved={(index) => {
-                        setSuggestions(suggestions.slice(0, index).concat(suggestions.slice(index + 1)));
+                        setSpecializationRequest({
+                            ...specializationRequest,
+                            suggestions: specializationRequest.suggestions
+                                .slice(0, index)
+                                .concat(specializationRequest.suggestions.slice(index + 1)),
+                        });
                     }}
                 />
                 <label htmlFor="membership">
@@ -895,15 +765,14 @@ export const SpecializationManager: React.FC = () => {
                 </label>
                 <Input
                     id="membership"
-                    className={determineIfNeedsAttention(membershipId)}
+                    className={determineIfNeedsAttention(specializationRequest.groupMemberships)}
                     required
-                    value={membershipId.join(', ')}
+                    value={specializationRequest.groupMemberships.join(', ')}
                     onChange={(_event, data) => {
-                        if (!data.value) {
-                            setMembershipId([]);
-                            return;
-                        }
-                        setMembershipId(data.value.split(', '));
+                        setSpecializationRequest({
+                            ...specializationRequest,
+                            groupMemberships: data.value.split(', '),
+                        });
                     }}
                 />
                 {editMode && (
