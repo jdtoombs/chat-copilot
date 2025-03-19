@@ -42,22 +42,11 @@ public class QSpecializationBase
     [JsonPropertyName("groupMemberships")]
     public IList<string>? GroupMemberships { get; set; }
 
-    private string? indexId;
-    public bool IsIndexIdSet { get; private set; }
-
     /// <summary>
     /// IndexName of the specialization
     /// </summary>
     [JsonProperty("indexId")]
-    public string? IndexId
-    {
-        get { return this.indexId; }
-        set
-        {
-            this.indexId = value;
-            this.IsIndexIdSet = true;
-        }
-    }
+    public string? IndexId { get; set; }
 
     /// <summary>
     /// Enable/Disable flag of the specialization.
