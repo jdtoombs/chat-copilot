@@ -32,7 +32,7 @@ public interface IQSpecializationService
     /// </summary>
     /// <param name="qSpecializationMutate">Specialization mutate payload</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the specialization</returns>
-    Task<Specialization> SaveSpecialization(QSpecializationBase specialization);
+    Task<Specialization> SaveSpecialization(Specialization specialization);
 
     /// <summary>
     /// Updates the specialization.

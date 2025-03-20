@@ -29,30 +29,13 @@ public class QSpecializationService(
     public Task<Specialization> GetSpecializationAsync(string id) =>
         specializationSourceRepository.GetSpecializationAsync(id);
 
-    public async Task<Specialization> SaveSpecialization(QSpecializationBase specialization)
+    public async Task<Specialization> SaveSpecialization(Specialization specialization)
     {
-        Specialization specializationSource = new(
-            Label: specialization.Label,
-            Name: specialization.Name,
-            Description: specialization.Description,
-            RoleInformation: specialization.RoleInformation,
-            InitialChatMessage: specialization.InitialChatMessage,
-            OpenAIDeploymentId: specialization.OpenAIDeploymentId,
-            CompletionDeploymentName: specialization.CompletionDeploymentName,
-            IndexId: specialization.IndexId,
-            IsDefault: specialization.IsDefault,
-            RestrictResultScope: specialization.IndexId != null ? specialization.RestrictResultScope : null,
-            Strictness: specialization.IndexId != null ? specialization.Strictness : null,
-            DocumentCount: specialization.IndexId != null ? specialization.DocumentCount : null,
-            PastMessagesIncludedCount: specialization.IndexId != null ? specialization.PastMessagesIncludedCount : null,
-            MaxResponseTokenLimit: specialization.IndexId != null ? specialization.MaxResponseTokenLimit : null,
-            ImageFilePath: ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage),
-            IconFilePath: ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon),
-            GroupMemberships: specialization.GroupMemberships,
-            Order: specialization.Order,
-            Suggestions: specialization.Suggestions ?? new List<string>(),
-            CanGenImages: specialization.CanGenImages
-        );
+        var specializationSource = specialization with
+        {
+            ImageFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage),
+            IconFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon),
+        };
 
         await specializationSourceRepository.CreateAsync(specializationSource);
 

@@ -8,6 +8,6 @@ public class DeploytmentModelProfile : Profile
 {
     public DeploytmentModelProfile()
     {
-        this.CreateMap<QSpecializationBase, CompletionDeploymentModel>();
+        this.CreateMap<SpecializationBase, CompletionDeploymentModel>();
     }
 }

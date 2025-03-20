@@ -2,14 +2,13 @@
 
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
 /// <summary>
 /// Response definition for Specialization
 /// </summary>
-public class QSpecializationResponse
+public record SpecializationResponse
 {
     /// <summary>
     /// Id of the specialization
@@ -81,7 +80,7 @@ public class QSpecializationResponse
     /// Enable/Disable flag of the specialization.
     /// </summary>
     [JsonPropertyName("isActive")]
-    public bool isActive { get; set; } = true;
+    public bool IsActive { get; set; } = true;
 
     /// <summary>
     /// Is Default flag of the specialization
@@ -141,42 +140,4 @@ public class QSpecializationResponse
     /// </summary>
     [JsonPropertyName("canGenImages")]
     public bool CanGenImages { get; set; } = false;
-
-    /// <summary>
-    /// Creates new instance from SpecializationSource.
-    /// </summary>
-    public QSpecializationResponse(Specialization specializationSource)
-    {
-        this.Id = specializationSource.Id;
-        this.Label = specializationSource.Label;
-        this.Name = specializationSource.Name;
-        this.Description = specializationSource.Description;
-        this.RoleInformation = specializationSource.RoleInformation;
-        this.ImageFilePath = specializationSource.ImageFilePath;
-        this.IconFilePath = specializationSource.IconFilePath;
-        this.isActive = specializationSource.IsActive;
-        this.IsDefault = specializationSource.IsDefault;
-        this.RestrictResultScope = specializationSource.RestrictResultScope;
-        this.Strictness = specializationSource.Strictness;
-        this.DocumentCount = specializationSource.DocumentCount;
-        this.PastMessagesIncludedCount = specializationSource.PastMessagesIncludedCount;
-        this.MaxResponseTokenLimit = specializationSource.MaxResponseTokenLimit;
-        this.GroupMemberships = specializationSource.GroupMemberships;
-        this.CanGenImages = specializationSource.CanGenImages;
-        this.InitialChatMessage = specializationSource.InitialChatMessage;
-        this.Order = specializationSource.Order;
-        this.Suggestions = specializationSource.Suggestions;
-        if (specializationSource.IndexId != null)
-        {
-            this.IndexId = specializationSource.IndexId;
-        }
-        if (specializationSource.OpenAIDeploymentId != null)
-        {
-            this.OpenAIDeploymentId = specializationSource.OpenAIDeploymentId;
-        }
-        if (specializationSource.CompletionDeploymentName != null)
-        {
-            this.CompletionDeploymentName = specializationSource.CompletionDeploymentName;
-        }
-    }
 }

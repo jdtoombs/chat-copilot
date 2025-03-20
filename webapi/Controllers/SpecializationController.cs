@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CopilotChat.WebApi.Auth;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
@@ -33,11 +34,11 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<OkObjectResult> GetAllSpecializations()
+    public async Task<OkObjectResult> GetAllSpecializations(IMapper mapper)
     {
         var specializations = await qSpecializationService.GetAllSpecializations();
 
-        var specializationResponses = specializations.Select(s => new QSpecializationResponse(s));
+        var specializationResponses = mapper.Map<SpecializationResponse[]>(specializations);
 
         var orderedSpecializations = specializationResponses
             .Select((spec, index) => (spec, index))
@@ -63,21 +64,21 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
     public async Task<IActionResult> CreateSpecializationAsync(
         [FromServices] IAuthInfo authInfo,
-        [FromBody] QSpecializationBase specialization
+        [FromBody] SpecializationBase model,
+        IMapper mapper
     )
     {
         try
         {
-            var _specializationsource = await qSpecializationService.SaveSpecialization(specialization);
+            var specialization = await qSpecializationService.SaveSpecialization(mapper.Map<Specialization>(model));
 
-            QSpecializationResponse response = new(_specializationsource);
-            return this.Ok(response);
+            return this.Ok(mapper.Map<SpecializationResponse>(specialization));
         }
         catch (Azure.RequestFailedException ex)
         {
             logger.LogError(ex, "Specialization create threw an exception");
 
-            return this.StatusCode(500, $"Failed to create specialization for label '{specialization.Label}'.");
+            return this.StatusCode(500, $"Failed to create specialization for label '{model.Label}'.");
         }
     }
 

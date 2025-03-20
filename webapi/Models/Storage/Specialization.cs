@@ -7,7 +7,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Models.Storage;
 
-public class Specialization : IStorageEntity
+public record Specialization : IStorageEntity
 {
     public string Id { get; set; }
 
@@ -63,54 +63,4 @@ public class Specialization : IStorageEntity
     public IList<string> Suggestions { get; set; } = new List<string>();
 
     public bool CanGenImages { get; set; } = false;
-
-    public Specialization() { }
-
-    public Specialization(
-        string Label,
-        string Name,
-        string Description,
-        string RoleInformation,
-        string InitialChatMessage,
-        string? OpenAIDeploymentId,
-        string? CompletionDeploymentName,
-        string? IndexId,
-        bool? IsDefault,
-        bool? RestrictResultScope,
-        int? Strictness,
-        int? DocumentCount,
-        int? PastMessagesIncludedCount,
-        int? MaxResponseTokenLimit,
-        string ImageFilePath,
-        string IconFilePath,
-        IList<string> GroupMemberships,
-        int? Order,
-        IList<string> Suggestions,
-        bool CanGenImages
-    )
-    {
-        this.Id = Guid.NewGuid().ToString();
-        this.Label = Label;
-        this.Name = Name;
-        this.Description = Description;
-        this.RoleInformation = RoleInformation;
-        this.OpenAIDeploymentId = OpenAIDeploymentId;
-        this.IndexId = IndexId;
-        this.IsDefault = IsDefault;
-        this.RestrictResultScope = RestrictResultScope;
-        this.Strictness = Strictness;
-        this.DocumentCount = DocumentCount;
-        this.PastMessagesIncludedCount = PastMessagesIncludedCount;
-        this.MaxResponseTokenLimit = MaxResponseTokenLimit;
-        this.ImageFilePath = ImageFilePath;
-        this.IconFilePath = IconFilePath;
-        this.GroupMemberships = GroupMemberships;
-        this.CreatedOn = DateTimeOffset.Now;
-        this.IsActive = true;
-        this.InitialChatMessage = InitialChatMessage;
-        this.Order = Order;
-        this.Suggestions = Suggestions;
-        this.CanGenImages = CanGenImages;
-        this.CompletionDeploymentName = CompletionDeploymentName;
-    }
 }
