@@ -1,8 +1,8 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public class QAISearchDeploymentBase
+public class AISearchDeploymentBase
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

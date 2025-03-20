@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-public class QOpenAIDeploymentResponse
+public class OpenAIDeploymentResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -31,7 +31,7 @@ public class QOpenAIDeploymentResponse
     [JsonPropertyName("order")]
     public int Order { get; set; } = 0;
 
-    public QOpenAIDeploymentResponse(OpenAIDeployment deployment)
+    public OpenAIDeploymentResponse(OpenAIDeployment deployment)
     {
         this.Id = deployment.Id;
         this.Name = deployment.Name;

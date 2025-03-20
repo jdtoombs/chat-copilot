@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Request;
 
-public class QOpenAIDeploymentBase
+public class OpenAIDeploymentBase
 {
     [JsonPropertyName("name")]
     public string? Name { get; set; }

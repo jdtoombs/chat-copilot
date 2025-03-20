@@ -6,15 +6,15 @@ using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public interface IQOpenAIDeploymentService
+public interface IOpenAIDeploymentService
 {
     Task<IEnumerable<OpenAIDeployment>> GetAllDeployments();
 
     Task<OpenAIDeployment> GetDeployment(string id);
 
-    Task<OpenAIDeployment> SaveDeployment(QOpenAIDeploymentCreate deployment);
+    Task<OpenAIDeployment> SaveDeployment(OpenAIDeploymentCreate deployment);
 
-    Task<OpenAIDeployment?> UpdateDeployment(Guid indexId, QOpenAIDeploymentMutate qDeploymentMutate);
+    Task<OpenAIDeployment?> UpdateDeployment(Guid indexId, OpenAIDeploymentMutate deploymentMutate);
 
     Task<OpenAIDeployment?> DeleteDeployment(Guid indexId);
 

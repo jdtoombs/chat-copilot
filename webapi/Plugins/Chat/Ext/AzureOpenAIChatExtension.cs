@@ -14,12 +14,12 @@ namespace CopilotChat.WebApi.Plugins.Chat.Ext;
 /// <summary>
 /// Chat extension class to support Azure search indexes for bot response.
 /// </summary>
-public class QAzureOpenAIChatExtension(
+public class AzureOpenAIChatExtension(
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
-    IQOpenAIDeploymentService qOpenAIDeploymentService,
-    IQSearchDeploymentService qSearchDeploymentService,
-    IQSpecializationIndexService qSpecializationIndexService
-) : IQAzureOpenAIChatExtension
+    IOpenAIDeploymentService openAIDeploymentService,
+    ISearchDeploymentService searchDeploymentService,
+    ISpecializationIndexService specializationIndexService
+) : IAzureOpenAIChatExtension
 {
     /// <summary>
     /// Default specialization key.
@@ -47,16 +47,16 @@ public class QAzureOpenAIChatExtension(
             return null;
         }
 
-        var qSpecializationIndex = await qSpecializationIndexService.GetIndexAsync(specialization.IndexId);
+        var qSpecializationIndex = await specializationIndexService.GetIndexAsync(specialization.IndexId);
         if (qSpecializationIndex == null)
         {
             return null;
         }
 
-        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
+        var aiSearchDeploymentConnection = await searchDeploymentService.GetSearchDeploymentAsync(
             qSpecializationIndex.AISearchDeploymentId
         );
-        var aiSearchDeploymentApiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(
+        var aiSearchDeploymentApiKey = await searchDeploymentService.GetAPIKeyFromVaultForDeployment(
             aiSearchDeploymentConnection
         );
         if (aiSearchDeploymentConnection == null)
@@ -64,10 +64,10 @@ public class QAzureOpenAIChatExtension(
             throw new InvalidOperationException("Configuration error: AI Search Deployment Connection is missing.");
         }
 
-        var openAIDeploymentConnection = await qOpenAIDeploymentService.GetDeployment(
+        var openAIDeploymentConnection = await openAIDeploymentService.GetDeployment(
             specialization.OpenAIDeploymentId ?? ""
         );
-        var openAIDeploymentApiKey = await qOpenAIDeploymentService.GetAPIKeyFromVaultForDeployment(
+        var openAIDeploymentApiKey = await openAIDeploymentService.GetAPIKeyFromVaultForDeployment(
             openAIDeploymentConnection
         );
         if (
@@ -118,15 +118,15 @@ public class QAzureOpenAIChatExtension(
         string indexId
     )
     {
-        var specializationIndex = await qSpecializationIndexService.GetIndexAsync(indexId);
+        var specializationIndex = await specializationIndexService.GetIndexAsync(indexId);
         if (specializationIndex == null)
         {
             return (null, null, null);
         }
-        var aiSearchDeploymentConnection = await qSearchDeploymentService.GetSearchDeploymentAsync(
+        var aiSearchDeploymentConnection = await searchDeploymentService.GetSearchDeploymentAsync(
             specializationIndex.AISearchDeploymentId
         );
-        var apiKey = await qSearchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
+        var apiKey = await searchDeploymentService.GetAPIKeyFromVaultForDeployment(aiSearchDeploymentConnection);
         return (specializationIndex.Name, apiKey, aiSearchDeploymentConnection?.Endpoint?.ToString());
     }
 }

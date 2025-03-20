@@ -47,7 +47,7 @@ public class ChatController(
     ITelemetryService telemetryService,
     IOptions<MsGraphOboPluginOptions> msGraphOboPluginOptions,
     IOptions<PromptsOptions> promptsOptions,
-    IQSpecializationService specializationService,
+    ISpecializationService specializationService,
     IDictionary<string, Plugin> plugins
 ) : ControllerBase, IDisposable
 {

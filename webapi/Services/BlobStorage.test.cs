@@ -7,7 +7,7 @@ using Moq;
 namespace CopilotChat.WebApi.Services.Test;
 
 [TestClass]
-public class QBlobStorageTest
+public class BlobStorageTest
 {
     [DataRow(true)]
     [DataRow(false)]
@@ -24,9 +24,9 @@ public class QBlobStorageTest
             .Setup(mock => mock.ExistsAsync(It.IsAny<System.Threading.CancellationToken>()))
             .Returns(Task.FromResult(Azure.Response.FromValue(exists, It.IsAny<Azure.Response>())));
 
-        var qBlobStorage = new QBlobStorage(blobContainerClientMock.Object);
+        var blobStorage = new BlobStorage(blobContainerClientMock.Object);
 
-        var blobExists = await qBlobStorage.BlobExistsAsync(new System.Uri("https://www.example.com/index.html"));
+        var blobExists = await blobStorage.BlobExistsAsync(new System.Uri("https://www.example.com/index.html"));
 
         Assert.AreEqual(blobExists, exists);
     }
@@ -42,7 +42,7 @@ public class QBlobStorageTest
             .Setup(mock => mock.GetBlobClient(It.IsAny<string>()))
             .Throws(new Azure.RequestFailedException("Blob not found"));
 
-        var qBlobStorage = new QBlobStorage(blobContainerClientMock.Object);
+        var qBlobStorage = new BlobStorage(blobContainerClientMock.Object);
 
         var blobExists = await qBlobStorage.BlobExistsAsync(new System.Uri("https://www.example.com/index.html"));
 
@@ -75,9 +75,9 @@ public class QBlobStorageTest
             )
             .Returns(blobClientMock.Object);
 
-        var qBlobStorage = new QBlobStorage(blobContainerClientMock.Object);
+        var blobStorage = new BlobStorage(blobContainerClientMock.Object);
 
-        var uri = await qBlobStorage.AddBlobAsync(blobMock.Object);
+        var uri = await blobStorage.AddBlobAsync(blobMock.Object);
 
         Assert.AreEqual(uri, "https://www.example.com/index.html");
     }
@@ -93,8 +93,8 @@ public class QBlobStorageTest
 
         try
         {
-            var qBlobStorage = new QBlobStorage(blobContainerClientMock.Object);
-            await qBlobStorage.DeleteBlobByURIAsync(new System.Uri("https://www.example.com/index.html"));
+            var blobStorage = new BlobStorage(blobContainerClientMock.Object);
+            await blobStorage.DeleteBlobByURIAsync(new System.Uri("https://www.example.com/index.html"));
         }
         catch (Azure.RequestFailedException)
         {

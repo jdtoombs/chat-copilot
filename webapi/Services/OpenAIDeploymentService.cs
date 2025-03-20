@@ -10,10 +10,10 @@ using Newtonsoft.Json;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QOpenAIDeploymentService(
+public class OpenAIDeploymentService(
     OpenAIDeploymentRepository deploymentRepository,
     ISecretClientAccessor secretClientAccessor
-) : IQOpenAIDeploymentService
+) : IOpenAIDeploymentService
 {
     public async Task<OpenAIDeployment?> DeleteDeployment(Guid indexId)
     {
@@ -62,7 +62,7 @@ public class QOpenAIDeploymentService(
         return chatCompletionDeployments;
     }
 
-    public async Task<OpenAIDeployment> SaveDeployment(QOpenAIDeploymentCreate deployment)
+    public async Task<OpenAIDeployment> SaveDeployment(OpenAIDeploymentCreate deployment)
     {
         var deserializeCompletions = JsonConvert.DeserializeObject<List<ChatCompletionDeployment>>(
             deployment.ChatCompletionDeployments
@@ -85,20 +85,20 @@ public class QOpenAIDeploymentService(
         return deploymentInsert;
     }
 
-    public async Task<OpenAIDeployment?> UpdateDeployment(Guid indexId, QOpenAIDeploymentMutate qDeploymentMutate)
+    public async Task<OpenAIDeployment?> UpdateDeployment(Guid indexId, OpenAIDeploymentMutate deploymentMutate)
     {
         var deserializeCompletions = JsonConvert.DeserializeObject<List<ChatCompletionDeployment>>(
-            qDeploymentMutate.ChatCompletionDeployments
+            deploymentMutate.ChatCompletionDeployments
         );
-        var deserializeEmbeddings = JsonConvert.DeserializeObject<List<string>>(qDeploymentMutate.EmbeddingDeployments);
+        var deserializeEmbeddings = JsonConvert.DeserializeObject<List<string>>(deploymentMutate.EmbeddingDeployments);
         var deserializeImageGeneration = JsonConvert.DeserializeObject<List<string>>(
-            qDeploymentMutate.ImageGenerationDeployments
+            deploymentMutate.ImageGenerationDeployments
         );
         var deploymentToEdit = await deploymentRepository.FindByIdAsync(indexId.ToString());
 
-        deploymentToEdit.Name = qDeploymentMutate.Name ?? deploymentToEdit.Name;
-        deploymentToEdit.SecretName = qDeploymentMutate.SecretName ?? deploymentToEdit.SecretName;
-        deploymentToEdit.Endpoint = qDeploymentMutate.Endpoint ?? deploymentToEdit.Endpoint;
+        deploymentToEdit.Name = deploymentMutate.Name ?? deploymentToEdit.Name;
+        deploymentToEdit.SecretName = deploymentMutate.SecretName ?? deploymentToEdit.SecretName;
+        deploymentToEdit.Endpoint = deploymentMutate.Endpoint ?? deploymentToEdit.Endpoint;
         deploymentToEdit.ChatCompletionDeployments =
             deserializeCompletions ?? deploymentToEdit.ChatCompletionDeployments;
         deploymentToEdit.EmbeddingDeployments = deserializeEmbeddings ?? deploymentToEdit.EmbeddingDeployments;
@@ -113,7 +113,7 @@ public class QOpenAIDeploymentService(
     {
         if (deploymentOrder == null)
         {
-            throw new ArgumentNullException(nameof(deploymentOrder), "QSpecializationOrder must be provided.");
+            throw new ArgumentNullException(nameof(deploymentOrder), "SpecializationOrder must be provided.");
         }
 
         var indexes = (await this.GetAllDeployments()).ToList();

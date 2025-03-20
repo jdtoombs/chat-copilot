@@ -22,7 +22,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SpecializationController(
     ILogger<SpecializationController> logger,
-    IQSpecializationService qSpecializationService
+    ISpecializationService specializationService
 ) : ControllerBase
 {
     /// <summary>
@@ -36,7 +36,7 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<OkObjectResult> GetAllSpecializations(IMapper mapper)
     {
-        var specializations = await qSpecializationService.GetAllSpecializations();
+        var specializations = await specializationService.GetAllSpecializations();
 
         var specializationResponses = mapper.Map<SpecializationResponse[]>(specializations);
 
@@ -70,7 +70,7 @@ public class SpecializationController(
     {
         try
         {
-            var specialization = await qSpecializationService.SaveSpecialization(mapper.Map<Specialization>(model));
+            var specialization = await specializationService.SaveSpecialization(mapper.Map<Specialization>(model));
 
             return this.Ok(mapper.Map<SpecializationResponse>(specialization));
         }
@@ -98,11 +98,11 @@ public class SpecializationController(
         [FromRoute] Guid specializationId
     )
     {
-        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
 
         patchSpecialization.ApplyTo(specialization);
 
-        await qSpecializationService.UpdateSpecialization(specialization);
+        await specializationService.UpdateSpecialization(specialization);
 
         return this.Ok(specialization);
     }
@@ -120,9 +120,9 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateIconAsync([FromForm] IFormFile icon, [FromRoute] Guid specializationId)
     {
-        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
 
-        await qSpecializationService.UpdateIcon(specialization, icon);
+        await specializationService.UpdateIcon(specialization, icon);
 
         return this.NoContent();
     }
@@ -139,9 +139,9 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteIconAsync([FromRoute] Guid specializationId)
     {
-        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
 
-        await qSpecializationService.DeleteIcon(specialization);
+        await specializationService.DeleteIcon(specialization);
 
         return this.NoContent();
     }
@@ -159,9 +159,9 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateImageAsync([FromForm] IFormFile image, [FromRoute] Guid specializationId)
     {
-        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
 
-        await qSpecializationService.UpdateImage(specialization, image);
+        await specializationService.UpdateImage(specialization, image);
 
         return this.NoContent();
     }
@@ -178,9 +178,9 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImageAsync([FromRoute] Guid specializationId)
     {
-        var specialization = await qSpecializationService.GetSpecializationAsync(specializationId.ToString());
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
 
-        await qSpecializationService.DeleteImage(specialization);
+        await specializationService.DeleteImage(specialization);
 
         return this.NoContent();
     }
@@ -200,11 +200,11 @@ public class SpecializationController(
     {
         try
         {
-            Specialization specialization = await qSpecializationService.GetSpecializationAsync(
+            Specialization specialization = await specializationService.GetSpecializationAsync(
                 specializationId.ToString()
             );
 
-            bool result = await qSpecializationService.DeleteSpecialization(specializationId);
+            bool result = await specializationService.DeleteSpecialization(specializationId);
 
             if (result)
             {
@@ -230,7 +230,7 @@ public class SpecializationController(
     {
         try
         {
-            await qSpecializationService.OrderSpecializations(qSpecializationOrder);
+            await specializationService.OrderSpecializations(qSpecializationOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)

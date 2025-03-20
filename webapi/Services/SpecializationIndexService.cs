@@ -8,7 +8,7 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QSpecializationIndexService(SpecializationIndexRepository indexRepository) : IQSpecializationIndexService
+public class SpecializationIndexService(SpecializationIndexRepository indexRepository) : ISpecializationIndexService
 {
     public Task<IEnumerable<SpecializationIndex>> GetAllIndexes()
     {
@@ -20,7 +20,7 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
         return indexRepository.FindByIdAsync(id);
     }
 
-    public async Task<SpecializationIndex> SaveIndex(QSpecializationIndexCreate index)
+    public async Task<SpecializationIndex> SaveIndex(SpecializationIndexCreate index)
     {
         var indexInsert = new SpecializationIndex(
             index.Name,
@@ -36,7 +36,7 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
         return indexInsert;
     }
 
-    public async Task<SpecializationIndex?> UpdateIndex(Guid indexId, QSpecializationIndexBase qIndexMutate)
+    public async Task<SpecializationIndex?> UpdateIndex(Guid indexId, SpecializationIndexBase indexMutate)
     {
         var indexToEdit = await indexRepository.FindByIdAsync(indexId.ToString());
         if (indexToEdit == null)
@@ -44,14 +44,14 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
             return null;
         }
 
-        indexToEdit.Name = qIndexMutate.Name ?? indexToEdit.Name;
-        indexToEdit.Label = qIndexMutate.Label ?? indexToEdit.Label;
-        indexToEdit.QueryType = qIndexMutate.QueryType ?? indexToEdit.QueryType;
-        indexToEdit.AISearchDeploymentId = qIndexMutate.AISearchDeploymentId ?? indexToEdit.AISearchDeploymentId;
+        indexToEdit.Name = indexMutate.Name ?? indexToEdit.Name;
+        indexToEdit.Label = indexMutate.Label ?? indexToEdit.Label;
+        indexToEdit.QueryType = indexMutate.QueryType ?? indexToEdit.QueryType;
+        indexToEdit.AISearchDeploymentId = indexMutate.AISearchDeploymentId ?? indexToEdit.AISearchDeploymentId;
         indexToEdit.OpenAIDeploymentConnection =
-            qIndexMutate.OpenAIDeploymentConnection ?? indexToEdit.OpenAIDeploymentConnection;
-        indexToEdit.EmbeddingDeployment = qIndexMutate.EmbeddingDeployment ?? indexToEdit.EmbeddingDeployment;
-        indexToEdit.Order = qIndexMutate.Order ?? indexToEdit.Order;
+            indexMutate.OpenAIDeploymentConnection ?? indexToEdit.OpenAIDeploymentConnection;
+        indexToEdit.EmbeddingDeployment = indexMutate.EmbeddingDeployment ?? indexToEdit.EmbeddingDeployment;
+        indexToEdit.Order = indexMutate.Order ?? indexToEdit.Order;
 
         await indexRepository.UpsertAsync(indexToEdit);
         return indexToEdit;
@@ -72,7 +72,7 @@ public class QSpecializationIndexService(SpecializationIndexRepository indexRepo
     {
         if (specializationOrder == null)
         {
-            throw new ArgumentNullException(nameof(specializationOrder), "QSpecializationOrder must be provided.");
+            throw new ArgumentNullException(nameof(specializationOrder), "SpecializationOrder must be provided.");
         }
 
         var indexes = (await this.GetAllIndexes()).ToList();

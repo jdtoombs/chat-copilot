@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SpecializationIndexController(
     ILogger<SpecializationIndexController> logger,
-    IQSpecializationIndexService qSpecializationIndexService
+    ISpecializationIndexService specializationIndexService
 ) : ControllerBase
 {
     [HttpGet]
@@ -22,7 +22,7 @@ public class SpecializationIndexController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetIndexesAsync()
     {
-        var indexes = await qSpecializationIndexService.GetAllIndexes();
+        var indexes = await specializationIndexService.GetAllIndexes();
         return this.Ok(indexes);
     }
 
@@ -33,12 +33,12 @@ public class SpecializationIndexController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    public async Task<IActionResult> SaveIndex([FromForm] QSpecializationIndexCreate indexCreate)
+    public async Task<IActionResult> SaveIndex([FromForm] SpecializationIndexCreate indexCreate)
     {
         try
         {
-            var index = await qSpecializationIndexService.SaveIndex(indexCreate);
-            var specializationResponse = new QSpecializationIndexResponse(index);
+            var index = await specializationIndexService.SaveIndex(indexCreate);
+            var specializationResponse = new SpecializationIndexResponse(index);
 
             return this.Ok(specializationResponse);
         }
@@ -56,13 +56,13 @@ public class SpecializationIndexController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EditIndex(
-        [FromForm] QSpecializationIndexMutate qIndexMutate,
+        [FromForm] SpecializationIndexMutate indexMutate,
         [FromRoute] Guid indexId
     )
     {
         try
         {
-            var indexToEdit = await qSpecializationIndexService.UpdateIndex(indexId, qIndexMutate);
+            var indexToEdit = await specializationIndexService.UpdateIndex(indexId, indexMutate);
             if (indexToEdit != null)
             {
                 return this.Ok(indexToEdit);
@@ -87,7 +87,7 @@ public class SpecializationIndexController(
     {
         try
         {
-            var indexToDelete = await qSpecializationIndexService.DeleteIndex(indexId);
+            var indexToDelete = await specializationIndexService.DeleteIndex(indexId);
             if (indexToDelete != null)
             {
                 return this.Ok(true);
@@ -111,7 +111,7 @@ public class SpecializationIndexController(
     {
         try
         {
-            await qSpecializationIndexService.OrderSpecializations(qSpecializationOrder);
+            await specializationIndexService.OrderSpecializations(qSpecializationOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)

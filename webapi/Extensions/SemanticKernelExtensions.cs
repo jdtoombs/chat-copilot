@@ -122,12 +122,12 @@ internal static class SemanticKernelExtensions
                 contentSafety: sp.GetService<AzureContentSafety>(),
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
                 openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
-                qOpenAIDeploymentService: sp.GetRequiredService<IQOpenAIDeploymentService>(),
-                qSearchDeploymentService: sp.GetRequiredService<IQSearchDeploymentService>(),
-                qSpecializationService: sp.GetRequiredService<IQSpecializationService>(),
-                qSpecializationIndexService: sp.GetRequiredService<IQSpecializationIndexService>(),
-                qAzureOpenAIChatExtension: sp.GetRequiredService<IQAzureOpenAIChatExtension>(),
-                qBlobStorage: sp.GetRequiredService<IQBlobStorage>()
+                openAIDeploymentService: sp.GetRequiredService<IOpenAIDeploymentService>(),
+                searchDeploymentService: sp.GetRequiredService<ISearchDeploymentService>(),
+                specializationService: sp.GetRequiredService<ISpecializationService>(),
+                specializationIndexService: sp.GetRequiredService<ISpecializationIndexService>(),
+                azureOpenAIChatExtension: sp.GetRequiredService<IAzureOpenAIChatExtension>(),
+                blobStorage: sp.GetRequiredService<IBlobStorage>()
             ),
             nameof(ChatPlugin)
         );
@@ -139,7 +139,7 @@ internal static class SemanticKernelExtensions
     {
         builder.Services.AddScoped(sp =>
         {
-            var openAiService = new QOpenAIDeploymentService(
+            var openAiService = new OpenAIDeploymentService(
                 sp.GetRequiredService<OpenAIDeploymentRepository>(),
                 sp.GetRequiredService<ISecretClientAccessor>()
             );

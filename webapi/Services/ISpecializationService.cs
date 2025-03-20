@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// Defines specialization service
 /// </summary>
-public interface IQSpecializationService
+public interface ISpecializationService
 {
     /// <summary>
     /// Retrieve all specializations.
@@ -82,7 +82,7 @@ public interface IQSpecializationService
     /// Reorders specializations based on the provided ordering information. This method updates the order of existing specializations
     /// in the database asynchronously, utilizing concurrent task execution for efficiency.
     /// </summary>
-    /// <param name="specializationOrder">A QSpecializationOrder object containing the new order for specializations, where each key is a specialization ID and each value is the intended order.</param>
+    /// <param name="specializationOrder">A SpecializationOrder object containing the new order for specializations, where each key is a specialization ID and each value is the intended order.</param>
     /// <returns>A Task representing the asynchronous operation of updating all relevant specializations.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="specializationOrder"/> is null.</exception>
     Task OrderSpecializations(OrderMapGuidToInt specializationOrder);

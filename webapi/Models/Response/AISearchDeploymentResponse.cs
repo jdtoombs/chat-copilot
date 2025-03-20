@@ -1,9 +1,9 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using CopilotChat.WebApi.Models.Storage;
 
 namespace CopilotChat.WebApi.Models.Response;
 
-public class QAISearchDeploymentResponse
+public class AISearchDeploymentResponse
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
@@ -20,7 +20,7 @@ public class QAISearchDeploymentResponse
     [JsonPropertyName("endpoint")]
     public string Endpoint { get; set; } = string.Empty;
 
-    public QAISearchDeploymentResponse(AISearchDeployment search)
+    public AISearchDeploymentResponse(AISearchDeployment search)
     {
         this.Id = search.Id;
         this.Label = search.Label;

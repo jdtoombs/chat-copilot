@@ -17,11 +17,11 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for specialization service.
 /// </summary>
-public class QSpecializationService(
+public class SpecializationService(
     SpecializationRepository specializationSourceRepository,
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
-    IQBlobStorage qBlobStorage
-) : IQSpecializationService
+    IBlobStorage blobStorage
+) : ISpecializationService
 {
     public Task<IEnumerable<Specialization>> GetAllSpecializations() =>
         specializationSourceRepository.GetAllSpecializationsAsync();
@@ -108,15 +108,15 @@ public class QSpecializationService(
         )
         {
             // Delete image file from blob storage if it exists
-            if (await qBlobStorage.BlobExistsAsync(imageFileUri))
+            if (await blobStorage.BlobExistsAsync(imageFileUri))
             {
-                await qBlobStorage.DeleteBlobByURIAsync(imageFileUri);
+                await blobStorage.DeleteBlobByURIAsync(imageFileUri);
             }
 
             // Delete icon file from blob storage if it exists
-            if (await qBlobStorage.BlobExistsAsync(iconFileUri))
+            if (await blobStorage.BlobExistsAsync(iconFileUri))
             {
-                await qBlobStorage.DeleteBlobByURIAsync(iconFileUri);
+                await blobStorage.DeleteBlobByURIAsync(iconFileUri);
             }
         }
         return true;
@@ -126,7 +126,7 @@ public class QSpecializationService(
     {
         if (specializationOrder == null)
         {
-            throw new ArgumentNullException(nameof(specializationOrder), "QSpecializationOrder must be provided.");
+            throw new ArgumentNullException(nameof(specializationOrder), "SpecializationOrder must be provided.");
         }
 
         var specializations = (await this.GetAllSpecializations()).ToList();
@@ -172,25 +172,25 @@ public class QSpecializationService(
             return filePathDefault;
         }
 
-        var blobExists = await qBlobStorage.BlobExistsAsync(fileUri);
+        var blobExists = await blobStorage.BlobExistsAsync(fileUri);
 
         // 1. File provided and a default file path is stored in the DB
         if (file != null && !blobExists)
         {
-            return await qBlobStorage.AddBlobAsync(file);
+            return await blobStorage.AddBlobAsync(file);
         }
 
         // 2. File provided and a Blob Storage URI is stored in the DB
         if (file != null && blobExists)
         {
-            await qBlobStorage.DeleteBlobByURIAsync(fileUri);
-            return await qBlobStorage.AddBlobAsync(file);
+            await blobStorage.DeleteBlobByURIAsync(fileUri);
+            return await blobStorage.AddBlobAsync(file);
         }
 
         // 3. File not provided and a default file path is stored in the DB and delete flag is set
         if (file == null && blobExists && delete)
         {
-            await qBlobStorage.DeleteBlobByURIAsync(fileUri);
+            await blobStorage.DeleteBlobByURIAsync(fileUri);
 
             return filePathDefault;
         }

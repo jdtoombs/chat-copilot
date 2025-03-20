@@ -16,19 +16,19 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for search service.
 /// </summary>
-public class QSearchService : IQSearchService
+public class SearchService : ISearchService
 {
     private readonly HttpClient _httpClient;
     private readonly HttpClientHandler? _httpClientHandler;
     private readonly SpecializationRepository _specializationRepository;
-    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IAzureOpenAIChatExtension _azureOpenAIChatExtension;
 
-    public QSearchService(
+    public SearchService(
         SpecializationRepository specializationSourceRepository,
-        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension
+        IAzureOpenAIChatExtension azureOpenAIChatExtension
     )
     {
-        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
+        this._azureOpenAIChatExtension = azureOpenAIChatExtension;
         this._httpClientHandler = new() { CheckCertificateRevocationList = true };
         this._httpClient = new(this._httpClientHandler);
         this._specializationRepository = specializationSourceRepository;
@@ -37,16 +37,17 @@ public class QSearchService : IQSearchService
     /// <summary>
     /// Retrieves the search results using AzureAISearch service.
     /// </summary>
-    public async Task<QSearchResult?> GetMatchesAsync(QSearchParameters qsearchParameters)
+    public async Task<SearchResult?> GetMatchesAsync(SearchParameters searchParameters)
     {
-        QAzureSearchRequest requestBody = new(qsearchParameters.Search);
-        var indexId = qsearchParameters.IndexId;
+        AzureSearchRequest requestBody = new(searchParameters.Search);
+        var indexId = searchParameters.IndexId;
         if (indexId == null)
         {
             return null;
         }
-        var (indexName, apiKey, endpoint) =
-            await this._qAzureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(indexId);
+        var (indexName, apiKey, endpoint) = await this._azureOpenAIChatExtension.GetAISearchDeploymentConnectionDetails(
+            indexId
+        );
         if (indexName == null || apiKey == null || endpoint == null)
         {
             return null;
@@ -60,34 +61,34 @@ public class QSearchService : IQSearchService
         httpRequestMessage.Headers.Add("api-Key", apiKey);
         var response = await this._httpClient.SendAsync(httpRequestMessage);
         var body = await response.Content.ReadAsStringAsync();
-        var searchResponse = JsonSerializer.Deserialize<QAzureSearchResponse>(body!);
+        var searchResponse = JsonSerializer.Deserialize<AzureSearchResponse>(body!);
         return this.formatSearchResponse(searchResponse);
     }
 
     /// <summary>
     /// Formatter to support the nested display of results i.e, FileName -> Matches
     /// </summary>
-    private QSearchResult formatSearchResponse(QAzureSearchResponse? searchResponse)
+    private SearchResult formatSearchResponse(AzureSearchResponse? searchResponse)
     {
         if (searchResponse != null)
         {
             var groupedByfilename = searchResponse
                 .values.Where(res => res.highlights != null)
                 .GroupBy(value => value.filename)
-                .Select(g => new QSearchResultValue
+                .Select(g => new SearchResultValue
                 {
                     filename = g.Key,
                     matches = g.Select(
                             (value, index) =>
-                                new QSearchMatch
+                                new SearchMatch
                                 {
                                     id = value.id,
                                     label = "Match-" + (index + 1),
                                     content = value.highlights.content,
-                                    metadata = new QSearchMetadata
+                                    metadata = new SearchMetadata
                                     {
                                         pageCount = 0,
-                                        source = new QSearchMetadataSource
+                                        source = new SearchMetadataSource
                                         {
                                             filename = value.filename,
                                             url = value.url,
@@ -97,9 +98,9 @@ public class QSearchService : IQSearchService
                         )
                         .ToArray(),
                 });
-            return new QSearchResult { count = searchResponse.Count, values = groupedByfilename };
+            return new SearchResult { count = searchResponse.Count, values = groupedByfilename };
         }
-        return new QSearchResult();
+        return new SearchResult();
     }
 
     public void Dispose()

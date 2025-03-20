@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Request;
 using CopilotChat.WebApi.Models.Response;
@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class AISearchDeploymentController(
     ILogger<AISearchDeploymentController> logger,
-    IQSearchDeploymentService searchDeploymentService
+    ISearchDeploymentService searchDeploymentService
 ) : ControllerBase
 {
     [HttpGet]
@@ -33,12 +33,12 @@ public class AISearchDeploymentController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    public async Task<IActionResult> SaveSearchDeployment([FromForm] QAISearchDeploymentCreate searchCreate)
+    public async Task<IActionResult> SaveSearchDeployment([FromForm] AISearchDeploymentCreate searchCreate)
     {
         try
         {
             var search = await searchDeploymentService.SaveSearchDeployment(searchCreate);
-            var searchCreateResponse = new QAISearchDeploymentResponse(search);
+            var searchCreateResponse = new AISearchDeploymentResponse(search);
 
             return this.Ok(searchCreateResponse);
         }
@@ -56,7 +56,7 @@ public class AISearchDeploymentController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EditSearchDeployment(
-        [FromForm] QAISearchDeploymentBase qSearchMutate,
+        [FromForm] AISearchDeploymentBase qSearchMutate,
         [FromRoute] Guid searchId
     )
     {

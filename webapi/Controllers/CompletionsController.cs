@@ -18,7 +18,7 @@ namespace CopilotChat.WebApi.Controllers;
 [Route("[controller]")]
 public class CompletionsController(
     ISingleMessageCompletionService singleMessageCompletionService,
-    IQSpecializationService qSpecializationService
+    ISpecializationService specializationService
 ) : ControllerBase
 {
     [Route("chats")]
@@ -41,7 +41,7 @@ public class CompletionsController(
         Specialization? spec = null;
         if (!string.IsNullOrEmpty(specializationId))
         {
-            spec = await qSpecializationService.GetSpecializationAsync(specializationId);
+            spec = await specializationService.GetSpecializationAsync(specializationId);
         }
 
         var textResponse = await singleMessageCompletionService.GetResponse(ask.Input, spec, cancellationToken);

@@ -41,7 +41,7 @@ public class ChatHistoryController(
     ChatParticipantRepository participantRepository,
     ChatMemorySourceRepository sourceRepository,
     IOptions<PromptsOptions> promptOptions,
-    IQSpecializationService qSpecializationService,
+    ISpecializationService specializationService,
     IAuthInfo authInfo
 ) : ControllerBase
 {
@@ -67,7 +67,7 @@ public class ChatHistoryController(
             return this.BadRequest("Chat session parameters cannot be null.");
         }
 
-        var specialization = await qSpecializationService.GetSpecializationAsync(chatParameters.specializationId);
+        var specialization = await specializationService.GetSpecializationAsync(chatParameters.specializationId);
 
         var systemDescription = promptOptions.Value.SystemDescription;
         var newChat = new ChatSession(
@@ -265,7 +265,7 @@ public class ChatHistoryController(
         {
             if (chatParameters.SpecializationId != "general")
             {
-                Specialization specializationSource = await qSpecializationService.GetSpecializationAsync(
+                Specialization specializationSource = await specializationService.GetSpecializationAsync(
                     chatParameters.SpecializationId
                 );
                 chat!.SystemDescription = specializationSource.RoleInformation;

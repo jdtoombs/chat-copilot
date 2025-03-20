@@ -74,11 +74,11 @@ public class ChatPlugin
     private readonly IHubContext<MessageRelayHub> _messageRelayHubContext;
 
     /// <summary>
-    /// The QSpecializationService used for managing specializations.
+    /// The SpecializationService used for managing specializations.
     /// </summary>
-    private readonly IQSpecializationService _qSpecializationService;
+    private readonly ISpecializationService _specializationService;
 
-    private readonly IQOpenAIDeploymentService _qOpenAIDeploymentService;
+    private readonly IOpenAIDeploymentService _openAIDeploymentService;
 
     /// <summary>
     /// The current specialization in use, may be null if not yet set or if no specialization applies.
@@ -103,7 +103,7 @@ public class ChatPlugin
     /// <summary>
     /// Extension: AzureOpenAI Extension handler
     /// </summary>
-    private IQAzureOpenAIChatExtension _qAzureOpenAIChatExtension;
+    private IAzureOpenAIChatExtension _azureOpenAIChatExtension;
 
     // feature flag for user intent extraction
     private readonly bool _isUserIntentExtractionEnabled;
@@ -119,18 +119,18 @@ public class ChatPlugin
         SpecializationRepository specializationSourceRepository,
         SpecializationIndexRepository specializationIndexRepository,
         OpenAIDeploymentRepository openAIDeploymentRepository,
-        IQOpenAIDeploymentService qOpenAIDeploymentService,
-        IQSearchDeploymentService qSearchDeploymentService,
+        IOpenAIDeploymentService openAIDeploymentService,
+        ISearchDeploymentService searchDeploymentService,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         IOptions<DocumentMemoryOptions> documentImportOptions,
         IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
-        IQSpecializationService qSpecializationService,
-        IQSpecializationIndexService qSpecializationIndexService,
+        ISpecializationService specializationService,
+        ISpecializationIndexService specializationIndexService,
         SecretClient secretClient,
         ILogger logger,
-        IQBlobStorage qBlobStorage,
-        IQAzureOpenAIChatExtension qAzureOpenAIChatExtension,
+        IBlobStorage blobStorage,
+        IAzureOpenAIChatExtension azureOpenAIChatExtension,
         AzureContentSafety? contentSafety = null,
         bool isUserIntentExtractionEnabled = true
     ) // Parameter for feature flag
@@ -143,15 +143,15 @@ public class ChatPlugin
         this._messageRelayHubContext = messageRelayHubContext;
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
-        this._qSpecializationService = qSpecializationService;
-        this._qOpenAIDeploymentService = qOpenAIDeploymentService;
+        this._specializationService = specializationService;
+        this._openAIDeploymentService = openAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
             chatSessionRepository,
             memoryClient,
             logger
         );
-        this._qAzureOpenAIChatExtension = qAzureOpenAIChatExtension;
+        this._azureOpenAIChatExtension = azureOpenAIChatExtension;
         this._contentSafety = contentSafety;
         this._isUserIntentExtractionEnabled = isUserIntentExtractionEnabled; // Initialize feature flag
     }
@@ -193,10 +193,10 @@ public class ChatPlugin
         KernelArguments chatContext = new(context);
         chatContext["knowledgeCutoff"] = this._promptOptions.KnowledgeCutoffDate;
 
-        string? specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString();
+        string? specializationKey = context[this._azureOpenAIChatExtension.ContextKey]?.ToString();
         if (specializationKey != null)
         {
-            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+            this._qSpecialization = await this._specializationService.GetSpecializationAsync(specializationKey);
         }
 
         this._logger.LogInformation("Getting chat response");
@@ -368,10 +368,10 @@ public class ChatPlugin
 
         this._logger.LogInformation("Getting chat response! Silent version.");
 
-        string? specializationKey = context[this._qAzureOpenAIChatExtension.ContextKey]?.ToString();
+        string? specializationKey = context[this._azureOpenAIChatExtension.ContextKey]?.ToString();
         if (specializationKey != null)
         {
-            this._qSpecialization = await this._qSpecializationService.GetSpecializationAsync(specializationKey);
+            this._qSpecialization = await this._specializationService.GetSpecializationAsync(specializationKey);
         }
 
         CopilotChatMessage chatMessage = await this.GetChatResponseAsync(
@@ -821,7 +821,7 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.ResponseFrequencyPenalty,
             PresencePenalty = this._promptOptions.ResponsePresencePenalty,
             ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions,
-            AzureChatDataSource = await this._qAzureOpenAIChatExtension.GetAzureSearchChatDataSource(
+            AzureChatDataSource = await this._azureOpenAIChatExtension.GetAzureSearchChatDataSource(
                 this._qSpecialization
             ),
         };
@@ -842,7 +842,7 @@ public class ChatPlugin
             FrequencyPenalty = this._promptOptions.IntentFrequencyPenalty,
             PresencePenalty = this._promptOptions.IntentPresencePenalty,
             StopSequences = new string[] { "] bot:" },
-            AzureChatDataSource = await this._qAzureOpenAIChatExtension.GetAzureSearchChatDataSource(
+            AzureChatDataSource = await this._azureOpenAIChatExtension.GetAzureSearchChatDataSource(
                 this._qSpecialization
             ),
         };
@@ -854,7 +854,7 @@ public class ChatPlugin
     /// </summary>
     private async Task<int> GetCompletionTokenLimit()
     {
-        var deploymentConnection = await this._qOpenAIDeploymentService.GetDeployment(
+        var deploymentConnection = await this._openAIDeploymentService.GetDeployment(
             this._qSpecialization?.OpenAIDeploymentId ?? ""
         );
         var completionConnection = deploymentConnection.ChatCompletionDeployments.FirstOrDefault(c =>

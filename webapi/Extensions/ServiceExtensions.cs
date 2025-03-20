@@ -447,7 +447,7 @@ public static class CopilotChatServiceExtensions
 
         services.AddSingleton<BlobContainerClient>(blobContainerClient);
 
-        services.AddScoped<IQBlobStorage, QBlobStorage>();
+        services.AddScoped<IBlobStorage, BlobStorage>();
 
         return services;
     }
@@ -514,14 +514,14 @@ public static class CopilotChatServiceExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         // chat extension services
-        services.AddScoped<IQAzureOpenAIChatExtension, QAzureOpenAIChatExtension>();
+        services.AddScoped<IAzureOpenAIChatExtension, AzureOpenAIChatExtension>();
 
         // chat session services
         services.AddScoped<IChatSessionService, ChatSessionService>();
 
         // specialization services
-        services.AddScoped<IQSpecializationService, QSpecializationService>();
-        services.AddScoped<IQSpecializationIndexService, QSpecializationIndexService>();
+        services.AddScoped<ISpecializationService, SpecializationService>();
+        services.AddScoped<ISpecializationIndexService, SpecializationIndexService>();
 
         // email services
         services.AddScoped<IEmailSender, EmailSender>();
@@ -551,15 +551,15 @@ public static class CopilotChatServiceExtensions
         services.AddScoped<ISingleMessageCompletionService, SingleMessageCompletionService>();
 
         // deployment services
-        services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
-        services.AddScoped<IQSearchDeploymentService, QAISearchDeploymentService>();
         services.AddScoped<ICompletionDeploymentModelService, CompletionDeploymentModelService>();
+        services.AddScoped<IOpenAIDeploymentService, OpenAIDeploymentService>();
+        services.AddScoped<ISearchDeploymentService, AISearchDeploymentService>();
 
         // user feedback services
         services.AddScoped<IUserFeedbackService, UserFeedbackService>();
 
         // search services
-        services.AddScoped<IQSearchService, QSearchService>();
+        services.AddScoped<ISearchService, SearchService>();
 
         return services;
     }

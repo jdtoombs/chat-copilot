@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace CopilotChat.WebApi.Services;
 
-public interface IQBlobStorage
+public interface IBlobStorage
 {
     Task<bool> BlobExistsAsync(System.Uri blobURI);
 

@@ -12,7 +12,7 @@ namespace CopilotChat.WebApi.Controllers;
 /// Controller responsible for handling search.
 /// </summary>
 [ApiController]
-public class SearchController(IQSearchService qSearchService) : ControllerBase
+public class SearchController(ISearchService searchService) : ControllerBase
 {
     /// <summary>
     /// Invokes the Azure search function to get a results.
@@ -26,10 +26,10 @@ public class SearchController(IQSearchService qSearchService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    public async Task<IActionResult> GetMatchesAsync([FromBody] QSearchParameters searchParameters)
+    public async Task<IActionResult> GetMatchesAsync([FromBody] SearchParameters searchParameters)
     {
         //Scope: To implement filter to give more refined search functionality.
-        var response = await qSearchService.GetMatchesAsync(searchParameters);
+        var response = await searchService.GetMatchesAsync(searchParameters);
         if (response == null)
         {
             return this.StatusCode(500, "Specialization does not have an index to search.");

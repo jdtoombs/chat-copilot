@@ -7,8 +7,8 @@ namespace CopilotChat.WebApi.Services;
 
 public class ChatSessionService(
     ChatSessionRepository chatSessionRepository,
-    IQSpecializationService specializationService,
-    IQOpenAIDeploymentService openAIDeploymentService
+    ISpecializationService specializationService,
+    IOpenAIDeploymentService openAIDeploymentService
 ) : IChatSessionService
 {
     private Specialization? _specialization { get; set; }

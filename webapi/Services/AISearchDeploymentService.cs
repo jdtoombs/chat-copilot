@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,10 +9,10 @@ using CopilotChat.WebApi.Storage;
 
 namespace CopilotChat.WebApi.Services;
 
-public class QAISearchDeploymentService(
+public class AISearchDeploymentService(
     AISearchDeploymentRepository searchRepository,
     ISecretClientAccessor secretClientAccessor
-) : IQSearchDeploymentService
+) : ISearchDeploymentService
 {
     public Task<IEnumerable<AISearchDeployment>> GetAllSearchDeployments()
     {
@@ -24,7 +24,7 @@ public class QAISearchDeploymentService(
         return searchRepository.FindByIdAsync(id);
     }
 
-    public async Task<AISearchDeployment> SaveSearchDeployment(QAISearchDeploymentCreate index)
+    public async Task<AISearchDeployment> SaveSearchDeployment(AISearchDeploymentCreate index)
     {
         var indexInsert = new AISearchDeployment(
             index.Name,
@@ -45,7 +45,7 @@ public class QAISearchDeploymentService(
         return secretValue.Value.Value ?? "";
     }
 
-    public async Task<AISearchDeployment?> UpdateSearchDeployment(Guid searchId, QAISearchDeploymentBase qSearchMutate)
+    public async Task<AISearchDeployment?> UpdateSearchDeployment(Guid searchId, AISearchDeploymentBase searchMutate)
     {
         var searchToEdit = await searchRepository.FindByIdAsync(searchId.ToString());
         if (searchToEdit == null)
@@ -53,11 +53,11 @@ public class QAISearchDeploymentService(
             return null;
         }
 
-        searchToEdit.Name = qSearchMutate.Name ?? searchToEdit.Name;
-        searchToEdit.Label = qSearchMutate.Label ?? searchToEdit.Label;
-        searchToEdit.Endpoint = qSearchMutate.Endpoint ?? searchToEdit.Endpoint;
-        searchToEdit.SecretName = qSearchMutate.SecretName ?? searchToEdit.SecretName;
-        searchToEdit.Order = qSearchMutate.Order ?? searchToEdit.Order;
+        searchToEdit.Name = searchMutate.Name ?? searchToEdit.Name;
+        searchToEdit.Label = searchMutate.Label ?? searchToEdit.Label;
+        searchToEdit.Endpoint = searchMutate.Endpoint ?? searchToEdit.Endpoint;
+        searchToEdit.SecretName = searchMutate.SecretName ?? searchToEdit.SecretName;
+        searchToEdit.Order = searchMutate.Order ?? searchToEdit.Order;
 
         await searchRepository.UpsertAsync(searchToEdit);
         return searchToEdit;

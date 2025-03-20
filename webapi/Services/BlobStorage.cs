@@ -8,7 +8,7 @@ namespace CopilotChat.WebApi.Services;
 /// <summary>
 /// The implementation class for Blob Storage.
 /// </summary>
-public class QBlobStorage(BlobContainerClient blobContainerClient) : IQBlobStorage
+public class BlobStorage(BlobContainerClient blobContainerClient) : IBlobStorage
 {
     /// <summary>
     /// Checks if the provided URI points to a valid Blob Storage File

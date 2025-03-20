@@ -14,7 +14,7 @@ namespace CopilotChat.WebApi.Controllers;
 public class OpenAIDeploymentController(
     ILogger<OpenAIDeploymentController> logger,
     OpenAIDeploymentRepository openAIDeploymentRepository,
-    IQOpenAIDeploymentService qOpenAIDeploymentService
+    IOpenAIDeploymentService openAIDeploymentService
 ) : ControllerBase
 {
     [HttpGet]
@@ -35,12 +35,12 @@ public class OpenAIDeploymentController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
-    public async Task<IActionResult> SaveDeployment([FromForm] QOpenAIDeploymentCreate deploymentCreate)
+    public async Task<IActionResult> SaveDeployment([FromForm] OpenAIDeploymentCreate deploymentCreate)
     {
         try
         {
-            var deployment = await qOpenAIDeploymentService.SaveDeployment(deploymentCreate);
-            var deploymentResponse = new QOpenAIDeploymentResponse(deployment);
+            var deployment = await openAIDeploymentService.SaveDeployment(deploymentCreate);
+            var deploymentResponse = new OpenAIDeploymentResponse(deployment);
 
             return this.Ok(deploymentResponse);
         }
@@ -58,13 +58,13 @@ public class OpenAIDeploymentController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EditDeployment(
-        [FromForm] QOpenAIDeploymentMutate qDeploymentMutate,
+        [FromForm] OpenAIDeploymentMutate deploymentMutate,
         [FromRoute] Guid deploymentId
     )
     {
         try
         {
-            var deploymentToEdit = await qOpenAIDeploymentService.UpdateDeployment(deploymentId, qDeploymentMutate);
+            var deploymentToEdit = await openAIDeploymentService.UpdateDeployment(deploymentId, deploymentMutate);
             if (deploymentToEdit != null)
             {
                 return this.Ok(deploymentToEdit);
@@ -89,7 +89,7 @@ public class OpenAIDeploymentController(
     {
         try
         {
-            var deploymentToDelete = await qOpenAIDeploymentService.DeleteDeployment(deploymentId);
+            var deploymentToDelete = await openAIDeploymentService.DeleteDeployment(deploymentId);
             if (deploymentToDelete != null)
             {
                 return this.Ok(true);
@@ -113,7 +113,7 @@ public class OpenAIDeploymentController(
     {
         try
         {
-            await qOpenAIDeploymentService.OrderDeployments(deploymentOrder);
+            await openAIDeploymentService.OrderDeployments(deploymentOrder);
             return this.NoContent();
         }
         catch (Azure.RequestFailedException ex)
