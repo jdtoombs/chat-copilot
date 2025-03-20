@@ -17,6 +17,7 @@ using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Chat.Ext;
 using CopilotChat.WebApi.Services;
+using CopilotChat.WebApi.Services.Implementations;
 using CopilotChat.WebApi.Storage;
 using CopilotChat.WebApi.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -552,6 +553,7 @@ public static class CopilotChatServiceExtensions
         // deployment services
         services.AddScoped<IQOpenAIDeploymentService, QOpenAIDeploymentService>();
         services.AddScoped<IQSearchDeploymentService, QAISearchDeploymentService>();
+        services.AddScoped<ICompletionDeploymentModelService, CompletionDeploymentModelService>();
 
         // user feedback services
         services.AddScoped<IUserFeedbackService, UserFeedbackService>();
