@@ -46,6 +46,7 @@ public sealed class Program
         // Add in configuration options and required services.
         builder
             .Services.AddSingleton<ILogger>(sp => sp.GetRequiredService<ILogger<Program>>()) // some services require an un-templated ILogger
+            .AddAutoMapper(typeof(Program).Assembly)
             .AddOptions(builder.Configuration)
             .AddPersistentChatStore()
             .AddBlobStorage()

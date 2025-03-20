@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using CopilotChat.WebApi.Storage;
 using CopilotChat.WebApi.Models.Storage;
+using CopilotChat.WebApi.Storage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CopilotChat.WebApi.Services.Implementations;
@@ -10,7 +10,7 @@ public class CompletionDeploymentModelService(CompletionDeploymentModelRepositor
 {
     public Task Save(CompletionDeploymentModel completionDeploymentModel)
     {
-        Validate(completionDeploymentModel);
+        this.Validate(completionDeploymentModel);
 
         return completionDeploymentModelRepository.CreateAsync(completionDeploymentModel);
     }
