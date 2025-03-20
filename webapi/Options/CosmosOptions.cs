@@ -75,4 +75,10 @@ public class CosmosOptions
     /// /// </summary>
     [Required, NotEmptyOrWhitespace]
     public string ChatUserContainer { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the Cosmos container for completion deployment models.
+    /// /// </summary>
+    [Required, NotEmptyOrWhitespace]
+    public string CompletionDeploymentModel { get; set; } = string.Empty;
 }

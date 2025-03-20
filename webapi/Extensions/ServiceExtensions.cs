@@ -216,6 +216,7 @@ public static class CopilotChatServiceExtensions
         IStorageContext<SpecializationIndex> specializationIndexStorageContext;
         IStorageContext<OpenAIDeployment> openAIDeploymentStorageContext;
         IStorageContext<AISearchDeployment> aiSearchDeploymentStorageContext;
+        IStorageContext<CompletionDeploymentModel> completionDeploymentModelStorageContext;
 
         ChatStoreOptions chatStoreConfig = services
             .BuildServiceProvider()
@@ -235,6 +236,7 @@ public static class CopilotChatServiceExtensions
                 specializationIndexStorageContext = new VolatileContext<SpecializationIndex>();
                 openAIDeploymentStorageContext = new VolatileContext<OpenAIDeployment>();
                 aiSearchDeploymentStorageContext = new VolatileContext<AISearchDeployment>();
+                completionDeploymentModelStorageContext = new VolatileContext<CompletionDeploymentModel>();
                 break;
             }
 
@@ -321,6 +323,14 @@ public static class CopilotChatServiceExtensions
                         )
                     )
                 );
+                completionDeploymentModelStorageContext = new FileSystemContext<CompletionDeploymentModel>(
+                    new FileInfo(
+                        Path.Combine(
+                            directory,
+                            $"{Path.GetFileNameWithoutExtension(fullPath)}_completionDeploymentModels{Path.GetExtension(fullPath)}"
+                        )
+                    )
+                );
                 break;
             }
 
@@ -376,6 +386,11 @@ public static class CopilotChatServiceExtensions
                     chatStoreConfig.Cosmos.Database,
                     chatStoreConfig.Cosmos.AISearchDeploymentContainer
                 );
+                completionDeploymentModelStorageContext = new CosmosDbContext<CompletionDeploymentModel>(
+                    chatStoreConfig.Cosmos.ConnectionString,
+                    chatStoreConfig.Cosmos.Database,
+                    chatStoreConfig.Cosmos.CompletionDeploymentModel
+                );
 #pragma warning restore CA2000 // Dispose objects before losing scope
                 break;
             }
@@ -402,6 +417,9 @@ public static class CopilotChatServiceExtensions
         );
         services.AddSingleton<AISearchDeploymentRepository>(
             new AISearchDeploymentRepository(aiSearchDeploymentStorageContext)
+        );
+        services.AddSingleton<CompletionDeploymentModelRepository>(
+            new CompletionDeploymentModelRepository(completionDeploymentModelStorageContext)
         );
 
         return services;
