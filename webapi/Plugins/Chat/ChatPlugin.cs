@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
-using Azure.Security.KeyVault.Secrets;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Models.Storage;
@@ -116,24 +115,15 @@ public class ChatPlugin
         IKernelMemory memoryClient,
         ChatMessageRepository chatMessageRepository,
         ChatSessionRepository chatSessionRepository,
-        SpecializationRepository specializationSourceRepository,
-        SpecializationIndexRepository specializationIndexRepository,
-        OpenAIDeploymentRepository openAIDeploymentRepository,
         IOpenAIDeploymentService openAIDeploymentService,
-        ISearchDeploymentService searchDeploymentService,
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
-        IOptions<DocumentMemoryOptions> documentImportOptions,
-        IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
         ISpecializationService specializationService,
-        ISpecializationIndexService specializationIndexService,
-        SecretClient secretClient,
         ILogger logger,
-        IBlobStorage blobStorage,
         IAzureOpenAIChatExtension azureOpenAIChatExtension,
         AzureContentSafety? contentSafety = null,
         bool isUserIntentExtractionEnabled = true
-    ) // Parameter for feature flag
+    )
     {
         this._logger = logger;
         this._kernel = kernel;

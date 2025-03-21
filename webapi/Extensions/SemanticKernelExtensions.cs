@@ -112,22 +112,13 @@ internal static class SemanticKernelExtensions
                 memoryClient: sp.GetRequiredService<IKernelMemory>(),
                 chatMessageRepository: sp.GetRequiredService<ChatMessageRepository>(),
                 chatSessionRepository: sp.GetRequiredService<ChatSessionRepository>(),
-                specializationSourceRepository: sp.GetRequiredService<SpecializationRepository>(),
-                specializationIndexRepository: sp.GetRequiredService<SpecializationIndexRepository>(),
                 messageRelayHubContext: sp.GetRequiredService<IHubContext<MessageRelayHub>>(),
-                secretClient: sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient(),
                 promptOptions: sp.GetRequiredService<IOptions<PromptsOptions>>(),
-                documentImportOptions: sp.GetRequiredService<IOptions<DocumentMemoryOptions>>(),
-                qAzureOpenAIChatOptions: sp.GetRequiredService<IOptions<QAzureOpenAIChatOptions>>(),
                 contentSafety: sp.GetService<AzureContentSafety>(),
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
-                openAIDeploymentRepository: sp.GetRequiredService<OpenAIDeploymentRepository>(),
                 openAIDeploymentService: sp.GetRequiredService<IOpenAIDeploymentService>(),
-                searchDeploymentService: sp.GetRequiredService<ISearchDeploymentService>(),
                 specializationService: sp.GetRequiredService<ISpecializationService>(),
-                specializationIndexService: sp.GetRequiredService<ISpecializationIndexService>(),
-                azureOpenAIChatExtension: sp.GetRequiredService<IAzureOpenAIChatExtension>(),
-                blobStorage: sp.GetRequiredService<IBlobStorage>()
+                azureOpenAIChatExtension: sp.GetRequiredService<IAzureOpenAIChatExtension>()
             ),
             nameof(ChatPlugin)
         );
