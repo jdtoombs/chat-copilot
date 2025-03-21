@@ -33,6 +33,7 @@ public class SpecializationService(
     {
         var specializationSource = specialization with
         {
+            Id = Guid.NewGuid().ToString(),
             ImageFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage),
             IconFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon),
         };
