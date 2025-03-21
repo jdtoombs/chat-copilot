@@ -22,7 +22,8 @@ namespace CopilotChat.WebApi.Controllers;
 [ApiController]
 public class SpecializationController(
     ILogger<SpecializationController> logger,
-    ISpecializationService specializationService
+    ISpecializationService specializationService,
+    ICompletionDeploymentModelService completionDeploymentModelService
 ) : ControllerBase
 {
     /// <summary>
@@ -64,22 +65,20 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status504GatewayTimeout)]
     public async Task<IActionResult> CreateSpecializationAsync(
         [FromServices] IAuthInfo authInfo,
-        [FromBody] SpecializationBase model,
+        [FromBody] SpecializationWriteModel model,
         IMapper mapper
     )
     {
-        try
-        {
-            var specialization = await specializationService.SaveSpecialization(mapper.Map<Specialization>(model));
+        var specialization = await specializationService.SaveSpecialization(mapper.Map<Specialization>(model));
 
-            return this.Ok(mapper.Map<SpecializationResponse>(specialization));
-        }
-        catch (Azure.RequestFailedException ex)
-        {
-            logger.LogError(ex, "Specialization create threw an exception");
+        await completionDeploymentModelService.Save(
+            mapper.Map<CompletionDeploymentModel>(model) with
+            {
+                Partition = specialization.Id,
+            }
+        );
 
-            return this.StatusCode(500, $"Failed to create specialization for label '{model.Label}'.");
-        }
+        return this.Ok(specialization);
     }
 
     /// <summary>
