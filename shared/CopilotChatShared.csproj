@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>CopilotChat.Shared</RootNamespace>
@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.KernelMemory" Version="0.97.250211.1" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.97.250211.1" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.97.250211.1" />
-    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Redis" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Redis" Version="0.98.250323.1" />
     <PackageReference Include="Microsoft.KernelMemory.Orchestration.RabbitMQ" Version="0.97.250211.1" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
