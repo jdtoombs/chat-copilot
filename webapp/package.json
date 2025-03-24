@@ -23,7 +23,7 @@
         "@mdxeditor/editor": "^3.28.0",
         "@microsoft/microsoft-graph-client": "^3.0.7",
         "@microsoft/signalr": "^8.0.7",
-        "@playwright/test": "^1.50.1",
+        "@playwright/test": "^1.51.1",
         "@reduxjs/toolkit": "^2.6.1",
         "@vitejs/plugin-react": "^4.3.4",
         "browserslist-to-esbuild": "^2.1.1",
