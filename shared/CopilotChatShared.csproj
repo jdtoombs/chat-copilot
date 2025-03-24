@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.AI.Vision.ImageAnalysis" Version="1.0.0" />
     <PackageReference Include="Microsoft.KernelMemory" Version="0.97.250211.1" />
-    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.97.250211.1" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250323.1" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Postgres" Version="0.97.250211.1" />
     <PackageReference Include="Microsoft.KernelMemory.MemoryDb.Redis" Version="0.98.250323.1" />
     <PackageReference Include="Microsoft.KernelMemory.Orchestration.RabbitMQ" Version="0.97.250211.1" />
