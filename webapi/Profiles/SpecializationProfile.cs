@@ -16,6 +16,7 @@ public class SpecializationProfile : Profile
                 destination => destination.Name,
                 option => option.MapFrom(source => source.CompletionDeploymentName)
             )
+            .ForCtorParam("Name", option => option.MapFrom(source => source.CompletionDeploymentName))
             .ReverseMap();
 
         this.CreateMap<Specialization, SpecializationResponse>();
