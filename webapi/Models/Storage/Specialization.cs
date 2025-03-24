@@ -25,10 +25,6 @@ public record Specialization : IStorageEntity
 
     public string? IndexId { get; set; }
 
-    public string OpenAIDeploymentId { get; set; }
-
-    public string? CompletionDeploymentName { get; set; }
-
     public string ImageFilePath { get; set; }
 
     public string IconFilePath { get; set; }

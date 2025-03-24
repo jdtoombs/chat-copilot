@@ -118,6 +118,7 @@ internal static class SemanticKernelExtensions
                 logger: sp.GetRequiredService<ILogger<ChatPlugin>>(),
                 openAIDeploymentService: sp.GetRequiredService<IOpenAIDeploymentService>(),
                 specializationService: sp.GetRequiredService<ISpecializationService>(),
+                completionDeploymentModelService: sp.GetRequiredService<ICompletionDeploymentModelService>(),
                 azureOpenAIChatExtension: sp.GetRequiredService<IAzureOpenAIChatExtension>()
             ),
             nameof(ChatPlugin)

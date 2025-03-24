@@ -18,7 +18,8 @@ public class AzureOpenAIChatExtension(
     IOptions<QAzureOpenAIChatOptions> qAzureOpenAIChatOptions,
     IOpenAIDeploymentService openAIDeploymentService,
     ISearchDeploymentService searchDeploymentService,
-    ISpecializationIndexService specializationIndexService
+    ISpecializationIndexService specializationIndexService,
+    ICompletionDeploymentModelService completionDeploymentModelService
 ) : IAzureOpenAIChatExtension
 {
     /// <summary>
@@ -36,10 +37,13 @@ public class AzureOpenAIChatExtension(
         return qAzureOpenAIChatOptions.Value.Enabled && specializationId != this.DefaultSpecialization;
     }
 
-    public async Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization)
+    public async Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization specialization)
     {
+        var completionDeploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specialization.Id
+        );
         if (
-            specialization == null
+            completionDeploymentModel == null
             || string.IsNullOrEmpty(specialization.IndexId)
             || !this.isEnabled(specialization.Id)
         )
@@ -65,7 +69,7 @@ public class AzureOpenAIChatExtension(
         }
 
         var openAIDeploymentConnection = await openAIDeploymentService.GetDeployment(
-            specialization.OpenAIDeploymentId ?? ""
+            completionDeploymentModel.OpenAIDeploymentId ?? ""
         );
         var openAIDeploymentApiKey = await openAIDeploymentService.GetAPIKeyFromVaultForDeployment(
             openAIDeploymentConnection

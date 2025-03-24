@@ -10,7 +10,7 @@ public interface IAzureOpenAIChatExtension
 {
     string ContextKey { get; }
 
-    Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization? specialization);
+    Task<AzureSearchChatDataSource?> GetAzureSearchChatDataSource(Specialization specialization);
 
     Task<(string? indexName, string? ApiKey, string? Endpoint)> GetAISearchDeploymentConnectionDetails(string indexId);
 }

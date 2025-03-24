@@ -9,13 +9,17 @@ public class SpecializationProfile : Profile
 {
     public SpecializationProfile()
     {
-        this.CreateMap<SpecializationWriteModel, Specialization>();
+        this.CreateMap<SpecializationWriteModel, Specialization>().ReverseMap();
+
         this.CreateMap<SpecializationWriteModel, CompletionDeploymentModel>()
             .ForMember(
                 destination => destination.Name,
                 option => option.MapFrom(source => source.CompletionDeploymentName)
-            );
+            )
+            .ReverseMap();
+
         this.CreateMap<Specialization, SpecializationResponse>();
+
         this.CreateMap<CompletionDeploymentModel, SpecializationResponse>();
     }
 }

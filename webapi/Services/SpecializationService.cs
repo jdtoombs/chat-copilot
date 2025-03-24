@@ -11,6 +11,7 @@ using CopilotChat.WebApi.Storage;
 using CopilotChat.WebApi.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CopilotChat.WebApi.Services;
 
@@ -31,16 +32,18 @@ public class SpecializationService(
 
     public async Task<Specialization> SaveSpecialization(Specialization specialization)
     {
-        var specializationSource = specialization with
+        var entity = specialization with
         {
             Id = Guid.NewGuid().ToString(),
             ImageFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationImage),
             IconFilePath = ResourceUtils.GetImageAsDataUri(qAzureOpenAIChatOptions.Value.DefaultSpecializationIcon),
         };
 
-        await specializationSourceRepository.CreateAsync(specializationSource);
+        this.Validate(entity);
 
-        return specializationSource;
+        await specializationSourceRepository.CreateAsync(entity);
+
+        return entity;
     }
 
     public Task UpdateSpecialization(Specialization specialization) =>
@@ -197,5 +200,16 @@ public class SpecializationService(
         }
 
         return fileUriString;
+    }
+
+    private void Validate(Specialization completionDeploymentModel)
+    {
+        if (!string.IsNullOrWhiteSpace(completionDeploymentModel.IndexId))
+        {
+            Assert.AreNotEqual(completionDeploymentModel.Strictness, null);
+            Assert.AreNotEqual(completionDeploymentModel.DocumentCount, null);
+            Assert.AreNotEqual(completionDeploymentModel.MaxResponseTokenLimit, null);
+            Assert.AreNotEqual(completionDeploymentModel.PastMessagesIncludedCount, null);
+        }
     }
 }

@@ -8,53 +8,44 @@ namespace CopilotChat.WebApi.Services;
 public class ChatSessionService(
     ChatSessionRepository chatSessionRepository,
     ISpecializationService specializationService,
-    IOpenAIDeploymentService openAIDeploymentService
+    IOpenAIDeploymentService openAIDeploymentService,
+    ICompletionDeploymentModelService completionDeploymentModelService
 ) : IChatSessionService
 {
-    private Specialization? _specialization { get; set; }
-
-    private async Task<Specialization> GetSpecialization(string chatId)
+    public async Task<OpenAIDeployment> GetDeployment(string chatId)
     {
-        if (this._specialization == null)
-        {
-            var chatSession = await chatSessionRepository.FindByIdAsync(chatId);
-            this._specialization = await specializationService.GetSpecializationAsync(chatSession.specializationId);
-        }
-
-        return this._specialization;
+        var chatSession = await chatSessionRepository.FindByIdAsync(chatId);
+        var specialization = await specializationService.GetSpecializationAsync(chatSession.specializationId);
+        var completionDeploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specialization.Id
+        );
+        return await openAIDeploymentService.GetDeployment(completionDeploymentModel.OpenAIDeploymentId);
     }
-
-    private OpenAIDeployment? _openAIDeployment { get; set; }
-
-    private async Task<OpenAIDeployment> GetOpenAIDeployment(string chatId)
-    {
-        if (this._openAIDeployment == null)
-        {
-            var specialization = await this.GetSpecialization(chatId);
-            this._openAIDeployment = await openAIDeploymentService.GetDeployment(specialization.OpenAIDeploymentId);
-        }
-
-        return this._openAIDeployment;
-    }
-
-    public Task<OpenAIDeployment> GetDeployment(string chatId) => this.GetOpenAIDeployment(chatId);
 
     public async Task<ChatCompletionDeployment?> GetCompletionDeployment(string chatId)
     {
-        var specialization = await this.GetSpecialization(chatId);
-        var deployment = await this.GetOpenAIDeployment(chatId);
+        var chatSession = await chatSessionRepository.FindByIdAsync(chatId);
+        var specialization = await specializationService.GetSpecializationAsync(chatSession.specializationId);
+        var completionDeploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specialization.Id
+        );
+        var deployment = await openAIDeploymentService.GetDeployment(completionDeploymentModel.OpenAIDeploymentId);
 
         return deployment
             .ChatCompletionDeployments.Where(chatCompletionDeployment =>
-                chatCompletionDeployment.Name == specialization.CompletionDeploymentName
+                chatCompletionDeployment.Name == completionDeploymentModel.Name
             )
             .FirstOrDefault();
     }
 
     public async Task<string?> GetImageGenerationDeployment(string chatId)
     {
-        var specialization = await this.GetSpecialization(chatId);
-        var deployment = await this.GetOpenAIDeployment(chatId);
+        var chatSession = await chatSessionRepository.FindByIdAsync(chatId);
+        var specialization = await specializationService.GetSpecializationAsync(chatSession.specializationId);
+        var completionDeploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specialization.Id
+        );
+        var deployment = await openAIDeploymentService.GetDeployment(completionDeploymentModel.OpenAIDeploymentId);
 
         return deployment
             .ImageGenerationDeployments

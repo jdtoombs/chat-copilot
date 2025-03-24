@@ -77,12 +77,19 @@ public class ChatPlugin
     /// </summary>
     private readonly ISpecializationService _specializationService;
 
+    private readonly ICompletionDeploymentModelService _completionDeploymentModelService;
+
     private readonly IOpenAIDeploymentService _openAIDeploymentService;
 
     /// <summary>
     /// The current specialization in use, may be null if not yet set or if no specialization applies.
     /// </summary>
     private Specialization? _qSpecialization = null;
+
+    /// <summary>
+    /// The current completion deployment model in use, may be null if not yet set or if no specialization applies.
+    /// </summary>
+    private CompletionDeploymentModel? _completionDeploymentModel = null;
 
     /// <summary>
     /// Settings containing prompt texts.
@@ -119,6 +126,7 @@ public class ChatPlugin
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         ISpecializationService specializationService,
+        ICompletionDeploymentModelService completionDeploymentModelService,
         ILogger logger,
         IAzureOpenAIChatExtension azureOpenAIChatExtension,
         AzureContentSafety? contentSafety = null,
@@ -134,6 +142,7 @@ public class ChatPlugin
         // Clone the prompt options to avoid modifying the original prompt options.
         this._promptOptions = promptOptions.Value.Copy();
         this._specializationService = specializationService;
+        this._completionDeploymentModelService = completionDeploymentModelService;
         this._openAIDeploymentService = openAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
@@ -187,6 +196,9 @@ public class ChatPlugin
         if (specializationKey != null)
         {
             this._qSpecialization = await this._specializationService.GetSpecializationAsync(specializationKey);
+            this._completionDeploymentModel = await this._completionDeploymentModelService.FindBySpecializationId(
+                this._qSpecialization.Id
+            );
         }
 
         this._logger.LogInformation("Getting chat response");
@@ -845,10 +857,10 @@ public class ChatPlugin
     private async Task<int> GetCompletionTokenLimit()
     {
         var deploymentConnection = await this._openAIDeploymentService.GetDeployment(
-            this._qSpecialization?.OpenAIDeploymentId ?? ""
+            this._completionDeploymentModel?.OpenAIDeploymentId ?? ""
         );
         var completionConnection = deploymentConnection.ChatCompletionDeployments.FirstOrDefault(c =>
-            c.Name == this._qSpecialization?.CompletionDeploymentName
+            c.Name == this._completionDeploymentModel?.Name
         );
         return completionConnection == null
             ? this._promptOptions.CompletionTokenLimit
@@ -938,7 +950,7 @@ public class ChatPlugin
         if (chatCompletion == null)
         {
             throw new InvalidOperationException(
-                $"ChatCompletionService for deployment '{this._qSpecialization?.OpenAIDeploymentId}' not found."
+                $"ChatCompletionService for deployment '{this._completionDeploymentModel?.OpenAIDeploymentId}' not found."
             );
         }
 

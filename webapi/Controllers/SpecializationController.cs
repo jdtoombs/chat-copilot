@@ -71,12 +71,7 @@ public class SpecializationController(
     {
         var specialization = await specializationService.SaveSpecialization(mapper.Map<Specialization>(model));
 
-        await completionDeploymentModelService.Save(
-            mapper.Map<CompletionDeploymentModel>(model) with
-            {
-                Partition = specialization.Id,
-            }
-        );
+        await completionDeploymentModelService.Save(mapper.Map<CompletionDeploymentModel>(model), specialization.Id);
 
         return this.Ok(specialization);
     }
@@ -93,15 +88,30 @@ public class SpecializationController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PatchSpecializationAsync(
-        [FromBody] JsonPatchDocument<Specialization> patchSpecialization,
-        [FromRoute] Guid specializationId
+        [FromBody] JsonPatchDocument<SpecializationWriteModel> patchSpecialization,
+        [FromRoute] Guid specializationId,
+        IMapper mapper
     )
     {
         var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
+        var completionDeploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specializationId.ToString()
+        );
 
-        patchSpecialization.ApplyTo(specialization);
+        SpecializationWriteModel specializationWriteModel = new();
+        mapper.Map(specialization, specializationWriteModel);
+        mapper.Map(completionDeploymentModel, specializationWriteModel);
 
-        await specializationService.UpdateSpecialization(specialization);
+        patchSpecialization.ApplyTo(specializationWriteModel);
+
+        await specializationService.UpdateSpecialization(mapper.Map(specializationWriteModel, specialization));
+
+        if (completionDeploymentModel != null)
+        {
+            await completionDeploymentModelService.Update(
+                mapper.Map(specializationWriteModel, completionDeploymentModel)
+            );
+        }
 
         return this.Ok(specialization);
     }

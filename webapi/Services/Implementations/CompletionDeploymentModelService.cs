@@ -1,28 +1,28 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CopilotChat.WebApi.Services.Implementations;
 
 public class CompletionDeploymentModelService(CompletionDeploymentModelRepository completionDeploymentModelRepository)
     : ICompletionDeploymentModelService
 {
-    public Task Save(CompletionDeploymentModel completionDeploymentModel)
+    public Task Save(CompletionDeploymentModel completionDeploymentModel, string specializationId)
     {
-        this.Validate(completionDeploymentModel);
+        var entity = completionDeploymentModel with { Id = Guid.NewGuid().ToString(), Partition = specializationId };
 
-        return completionDeploymentModelRepository.CreateAsync(completionDeploymentModel);
+        return completionDeploymentModelRepository.CreateAsync(entity);
     }
 
-    private void Validate(CompletionDeploymentModel completionDeploymentModel)
+    public Task Update(CompletionDeploymentModel completionDeploymentModel) =>
+        completionDeploymentModelRepository.UpsertAsync(completionDeploymentModel);
+
+    public async Task<CompletionDeploymentModel?> FindBySpecializationId(string specializationId)
     {
-        if (!string.IsNullOrWhiteSpace(completionDeploymentModel.IndexId))
-        {
-            Assert.AreNotEqual(completionDeploymentModel.Strictness, null);
-            Assert.AreNotEqual(completionDeploymentModel.DocumentCount, null);
-            Assert.AreNotEqual(completionDeploymentModel.MaxResponseTokenLimit, null);
-            Assert.AreNotEqual(completionDeploymentModel.PastMessagesIncludedCount, null);
-        }
+        var completionDeploymentModels = await completionDeploymentModelRepository.FindByPartitionKey(specializationId);
+
+        return completionDeploymentModels.FirstOrDefault();
     }
 }
