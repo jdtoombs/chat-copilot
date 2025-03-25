@@ -27,6 +27,27 @@ public class SpecializationController(
 ) : ControllerBase
 {
     /// <summary>
+    /// Get a specialization
+    /// </summary>
+    [HttpGet]
+    [Route("specializations/{specializationId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSpecialization([FromRoute] Guid specializationId, IMapper mapper)
+    {
+        var specialization = await specializationService.GetSpecializationAsync(specializationId.ToString());
+        var deploymentModel = await completionDeploymentModelService.FindBySpecializationId(
+            specializationId.ToString()
+        );
+
+        var response = mapper.Map<SpecializationResponse>(specialization);
+        mapper.Map(deploymentModel, response);
+
+        return this.Ok(mapper.Map<SpecializationResponse>(specialization));
+    }
+
+    /// <summary>
     /// Get all available specializations maintained in the system.
     /// </summary>
     /// <returns>A list of available specializations. An empty list if no specializations are found.</returns>
