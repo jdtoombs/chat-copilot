@@ -10,6 +10,7 @@ using CopilotChat.WebApi.Extensions;
 using CopilotChat.WebApi.Models.Storage;
 using CopilotChat.WebApi.Options;
 using CopilotChat.WebApi.Plugins.Utils;
+using CopilotChat.WebApi.Services;
 using CopilotChat.WebApi.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,10 @@ public class SemanticMemoryRetriever
 
     private readonly ChatSessionRepository _chatSessionRepository;
 
+    private readonly ISpecializationService _specializationService;
+
+    private readonly ISpecializationIndexService _specializationIndexService;
+
     private readonly IKernelMemory _memoryClient;
 
     private readonly List<string> _memoryNames;
@@ -41,6 +46,8 @@ public class SemanticMemoryRetriever
     public SemanticMemoryRetriever(
         IOptions<PromptsOptions> promptOptions,
         ChatSessionRepository chatSessionRepository,
+        ISpecializationService specializationService,
+        ISpecializationIndexService specializationIndexService,
         IKernelMemory memoryClient,
         ILogger logger
     )
@@ -49,6 +56,8 @@ public class SemanticMemoryRetriever
         this._chatSessionRepository = chatSessionRepository;
         this._memoryClient = memoryClient;
         this._logger = logger;
+        this._specializationIndexService = specializationIndexService;
+        this._specializationService = specializationService;
 
         this._memoryNames = new List<string>
         {
@@ -74,6 +83,17 @@ public class SemanticMemoryRetriever
             throw new ArgumentException($"Chat session {chatId} not found.");
         }
 
+        var specialization = await this._specializationService.GetSpecializationAsync(chatSession.specializationId);
+        List<SpecializationIndex> indexes = new();
+        if (specialization != null && specialization.EnableKernelMemoryMultiIndex)
+        {
+            foreach (var indexId in specialization.IndexIds)
+            {
+                var index = await this._specializationIndexService.GetIndexAsync(indexId);
+                indexes.Add(index);
+            }
+        }
+
         var remainingToken = tokenLimit;
 
         // Search for relevant memories.
@@ -81,10 +101,22 @@ public class SemanticMemoryRetriever
         List<Task> tasks = new();
         foreach (var memoryName in this._memoryNames)
         {
-            tasks.Add(SearchMemoryAsync(memoryName));
+            tasks.Add(SearchMemoryAsync(this._promptOptions.MemoryIndexName, memoryName));
         }
+        // Specialization index memory.
+        foreach (var index in indexes)
+        {
+            tasks.Add(SearchMemoryAsync(index.Name, null));
+        }
+
         // Global document memory.
-        tasks.Add(SearchMemoryAsync(this._promptOptions.DocumentMemoryName, isGlobalMemory: true));
+        tasks.Add(
+            SearchMemoryAsync(
+                this._promptOptions.MemoryIndexName,
+                this._promptOptions.DocumentMemoryName,
+                isGlobalMemory: true
+            )
+        );
         // Wait for all tasks to complete.
         await Task.WhenAll(tasks);
 
@@ -104,7 +136,10 @@ public class SemanticMemoryRetriever
             /// </summary>
             void FormatMemories()
             {
-                foreach (var memoryName in this._promptOptions.MemoryMap.Keys)
+                var memoryKeys = this._promptOptions.MemoryMap.Keys.ToList();
+                //indexes.ForEach(indx => memoryKeys.Add(indx.Name));
+
+                foreach (var memoryName in memoryKeys)
                 {
                     if (memoryMap.TryGetValue(memoryName, out var memories))
                     {
@@ -127,24 +162,30 @@ public class SemanticMemoryRetriever
             /// </summary>
             void FormatSnippets()
             {
-                if (
-                    !memoryMap.TryGetValue(this._promptOptions.DocumentMemoryName, out var memories)
-                    || memories.Count == 0
-                )
+                List<(string, CitationSource)> knowledgeBaseMemories = new();
+                var knowledgebaseKeys = new List<string>() { this._promptOptions.DocumentMemoryName };
+                indexes.ForEach(indx => knowledgebaseKeys.Add(indx.Name));
+                foreach (var key in knowledgebaseKeys)
                 {
-                    return;
+                    var gotMemory = memoryMap.TryGetValue(key, out var documentMemories);
+                    if (gotMemory)
+                    {
+                        knowledgeBaseMemories = knowledgeBaseMemories.Concat(documentMemories).ToList();
+                    }
                 }
-
-                builderMemory.Append(
-                    "Use the following information as knowledgebase/context for your response:\n"
-                        + "Quote the document link in square brackets at the end of each sentence that refers to the snippet in your response.\n"
-                );
-
-                foreach ((var memoryContent, var citation) in memories)
+                if (knowledgeBaseMemories.Count > 0)
                 {
-                    var memoryText =
-                        $"Document name: {citation.SourceName}\nDocument link: {citation.Link}.\n[CONTENT START]\n{memoryContent}\n[CONTENT END]\n";
-                    builderMemory.Append(memoryText);
+                    builderMemory.Append(
+                        "Use the following information as knowledgebase/context for your response:\n"
+                            + "Quote the document link in square brackets at the end of each sentence that refers to the snippet in your response.\n"
+                    );
+
+                    foreach ((var memoryContent, var citation) in knowledgeBaseMemories)
+                    {
+                        var memoryText =
+                            $"Document name: {citation.SourceName}\nDocument link: {citation.Link}.\n[CONTENT START]\n{memoryContent}\n[CONTENT END]\n";
+                        builderMemory.Append(memoryText);
+                    }
                 }
             }
         }
@@ -154,12 +195,14 @@ public class SemanticMemoryRetriever
         /// <summary>
         /// Search the memory for relevant memories by memory name.
         /// </summary>
-        async Task SearchMemoryAsync(string memoryName, bool isGlobalMemory = false)
+        async Task SearchMemoryAsync(string memoryIndex, string? memoryName, bool isGlobalMemory = false)
         {
+            var threshold = this.CalculateRelevanceThreshold(memoryName ?? "", chatSession!.MemoryBalance);
+
             var searchResult = await this._memoryClient.SearchMemoryAsync(
-                this._promptOptions.MemoryIndexName,
+                memoryIndex,
                 query,
-                this.CalculateRelevanceThreshold(memoryName, chatSession!.MemoryBalance),
+                threshold,
                 isGlobalMemory ? DocumentMemoryOptions.GlobalDocumentChatId.ToString() : chatId,
                 memoryName
             );
@@ -210,6 +253,22 @@ public class SemanticMemoryRetriever
                         {
                             citationMap.TryAdd(result.Citation.Link, citationSource);
                         }
+                    }
+                    else if (indexes.Any(indx => indx.Name == result.Citation.Index))
+                    {
+                        var citationSource = CitationSource.FromSemanticMemoryCitation(
+                            result.Citation,
+                            result.Memory.Text,
+                            result.Memory.Relevance
+                        );
+                        if (!memoryMap.TryGetValue(result.Citation.Index, out var memories))
+                        {
+                            memories = new List<(string, CitationSource)>();
+                            memoryMap.Add(result.Citation.Index, memories);
+                        }
+                        memories.Add((result.Memory.Text, citationSource));
+                        remainingToken -= tokenCount;
+                        citationMap.TryAdd(result.Citation.Link, citationSource);
                     }
                 }
                 else
@@ -264,7 +323,7 @@ public class SemanticMemoryRetriever
         }
         else
         {
-            throw new ArgumentException($"Invalid memory name: {memoryName}");
+            return this._promptOptions.SearchIndexMinRelevance; //Fall through case for when using an Azure search index, should probably handle this more specifically later
         }
     }
 

@@ -25,6 +25,16 @@ public record Specialization : IStorageEntity
 
     public string? IndexId { get; set; }
 
+    /// <summary>
+    /// Specialization index ids for use with multi-index kernel memory retrieval approach.
+    /// </summary>
+    public List<string> IndexIds { get; set; } = new List<string>();
+
+    /// <summary>
+    /// If this feature is enabled, the chat will favor KernelMemory for indexing instead of AzureChatDataSource
+    /// </summary>
+    public bool EnableKernelMemoryMultiIndex { get; set; }
+
     public string ImageFilePath { get; set; }
 
     public string IconFilePath { get; set; }

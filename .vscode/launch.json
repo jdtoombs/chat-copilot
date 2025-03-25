@@ -7,11 +7,11 @@
             "type": "coreclr",
             "preLaunchTask": "build (CopilotChatWebApi)",
             "request": "launch",
-            "program": "${workspaceFolder}/webapi/bin/Debug/net8.0/CopilotChatWebApi.dll",
-            "cwd": "${workspaceFolder}/webapi",
+            "program": "${workspaceFolder}/webapi/bin/Debug/net9.0/CopilotChatWebApi.dll",
+            "cwd": "${workspaceFolder}/webapi/bin/Debug/net9.0",
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-            },
+            }
         }
     ]
 }

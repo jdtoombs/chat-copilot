@@ -38,6 +38,8 @@ public sealed class Program
     {
         Console.WriteLine("Starting Q-Pilot Service...");
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+        Console.WriteLine($"ASPNETCORE_ENVIRONMENT: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
 
         // Load in configuration settings from appsettings.json, user-secrets, key vaults, etc...
         builder.Host.AddConfiguration();
@@ -98,8 +100,7 @@ public sealed class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            })
-            .AddNewtonsoftJson();
+            });
         builder.Services.AddHealthChecks();
 
         // Configure middleware and endpoints

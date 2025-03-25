@@ -46,6 +46,7 @@ public class AzureOpenAIChatExtension(
             completionDeploymentModel == null
             || string.IsNullOrEmpty(specialization.IndexId)
             || !this.isEnabled(specialization.Id)
+            || specialization.EnableKernelMemoryMultiIndex
         )
         {
             return null;

@@ -126,6 +126,7 @@ public class ChatPlugin
         IHubContext<MessageRelayHub> messageRelayHubContext,
         IOptions<PromptsOptions> promptOptions,
         ISpecializationService specializationService,
+        ISpecializationIndexService specializationIndexService,
         ICompletionDeploymentModelService completionDeploymentModelService,
         ILogger logger,
         IAzureOpenAIChatExtension azureOpenAIChatExtension,
@@ -147,6 +148,8 @@ public class ChatPlugin
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
             chatSessionRepository,
+            specializationService,
+            specializationIndexService,
             memoryClient,
             logger
         );

@@ -57,6 +57,12 @@ public class PromptsOptions
     /// </summary>
     internal float DocumentMemoryMinRelevance { get; } = 0.66F;
 
+    /// <summary>
+    /// Minimum relevance of a document memory to be included in the final prompt.
+    /// The higher the value, the answer will be more relevant to the user intent.
+    /// </summary>
+    internal float SearchIndexMinRelevance { get; } = 0.80F;
+
     // System
     [Required, NotEmptyOrWhitespace]
     public string KnowledgeCutoffDate { get; set; } = string.Empty;

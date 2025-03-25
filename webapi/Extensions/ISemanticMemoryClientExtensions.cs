@@ -116,10 +116,9 @@ internal static class ISemanticMemoryClientExtensions
     {
         var filter = new MemoryFilter();
 
-        filter.ByTag(MemoryTags.TagChatId, chatId);
-
         if (!string.IsNullOrWhiteSpace(memoryName))
         {
+            filter.ByTag(MemoryTags.TagChatId, chatId);
             filter.ByTag(MemoryTags.TagMemory, memoryName);
         }
 
