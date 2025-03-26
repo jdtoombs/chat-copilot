@@ -46,6 +46,12 @@ public record SpecializationResponse
     [JsonPropertyName("indexId")]
     public string? IndexId { get; set; } = string.Empty;
 
+    [JsonPropertyName("indexIds")]
+    public required List<string> IndexIds { get; set; } = new List<string>();
+
+    [JsonPropertyName("enableKernelMemoryMultiIndex")]
+    public bool EnableKernelMemoryMultiIndex { get; set; } = false;
+
     /// <summary>
     /// Initial chat response of the specialization
     /// </summary>

@@ -148,6 +148,12 @@ export class SpecializationService extends BaseService {
         body.push({ op: 'replace', path: '/isDefault', value: specialization.isDefault.toString() });
         body.push({ op: 'replace', path: '/suggestions', value: specialization.suggestions });
         body.push({ op: 'replace', path: '/canGenImages', value: specialization.canGenImages.toString() });
+        body.push({
+            op: 'replace',
+            path: '/enableKernelMemoryMultiIndex',
+            value: specialization.enableKernelMemoryMultiIndex.toString(),
+        });
+        body.push({ op: 'replace', path: '/indexIds', value: specialization.indexIds });
 
         if (specialization.restrictResultScope != null) {
             body.push({

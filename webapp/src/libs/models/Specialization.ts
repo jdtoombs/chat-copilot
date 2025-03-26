@@ -21,6 +21,8 @@ export interface ISpecialization {
     order: number;
     suggestions: string[];
     canGenImages: boolean;
+    enableKernelMemoryMultiIndex: boolean;
+    indexIds?: string[];
 }
 
 /**
@@ -46,6 +48,8 @@ export interface ISpecializationRequest {
     order: number;
     suggestions: string[];
     canGenImages: boolean;
+    enableKernelMemoryMultiIndex: boolean;
+    indexIds?: string[];
 }
 
 export interface ISpecializationToggleRequest {

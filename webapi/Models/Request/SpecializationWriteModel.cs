@@ -27,6 +27,12 @@ public record SpecializationWriteModel
     [JsonProperty("indexId")]
     public string? IndexId { get; set; }
 
+    [JsonProperty("indexIds")]
+    public IList<string>? IndexIds { get; set; }
+
+    [JsonProperty("enableKernelMemoryMultiIndex")]
+    public bool EnableKernelMemoryMultiIndex { get; set; } = false;
+
     [JsonPropertyName("isActive")]
     public bool isActive { get; set; } = true;
 

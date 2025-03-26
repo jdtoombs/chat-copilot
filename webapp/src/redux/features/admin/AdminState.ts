@@ -53,6 +53,8 @@ export const Specializations = [
         order: 0,
         suggestions: [],
         canGenImages: false,
+        indexIds: [],
+        enableKernelMemoryMultiIndex: false,
     },
 ];
 export const initialState: AdminState = {

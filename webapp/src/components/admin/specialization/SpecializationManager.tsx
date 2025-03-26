@@ -9,6 +9,14 @@ import {
     SelectionEvents,
     shorthands,
     Slider,
+    Tag,
+    TagPicker,
+    TagPickerControl,
+    TagPickerGroup,
+    TagPickerInput,
+    TagPickerList,
+    TagPickerOnOptionSelectData,
+    TagPickerOption,
     Textarea,
     tokens,
     Tooltip,
@@ -134,6 +142,8 @@ export const SpecializationManager: React.FC = () => {
             order: 0,
             suggestions: [''],
             canGenImages: false,
+            enableKernelMemoryMultiIndex: false,
+            indexIds: [] as string[],
         };
     }, []);
 
@@ -238,6 +248,8 @@ export const SpecializationManager: React.FC = () => {
                     order: specializationObj.order,
                     suggestions: specializationObj.suggestions,
                     canGenImages: specializationObj.canGenImages,
+                    enableKernelMemoryMultiIndex: specializationObj.enableKernelMemoryMultiIndex,
+                    indexIds: specializationObj.indexIds ?? [],
                 });
                 /**
                  * Set the image and icon file paths
@@ -293,6 +305,20 @@ export const SpecializationManager: React.FC = () => {
             [event.target.name]: value,
         });
     };
+
+    const handleTagPickerChange = (_event: Event | React.SyntheticEvent, data: TagPickerOnOptionSelectData) => {
+        if (data.value === 'no-options') {
+            return;
+        }
+        setSpecializationRequest({
+            ...specializationRequest,
+            indexIds: data.selectedOptions,
+        });
+    };
+
+    const tagPickerOptions = specializationIndexes.filter(
+        (indx) => indx.name.includes('kernelmemory') && !specializationRequest.indexIds.includes(indx.id),
+    );
 
     const handleRoleInformationChange = (roleInformation: string) => {
         setSpecializationRequest({
@@ -479,6 +505,7 @@ export const SpecializationManager: React.FC = () => {
                         specializationIndexes.find((index) => index.id === specializationRequest.indexId)?.name ??
                         'None'
                     }
+                    disabled={specializationRequest.enableKernelMemoryMultiIndex}
                 >
                     <Option value="">None</Option>
                     {specializationIndexes.map((specializationIndex) => (
@@ -491,6 +518,37 @@ export const SpecializationManager: React.FC = () => {
                         </Option>
                     ))}
                 </Dropdown>
+                <Checkbox
+                    name="enableKernelMemoryMultiIndex"
+                    label="Enable Kernel Memory Multi-index (Experimental)"
+                    checked={specializationRequest.enableKernelMemoryMultiIndex}
+                    onChange={handleChange}
+                />
+                {specializationRequest.enableKernelMemoryMultiIndex && (
+                    <TagPicker onOptionSelect={handleTagPickerChange} selectedOptions={specializationRequest.indexIds}>
+                        <TagPickerControl>
+                            <TagPickerGroup aria-label="Selected Indexes">
+                                {specializationRequest.indexIds.map((option) => (
+                                    <Tag key={option} shape="rounded" value={option}>
+                                        {specializationIndexes.find((a) => a.id == option)?.label}
+                                    </Tag>
+                                ))}
+                            </TagPickerGroup>
+                            <TagPickerInput aria-label="Select Indexes" />
+                        </TagPickerControl>
+                        <TagPickerList>
+                            {tagPickerOptions.length > 0 ? (
+                                tagPickerOptions.map((option) => (
+                                    <TagPickerOption value={option.id} key={option.id}>
+                                        {option.label}
+                                    </TagPickerOption>
+                                ))
+                            ) : (
+                                <TagPickerOption value="no-options">No options available</TagPickerOption>
+                            )}
+                        </TagPickerList>
+                    </TagPicker>
+                )}
                 <Row>
                     <Checkbox
                         name="isDefault"
