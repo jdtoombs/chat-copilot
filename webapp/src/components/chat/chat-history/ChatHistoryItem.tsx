@@ -59,6 +59,7 @@ const useClasses = makeStyles({
     },
     item: {
         backgroundColor: customTokens.colorNeutralBackground1,
+        maxWidth: '100%',
         ...shorthands.borderRadius(customTokens.borderRadiusMedium),
         ...shorthands.padding(customTokens.spacingVerticalXS, customTokens.spacingHorizontalS),
     },

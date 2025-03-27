@@ -4,6 +4,7 @@ import { Badge, Card, CardHeader, makeStyles, shorthands, Text, ToggleButton } f
 import { ChevronDown20Regular, ChevronUp20Regular } from '@fluentui/react-icons';
 import React, { useState } from 'react';
 import { IChatMessage } from '../../../libs/models/ChatMessage';
+import { isUrl } from '../../../libs/utils/HelperMethods';
 import { customTokens } from '../../../styles';
 
 const useClasses = makeStyles({
@@ -14,7 +15,6 @@ const useClasses = makeStyles({
     },
     card: {
         display: 'flex',
-        width: '100%',
         height: 'fit-content',
     },
 });
@@ -55,6 +55,16 @@ export const CitationCards: React.FC<ICitationCardsProps> = ({ message }) => {
         setShowSnippetStates(newShowSnippetStates);
     };
 
+    const citationText = (sourceName: string) => {
+        const regex = new RegExp('([^\/]+)$');
+        const matchedGroup = sourceName.match(regex);
+        if (matchedGroup) {
+            return matchedGroup[1];
+        } else {
+            return '';
+        }
+    };
+
     return (
         <div className={classes.root}>
             {message.citations.map((citation, index) => {
@@ -66,7 +76,15 @@ export const CitationCards: React.FC<ICitationCardsProps> = ({ message }) => {
                                     {index + 1}
                                 </Badge>
                             }
-                            header={<Text weight="semibold">{citation.sourceName}</Text>}
+                            header={
+                                isUrl(citation.link) ? (
+                                    <a href={citation.link} target="_blank" rel="noopener noreferrer">
+                                        <Text weight="semibold">{citationText(citation.sourceName)}</Text>
+                                    </a>
+                                ) : (
+                                    <Text weight="semibold">{citationText(citation.sourceName)}</Text>
+                                )
+                            }
                             action={
                                 <ToggleButton
                                     appearance="transparent"

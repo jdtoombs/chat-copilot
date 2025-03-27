@@ -1026,13 +1026,14 @@ public class ChatPlugin
                         {
                             var citation = messageContext.Citations[i];
                             var sourceName = citation.FilePath;
-                            var link = citation.FilePath;
+                            var link = citation.FilePath; // Some legacy bring your own data indexes may not have URL, so still read this.
+                            var url = citation.Url; // However, ones that we have updated should now have a true hyperlink populating this field.
 
                             citationMap.Add(
                                 $"doc{i + 1}",
                                 new CitationSource
                                 {
-                                    Link = link,
+                                    Link = string.IsNullOrEmpty(citation.Url) ? citation.FilePath : citation.Url,
                                     SourceName = sourceName,
                                     Snippet = citation.Content,
                                     SourceContentType =
