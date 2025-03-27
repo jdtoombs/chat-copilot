@@ -93,23 +93,6 @@ module "kubernetes_namespace" {
 
 }
 
-resource "azurerm_role_assignment" "acr" {
-  scope                = data.azurerm_container_registry.acr.id
-  role_definition_name = "Contributor"
-  principal_id         = var.app_github_object_id
-
-  provider = azurerm
-}
-
-
-resource "azurerm_role_assignment" "aks" {
-  scope                = data.azurerm_kubernetes_cluster.aks.id
-  role_definition_name = "Azure Kubernetes Service Contributor Role"
-  principal_id         = var.app_github_object_id
-
-  provider = azurerm
-}
-
 
 module "azure_keyvault" {
   source              = "./modules/azure-keyvault"
