@@ -11,7 +11,11 @@ public class CompletionDeploymentModelService(CompletionDeploymentModelRepositor
 {
     public Task Save(CompletionDeploymentModel completionDeploymentModel, string specializationId)
     {
-        var entity = completionDeploymentModel with { Id = Guid.NewGuid().ToString(), Partition = specializationId };
+        var entity = completionDeploymentModel with
+        {
+            Id = Guid.NewGuid().ToString(),
+            SpecializationId = specializationId,
+        };
 
         return completionDeploymentModelRepository.CreateAsync(entity);
     }

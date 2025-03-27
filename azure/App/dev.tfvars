@@ -44,6 +44,7 @@ cosmosdb_sql_containers = [
   { name = "specializationindex", partition_key_path = "/id" },
   { name = "openaideployment", partition_key_path = "/id" },
   { name = "aisearchdeployment", partition_key_path = "/id" }
+  { name = "completiondeploymentmodel", partition_key_path = "/specializationId" }
 ]
 
 openai_deployments = [
