@@ -77,6 +77,7 @@ public class ChatPlugin
     /// </summary>
     private readonly ISpecializationService _specializationService;
 
+    private readonly ISpecializationIndexService _specializationIndexService;
     private readonly ICompletionDeploymentModelService _completionDeploymentModelService;
 
     private readonly IOpenAIDeploymentService _openAIDeploymentService;
@@ -144,6 +145,7 @@ public class ChatPlugin
         this._promptOptions = promptOptions.Value.Copy();
         this._specializationService = specializationService;
         this._completionDeploymentModelService = completionDeploymentModelService;
+        this._specializationIndexService = specializationIndexService;
         this._openAIDeploymentService = openAIDeploymentService;
         this._semanticMemoryRetriever = new SemanticMemoryRetriever(
             promptOptions,
@@ -282,6 +284,13 @@ public class ChatPlugin
             - TokenUtils.GetContextMessageTokenCount(AuthorRole.User, userMessage.ToFormattedString());
         chatMemoryTokenBudget = (int)(chatMemoryTokenBudget * this._promptOptions.MemoriesResponseContextWeight);
 
+        var memoryIndexes = await this.DetermineKernelMemoryIndexes(
+            chatId,
+            userIntent,
+            maxRequestTokenBudget,
+            cancellationToken
+        );
+
         // Query relevant semantic and document memories
         (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(
             userIntent,
@@ -335,6 +344,51 @@ public class ChatPlugin
                     cancellationToken
                 )
         );
+    }
+
+    private async Task<IEnumerable<SpecializationIndex>> DetermineKernelMemoryIndexes(
+        string chatId,
+        string userIntent,
+        int maxRequestTokenBudget,
+        CancellationToken cancellationToken
+    )
+    {
+        var chatSession = await this._chatSessionRepository.FindByIdAsync(chatId);
+        var spec = await this._specializationService.GetSpecializationAsync(chatSession.specializationId);
+        IEnumerable<SpecializationIndex> indexes;
+
+        if (spec.IndexIds.Count == 0 || !spec.EnableKernelMemoryMultiIndex)
+        {
+            return new List<SpecializationIndex>();
+        }
+
+        var chatHistory = new ChatHistory();
+        string allowedChatHistory = await this.GetAllowedChatHistoryAsync(
+            chatId,
+            (int)(maxRequestTokenBudget * 0.90f),
+            chatHistory,
+            cancellationToken
+        );
+
+        List<Task<SpecializationIndex>> specTasks = new();
+        foreach (var indexId in spec.IndexIds)
+        {
+            specTasks.Add(this._specializationIndexService.GetIndexAsync(indexId));
+        }
+        indexes = await Task.WhenAll(specTasks);
+        chatHistory.AddUserMessage(
+            $"Given this user intent: \"{userIntent}\", which of the following indexes should we query for an answer: {string.Join(",", indexes.Select(idx => idx.Name))}. Respond with the selected indexes and nothing else."
+        );
+
+        var completionService = this._kernel.GetRequiredService<IChatCompletionService>();
+        var response = await completionService.GetChatMessageContentAsync(chatHistory, null, null, cancellationToken);
+
+        if (response.Content != null)
+        {
+            var indexNames = response.Content.Split(",");
+            return indexes.Where((idx) => indexNames.Contains(idx.Name));
+        }
+        return indexes;
     }
 
     /// <summary>
