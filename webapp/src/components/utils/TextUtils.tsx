@@ -107,6 +107,16 @@ export function replaceBracketStyleCitationsWithCaret(formattedMessageContent: s
 }
 
 /**
+ * This will find markdown links in the style of [linktext](hyperlink) and enclose the round parentheses part with
+ * angle brackets as such [lintext](<hyperlink>), ensuring that URLs with special characters like spaces are escaped properly.
+ */
+export function escapeMarkdownLinks(formattedMessageContent: string) {
+    const markdownLinkRegex = /\[([^\]]+)\]\((https(?:%3A%2F%2F|:\/\/)[^\)]+)\)/g;
+    const ret = formattedMessageContent.replace(markdownLinkRegex, '[$1](<$2>)');
+    return ret;
+}
+
+/**
  * Will first escape all dollar signs present in the original string.
  * Then, replace every occurrence of block style MathJax delimiters \[ and \] with $$ and $$
  * Then, replace every occurrence of inline style MathJax delimiters \( and \) with $ and $.

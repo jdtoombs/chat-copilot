@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using System;
 using Microsoft.KernelMemory;
 
 namespace CopilotChat.WebApi.Models.Storage;
@@ -39,11 +40,16 @@ public class CitationSource
     /// <summary>
     /// Converts a <see cref="Citation"/> to a <see cref="CitationSource"/>.
     /// </summary>
-    public static CitationSource FromSemanticMemoryCitation(Citation citation, string snippet, double relevanceScore)
+    public static CitationSource FromSemanticMemoryCitation(
+        Citation citation,
+        string snippet,
+        double relevanceScore,
+        Uri? url = null
+    )
     {
         var citationSource = new CitationSource
         {
-            Link = citation.Link,
+            Link = url != null ? url.ToString() : citation.Link,
             SourceContentType = citation.SourceContentType,
             SourceName = citation.SourceName,
             Snippet = snippet,

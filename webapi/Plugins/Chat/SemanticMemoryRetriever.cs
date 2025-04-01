@@ -67,6 +67,25 @@ public class SemanticMemoryRetriever
         };
     }
 
+    private bool TryExtractUriFromMemory(Citation.Partition memory, out Uri? uri)
+    {
+        uri = null;
+        if (memory.Tags.TryGetValue("url", out var values))
+        {
+            if (values.Count != 1)
+            {
+                return false;
+            }
+            var value = values.First();
+            if (Uri.TryCreate(value, UriKind.Absolute, out Uri? hyperlink))
+            {
+                uri = hyperlink;
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// <summary>
     /// Query relevant memories based on the query.
     /// </summary>
@@ -256,10 +275,12 @@ public class SemanticMemoryRetriever
                     }
                     else if (indexes.Any(indx => indx.Name == result.Citation.Index))
                     {
+                        this.TryExtractUriFromMemory(result.Memory, out Uri? url);
                         var citationSource = CitationSource.FromSemanticMemoryCitation(
                             result.Citation,
                             result.Memory.Text,
-                            result.Memory.Relevance
+                            result.Memory.Relevance,
+                            url
                         );
                         if (!memoryMap.TryGetValue(result.Citation.Index, out var memories))
                         {
