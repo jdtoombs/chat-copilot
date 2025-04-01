@@ -14,8 +14,8 @@ const useClasses = makeStyles({
         ...Breakpoints.small({
             justifyContent: 'center',
         }),
-        cursor: 'pointer',
         ...shorthands.padding(tokens.spacingVerticalS, tokens.spacingHorizontalXL),
+        ':hover': { backgroundColor: 'lightGrey' },
     },
     body: {
         minWidth: 0,
