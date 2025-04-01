@@ -3,7 +3,6 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Secrets;
-using CopilotChat.WebApi.Context;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.KernelMemory;
@@ -19,8 +18,7 @@ namespace CopilotChat.WebApi.Services;
 public sealed class SemanticKernelProvider(
     IServiceProvider serviceProvider,
     SecretClient secretClient,
-    IChatSessionService chatSessionService,
-    IContextValueAccessor contextValueAccessor
+    IChatSessionService chatSessionService
 )
 {
     private Kernel? _kernel;
@@ -41,17 +39,11 @@ public sealed class SemanticKernelProvider(
 
         builder.Services.AddLogging();
 
-        var chatId = contextValueAccessor.GetRouteValue("chatId")?.ToString();
-        if (string.IsNullOrEmpty(chatId))
-        {
-            return builder.Build();
-        }
-
         var memoryOptions = serviceProvider.GetRequiredService<IOptions<KernelMemoryConfig>>().Value;
 
-        var openAIDeployment = await chatSessionService.GetDeployment(chatId);
-        var completionDeployment = await chatSessionService.GetCompletionDeployment(chatId);
-        var imageGenerationDeployment = await chatSessionService.GetImageGenerationDeployment(chatId);
+        var openAIDeployment = await chatSessionService.GetDeployment();
+        var completionDeployment = await chatSessionService.GetCompletionDeployment();
+        var imageGenerationDeployment = await chatSessionService.GetImageGenerationDeployment();
 
         var apiKey = await secretClient.GetSecretAsync(openAIDeployment.SecretName);
 

@@ -30,6 +30,8 @@ public class SpecializationService(
     public Task<Specialization> GetSpecializationAsync(string id) =>
         specializationSourceRepository.GetSpecializationAsync(id);
 
+    public Task<Specialization> GetDefaultSpecialization() => specializationSourceRepository.GetDefaultSpecialization();
+
     public async Task<Specialization> SaveSpecialization(Specialization specialization)
     {
         var entity = specialization with

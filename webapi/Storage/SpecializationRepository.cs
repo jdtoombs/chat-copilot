@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Quartech. All rights reserved.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CopilotChat.WebApi.Models.Storage;
 
@@ -18,6 +19,17 @@ public class SpecializationRepository(IStorageContext<Specialization> storageCon
     /// <returns>A list of specializations.</returns>
     public Task<IEnumerable<Specialization>> GetAllSpecializationsAsync() =>
         base.StorageContext.QueryEntitiesAsync(e => true);
+
+    /// <summary>
+    /// Retrieves the default specialization specialization.
+    /// </summary>
+    /// <returns>A list of specializations.</returns>
+    public async Task<Specialization> GetDefaultSpecialization()
+    {
+        var specializations = await base.StorageContext.QueryEntitiesAsync(e => e.IsDefault ?? false);
+
+        return specializations.First();
+    }
 
     /// <summary>
     /// Retrieves specialization by key.

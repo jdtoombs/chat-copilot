@@ -5,7 +5,7 @@ namespace CopilotChat.WebApi.Services;
 
 public interface IChatSessionService
 {
-    Task<OpenAIDeployment> GetDeployment(string chatId);
-    Task<ChatCompletionDeployment?> GetCompletionDeployment(string chatId);
-    Task<string?> GetImageGenerationDeployment(string chatId);
+    Task<OpenAIDeployment> GetDeployment();
+    Task<ChatCompletionDeployment?> GetCompletionDeployment();
+    Task<string?> GetImageGenerationDeployment();
 }

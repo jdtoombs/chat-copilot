@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using CopilotChat.WebApi.Context;
 using CopilotChat.WebApi.Hubs;
 using CopilotChat.WebApi.Models.Response;
 using CopilotChat.WebApi.Options;
@@ -144,8 +143,7 @@ internal static class SemanticKernelExtensions
             return new SemanticKernelProvider(
                 sp,
                 sp.GetRequiredService<ISecretClientAccessor>().GetSecretClient(),
-                sp.GetRequiredService<IChatSessionService>(),
-                sp.GetRequiredService<IContextValueAccessor>()
+                sp.GetRequiredService<IChatSessionService>()
             );
         });
     }

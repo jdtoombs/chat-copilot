@@ -28,6 +28,12 @@ public interface ISpecializationService
     Task<Specialization> GetSpecializationAsync(string id);
 
     /// <summary>
+    /// Retrieve the specialization marked as "default"
+    /// </summary>
+    /// <returns>Returns the specialization</returns>
+    Task<Specialization> GetDefaultSpecialization();
+
+    /// <summary>
     /// Creates new specialization.
     /// </summary>
     /// <param name="qSpecializationMutate">Specialization mutate payload</param>
