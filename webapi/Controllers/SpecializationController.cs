@@ -44,7 +44,7 @@ public class SpecializationController(
         var response = mapper.Map<SpecializationResponse>(specialization);
         mapper.Map(deploymentModel, response);
 
-        return this.Ok(mapper.Map<SpecializationResponse>(specialization));
+        return this.Ok(response);
     }
 
     /// <summary>

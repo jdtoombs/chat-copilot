@@ -3,6 +3,15 @@ import { ISpecialization, ISpecializationRequest, ISpecializationToggleRequest }
 import { BaseService } from './BaseService';
 
 export class SpecializationService extends BaseService {
+    public getSpecialization = (specializationId: string, accessToken: string): Promise<ISpecialization> =>
+        this.getResponseAsync<ISpecialization>(
+            {
+                commandPath: `specializations/${specializationId}`,
+                method: 'GET',
+            },
+            accessToken,
+        );
+
     public getAllSpecializationsAsync = async (accessToken: string): Promise<ISpecialization[]> => {
         const result = await this.getResponseAsync<ISpecialization[]>(
             {

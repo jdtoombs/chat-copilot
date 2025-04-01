@@ -84,8 +84,7 @@ interface ConversationsView {
 export const ChatList: FC = () => {
     const classes = useClasses();
     const { features } = useAppSelector((state: RootState) => state.app);
-    const { conversations } = useAppSelector((state: RootState) => state.conversations);
-    const { selectedId } = useAppSelector((state: RootState) => state.conversations);
+    const { selectedId, conversations } = useAppSelector((state: RootState) => state.conversations);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isFiltering, setIsFiltering] = useState(false);
     const [filterText, setFilterText] = useState('');

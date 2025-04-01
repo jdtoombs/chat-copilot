@@ -19,6 +19,21 @@ export const useSpecialization = () => {
     const { instance, inProgress } = useMsal();
     const specializationService = new SpecializationService();
 
+    const getSpecialization = async (id: string): Promise<ISpecialization | undefined> => {
+        try {
+            dispatch(showSpinner());
+            const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
+            return specializationService.getSpecialization(id, accessToken);
+        } catch (e: any) {
+            const errorMessage = `Unable to get specialization. Details: ${getErrorDetails(e)}`;
+            console.error('Error getting specialization:', e);
+            dispatch(addAlert({ message: errorMessage, type: AlertType.Error }));
+            return undefined;
+        } finally {
+            dispatch(hideSpinner());
+        }
+    };
+
     const loadSpecializations = async (): Promise<ISpecialization[] | undefined> => {
         try {
             const accessToken = await AuthHelper.getSKaaSAccessToken(instance, inProgress);
@@ -269,6 +284,7 @@ export const useSpecialization = () => {
     };
 
     return {
+        getSpecialization,
         loadSpecializations,
         createSpecialization,
         updateSpecialization,

@@ -23,7 +23,7 @@ import {
 } from '@fluentui/react-components';
 import { Info20Regular } from '@fluentui/react-icons';
 import '@mdxeditor/editor/style.css';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSpecialization } from '../../../libs/hooks';
 import { AlertType } from '../../../libs/models/AlertType';
 import { useAppDispatch, useAppSelector } from '../../../redux/app/hooks';
@@ -224,52 +224,59 @@ export const SpecializationManager: React.FC = () => {
         setDeploymentOutputTokens(4096);
     }, [defaultSpecializationRequest]);
 
-    useMemo(() => {
-        if (selectedId != '') {
-            setEditMode(true);
-            const specializationObj = specializations.find((specialization) => specialization.id === selectedId);
-            if (specializationObj) {
-                setSpecializationRequest({
-                    label: specializationObj.label,
-                    name: specializationObj.name,
-                    description: specializationObj.description,
-                    roleInformation: specializationObj.roleInformation,
-                    indexId: specializationObj.indexId,
-                    openAIDeploymentId: specializationObj.openAIDeploymentId,
-                    completionDeploymentName: specializationObj.completionDeploymentName,
-                    groupMemberships: specializationObj.groupMemberships,
-                    initialChatMessage: specializationObj.initialChatMessage,
-                    isDefault: specializationObj.isDefault,
-                    restrictResultScope: specializationObj.restrictResultScope ?? false,
-                    strictness: specializationObj.strictness ?? 3,
-                    documentCount: specializationObj.documentCount ?? 5,
-                    pastMessagesIncludedCount: specializationObj.pastMessagesIncludedCount ?? 10,
-                    maxResponseTokenLimit: specializationObj.maxResponseTokenLimit ?? 1024,
-                    order: specializationObj.order,
-                    suggestions: specializationObj.suggestions,
-                    canGenImages: specializationObj.canGenImages,
-                    enableKernelMemoryMultiIndex: specializationObj.enableKernelMemoryMultiIndex,
-                    indexIds: specializationObj.indexIds ?? [],
-                });
-                /**
-                 * Set the image and icon file paths
-                 * Note: The file is set to null because we only retrieve the file path from the server
-                 */
-                setImageFile({ file: null, src: specializationObj.imageFilePath });
-                setIconFile({ file: null, src: specializationObj.iconFilePath });
-                setId(specializationObj.id);
-                setDeploymentOutputTokens(
-                    chatCompletionDeployments
-                        .find((d) => d.id === specializationObj.openAIDeploymentId)
-                        ?.chatCompletionDeployments.find((a) => a.name === specializationObj.completionDeploymentName)
-                        ?.outputTokens ?? 4096,
-                );
+    useEffect(() => {
+        async function getSpecialization() {
+            if (selectedId == '') {
+                setEditMode(false);
+                resetSpecialization();
+                return;
             }
-        } else {
-            setEditMode(false);
-            resetSpecialization();
+
+            const specializationObj = await specialization.getSpecialization(selectedId);
+
+            if (!specializationObj) {
+                setEditMode(false);
+                resetSpecialization();
+                return;
+            }
+
+            setEditMode(true);
+            setSpecializationRequest({
+                label: specializationObj.label,
+                name: specializationObj.name,
+                description: specializationObj.description,
+                roleInformation: specializationObj.roleInformation,
+                indexId: specializationObj.indexId,
+                openAIDeploymentId: specializationObj.openAIDeploymentId,
+                completionDeploymentName: specializationObj.completionDeploymentName,
+                groupMemberships: specializationObj.groupMemberships,
+                initialChatMessage: specializationObj.initialChatMessage,
+                isDefault: specializationObj.isDefault,
+                restrictResultScope: specializationObj.restrictResultScope ?? false,
+                strictness: specializationObj.strictness ?? 3,
+                documentCount: specializationObj.documentCount ?? 5,
+                pastMessagesIncludedCount: specializationObj.pastMessagesIncludedCount ?? 10,
+                maxResponseTokenLimit: specializationObj.maxResponseTokenLimit ?? 1024,
+                order: specializationObj.order,
+                suggestions: specializationObj.suggestions,
+                canGenImages: specializationObj.canGenImages,
+                enableKernelMemoryMultiIndex: specializationObj.enableKernelMemoryMultiIndex,
+                indexIds: specializationObj.indexIds ?? [],
+            });
+            setImageFile({ file: null, src: specializationObj.imageFilePath });
+            setIconFile({ file: null, src: specializationObj.iconFilePath });
+            setId(specializationObj.id);
+            setDeploymentOutputTokens(
+                chatCompletionDeployments
+                    .find((d) => d.id === specializationObj.openAIDeploymentId)
+                    ?.chatCompletionDeployments.find((a) => a.name === specializationObj.completionDeploymentName)
+                    ?.outputTokens ?? 4096,
+            );
         }
-    }, [resetSpecialization, selectedId, specializations, chatCompletionDeployments]);
+
+        void getSpecialization();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedId]);
 
     const onDeleteSpecialization = () => {
         setIsDeleteDialogOpen(true);
@@ -362,7 +369,6 @@ export const SpecializationManager: React.FC = () => {
 
     const determineIfNeedsAttention = useCallback(
         (value: string | string[]) => {
-            // friendly reminder that !![] === true
             let needsAttention = false;
             if (typeof value === 'string') needsAttention = !value && saveAttempted;
             if (Array.isArray(value))

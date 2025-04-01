@@ -20,6 +20,12 @@ public class SpecializationProfile : Profile
 
         this.CreateMap<Specialization, SpecializationResponse>();
 
-        this.CreateMap<CompletionDeploymentModel, SpecializationResponse>();
+        this.CreateMap<CompletionDeploymentModel, SpecializationResponse>()
+            .ForMember(destination => destination.Id, option => option.Ignore())
+            .ForMember(destination => destination.Name, option => option.Ignore())
+            .ForMember(
+                destination => destination.CompletionDeploymentName,
+                option => option.MapFrom(source => source.Name)
+            );
     }
 }
