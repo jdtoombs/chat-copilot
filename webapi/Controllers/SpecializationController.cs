@@ -60,7 +60,7 @@ public class SpecializationController(
     {
         var specializations = await specializationService.GetAllSpecializations();
 
-        var specializationResponses = mapper.Map<SpecializationResponse[]>(specializations);
+        var specializationResponses = mapper.Map<SpecializationReadModel[]>(specializations);
 
         var orderedSpecializations = specializationResponses
             .Select((spec, index) => (spec, index))
@@ -127,7 +127,14 @@ public class SpecializationController(
 
         await specializationService.UpdateSpecialization(mapper.Map(specializationWriteModel, specialization));
 
-        if (completionDeploymentModel != null)
+        if (completionDeploymentModel == null)
+        {
+            await completionDeploymentModelService.Save(
+                mapper.Map<CompletionDeploymentModel>(specializationWriteModel),
+                specializationId.ToString()
+            );
+        }
+        else
         {
             await completionDeploymentModelService.Update(
                 mapper.Map(specializationWriteModel, completionDeploymentModel)

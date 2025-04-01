@@ -20,6 +20,8 @@ public class SpecializationProfile : Profile
 
         this.CreateMap<Specialization, SpecializationResponse>();
 
+        this.CreateMap<Specialization, SpecializationReadModel>();
+
         this.CreateMap<CompletionDeploymentModel, SpecializationResponse>()
             .ForMember(destination => destination.Id, option => option.Ignore())
             .ForMember(destination => destination.Name, option => option.Ignore())
