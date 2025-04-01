@@ -295,7 +295,8 @@ public class ChatPlugin
         (var memoryText, var citationMap) = await this._semanticMemoryRetriever.QueryMemoriesAsync(
             userIntent,
             chatId,
-            chatMemoryTokenBudget
+            chatMemoryTokenBudget,
+            memoryIndexes
         );
         if (!string.IsNullOrWhiteSpace(memoryText))
         {

@@ -93,7 +93,8 @@ public class SemanticMemoryRetriever
     public async Task<(string, IDictionary<string, CitationSource>)> QueryMemoriesAsync(
         [Description("Query to match.")] string query,
         [Description("Chat ID to query history from")] string chatId,
-        [Description("Maximum number of tokens")] int tokenLimit
+        [Description("Maximum number of tokens")] int tokenLimit,
+        [Description("Specialization indexes we are allowed to search on")] IEnumerable<SpecializationIndex> indexes
     )
     {
         ChatSession? chatSession = null;
@@ -103,15 +104,6 @@ public class SemanticMemoryRetriever
         }
 
         var specialization = await this._specializationService.GetSpecializationAsync(chatSession.specializationId);
-        List<SpecializationIndex> indexes = new();
-        if (specialization != null && specialization.EnableKernelMemoryMultiIndex)
-        {
-            foreach (var indexId in specialization.IndexIds)
-            {
-                var index = await this._specializationIndexService.GetIndexAsync(indexId);
-                indexes.Add(index);
-            }
-        }
 
         var remainingToken = tokenLimit;
 
@@ -123,11 +115,13 @@ public class SemanticMemoryRetriever
             tasks.Add(SearchMemoryAsync(this._promptOptions.MemoryIndexName, memoryName));
         }
         // Specialization index memory.
-        foreach (var index in indexes)
+        if (specialization != null && specialization.EnableKernelMemoryMultiIndex)
         {
-            tasks.Add(SearchMemoryAsync(index.Name, null));
+            foreach (var index in indexes)
+            {
+                tasks.Add(SearchMemoryAsync(index.Name, null));
+            }
         }
-
         // Global document memory.
         tasks.Add(
             SearchMemoryAsync(
@@ -183,7 +177,7 @@ public class SemanticMemoryRetriever
             {
                 List<(string, CitationSource)> knowledgeBaseMemories = new();
                 var knowledgebaseKeys = new List<string>() { this._promptOptions.DocumentMemoryName };
-                indexes.ForEach(indx => knowledgebaseKeys.Add(indx.Name));
+                indexes.ToList().ForEach(indx => knowledgebaseKeys.Add(indx.Name));
                 foreach (var key in knowledgebaseKeys)
                 {
                     var gotMemory = memoryMap.TryGetValue(key, out var documentMemories);

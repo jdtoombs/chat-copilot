@@ -61,7 +61,7 @@ public class PromptsOptions
     /// Minimum relevance of a document memory to be included in the final prompt.
     /// The higher the value, the answer will be more relevant to the user intent.
     /// </summary>
-    internal float SearchIndexMinRelevance { get; } = 0.80F;
+    internal float SearchIndexMinRelevance { get; } = 0.75F;
 
     // System
     [Required, NotEmptyOrWhitespace]
