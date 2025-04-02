@@ -10,6 +10,8 @@ public record SpecializationReadModel
 
     public required string Name { get; set; }
 
+    public required string Description { get; set; }
+
     public string RoleInformation { get; set; } = string.Empty;
 
     public required string ImageFilePath { get; set; }
