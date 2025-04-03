@@ -80,7 +80,7 @@
           },
           {
             "name": "url",
-            "source": "/document/uri",
+            "source": "/document/url",
             "inputs": []
           }
         ]

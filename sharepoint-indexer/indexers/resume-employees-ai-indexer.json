@@ -38,7 +38,7 @@
     },
     {
       "sourceFieldName": "metadata_spo_item_weburi",
-      "targetFieldName": "uri",
+      "targetFieldName": "url",
       "mappingFunction": null
     }
   ],
