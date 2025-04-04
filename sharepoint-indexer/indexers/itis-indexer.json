@@ -1,0 +1,51 @@
+{
+  "name": "itis-indexer",
+  "description": null,
+  "dataSourceName": "sharepoint-itis-datasource",
+  "skillsetName": "skillset-with-projection-itis",
+  "targetIndexName": "itis",
+  "disabled": null,
+  "schedule": {
+    "interval": "P1D",
+    "startTime": "2025-01-30T19:38:40.749Z"
+  },
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "indexedFileNameExtensions": ".pdf, .docx",
+      "excludedFileNameExtensions": ".png, .jpg",
+      "dataToExtract": "contentAndMetadata"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_spo_site_library_item_id",
+      "targetFieldName": "id",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": null
+      }
+    },
+    {
+      "sourceFieldName": "metadata_spo_item_name",
+      "targetFieldName": "title",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_spo_item_path",
+      "targetFieldName": "filepath",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "metadata_spo_item_weburi",
+      "targetFieldName": "url",
+      "mappingFunction": null
+    }
+  ],
+  "outputFieldMappings": [],
+  "cache": null,
+  "encryptionKey": null
+}
