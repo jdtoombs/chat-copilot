@@ -261,7 +261,7 @@ public class ChatPlugin
             () => this.GetAudienceAsync(chatContext, cancellationToken),
             nameof(GetAudienceAsync)
         );
-        metaPrompt.AddUserMessage(audience);
+        metaPrompt.AddSystemMessage(audience);
 
         var userIntent = string.Empty;
         if (this._isUserIntentExtractionEnabled)
@@ -271,7 +271,7 @@ public class ChatPlugin
                 () => this.GetUserIntentAsync(chatContext, cancellationToken),
                 nameof(GetUserIntentAsync)
             );
-            metaPrompt.AddUserMessage(userIntent);
+            metaPrompt.AddSystemMessage(userIntent);
         }
 
         // Calculate tokens used for memories
@@ -300,7 +300,7 @@ public class ChatPlugin
         );
         if (!string.IsNullOrWhiteSpace(memoryText))
         {
-            metaPrompt.AddUserMessage(memoryText);
+            metaPrompt.AddSystemMessage(memoryText);
             tokensUsed += TokenUtils.GetContextMessageTokenCount(AuthorRole.User, memoryText);
         }
 
@@ -1008,6 +1008,8 @@ public class ChatPlugin
                 $"ChatCompletionService for deployment '{this._completionDeploymentModel?.OpenAIDeploymentId}' not found."
             );
         }
+
+        this._kernel.Data[nameof(ChatHistory)] = prompt.MetaPromptTemplate;
 
         var stream = chatCompletion.GetStreamingChatMessageContentsAsync(
             prompt.MetaPromptTemplate,
