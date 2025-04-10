@@ -103,7 +103,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
                         value={index.name}
                         selectedOptions={[index.name]}
                     >
-                        {filteredIndexes.map(
+                        {filteredIndexes?.map(
                             (idx) =>
                                 idx.id != 'general' && (
                                     <Option
@@ -144,7 +144,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSubmit }) => {
                         }
                     />
                     {/* <Input
-                        
+
                         className={classes.inputWidth}
                         value={value}
                         onChange={(_event, data) => {
